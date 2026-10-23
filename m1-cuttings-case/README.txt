@@ -1,9 +1,9 @@
-M1 岩屑岩性辅助识别 · 1.0.0
+M1 岩屑岩性辅助识别 · 1.0.1
 场景：录井 / m1；方法：计算机视觉、图像特征与 k 近邻分类。
 
 运行与导入
 1. 直接打开 demo/index.html，可在“专业背景、案例流程、可视化示范”之间切换。
-2. 全部图像、标签、脚本和样式随包提供。无需后端、服务器、依赖安装或在线接口。
+2. demo/index.html 为自包含入口：样式、脚本、数据与插画均已内嵌，不读取相邻资源文件。无需后端、服务器、依赖安装或在线接口。
 3. 在老师的门户网站中点击“添加案例”，选择整个 m1-cuttings-case 文件夹。
 4. 沿用 firstbreak-pick-case 的 case.json + demo/index.html 标准 page 模式，不修改导入协议。
 5. 若使用压缩包，先解压，再选择文件夹。提交时应保留本文件夹的完整结构。
@@ -32,7 +32,7 @@ M1 岩屑岩性辅助识别 · 1.0.0
 采用 nature9420/-ResNet-HMM-Lithology 公开 RGB 岩屑资料的井 2 子集。
 66 张原始 JPEG：细砂岩 24、页岩 18、灰质白云岩 24。保留源 CSV 原标签与井深。
 数据原作者声明用于学术用途，其他用途需联系作者；不将数据宣称为 CC BY。详见 DATA-LICENSE.txt。
-原图字节以 data URL 保存在 demo/data.js，避免本地文件或导入沙箱中 Canvas 的跨源读取问题。
+原图字节以 data URL 内嵌在 demo/index.html 中，避免本地文件或导入沙箱中 Canvas 的跨源读取问题。
 provenance.json 逐样本保留源提交、路径、原标签、井深、分组、分区与 SHA-256。
 
 划分与评价边界
@@ -46,6 +46,6 @@ provenance.json 逐样本保留源提交、路径、原标签、井深、分组�
 井深图仅显示所选测试记录，缺失井段保留断开，不插值构造连续地层剖面。
 
 素材与参考
-assets/m1-dioramas.webp 为 OpenAI imagegen 生成的教学设备插画，不作为岩屑训练数据。
+内嵌插画为 OpenAI imagegen 生成的教学设备插画，不作为岩屑训练数据。原素材与可编辑源文件保留在项目 tools/m1/runtime/，不影响本包独立运行。
 所有标题、解释与按钮均由 HTML 提供；概念图、流线与数据图由 SVG / Canvas / CSS 提供。
 插画生成提示见 ARTWORK-PROMPT.txt。数据、专业背景与算法来源见 SOURCES.txt。

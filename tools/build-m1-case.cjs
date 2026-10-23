@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname,'..'), pack = path.join(root,'m1-cuttings-case');
-const context={window:{}};vm.runInNewContext(fs.readFileSync(path.join(pack,'demo/data.js'),'utf8'),context);
+const runtime=path.join(__dirname,'m1/runtime');
+const context={window:{}};vm.runInNewContext(fs.readFileSync(path.join(runtime,'data.js'),'utf8'),context);
 const data=context.window.M1_DATA;
 const style='<style>.m1c{background:#faf2e4;border:1px solid #e8dbc7;border-radius:12px;padding:22px;margin:20px 0;color:#334c56}.m1c svg{display:block;width:100%;height:auto}.m1c svg text{font-family:Microsoft YaHei,system-ui,sans-serif}.m1c p{font-size:12px;line-height:1.9;color:#858b7d}.m1c-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.m1c-photo img{width:100%;max-width:155px;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block;margin:0 auto 12px}.m1c-photo b{display:block;font-size:14px;color:#6d7f7e}.m1c-photo small{display:block;font-size:10px;line-height:1.9;color:#9a9b88}.m1c-legend{display:flex;gap:20px;font-size:11px;color:#859184}.m1c-legend i{display:inline-block;width:10px;height:10px;background:#90aab3;margin-right:5px}.m1c-legend i.test{background:#d4a06a}@media(max-width:600px){.m1c{padding:14px}.m1c-grid{gap:10px}.m1c-photo b{font-size:11px}.m1c-photo small{font-size:9px}}</style>';
 const well='<svg viewBox="0 0 720 300" role="img" aria-label="钻头破岩、岩屑沿环空返出，以及迟到时间造成深度偏移的示意"><defs><pattern id="m1-rock-dots" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="4" cy="5" r="1.5" fill="#bda384" opacity=".5"/></pattern></defs><path d="M38 82 259 56 355 98 135 129Z" fill="#e1c6a1"/><path d="M38 82v148l97 42V129Z" fill="#ccb392"/><path d="M135 129 355 98v148l-220 26Z" fill="#e7d7bd"/><path d="M135 174 355 145v35l-220 29Z" fill="#b7b6a2"/><path d="M135 232 355 204v30l-220 29Z" fill="#b9a088"/><path d="M135 129 355 98v148l-220 26Z" fill="url(#m1-rock-dots)"/><path d="M196 40V231" stroke="#7e8178" stroke-width="19"/><path d="M196 40V231" stroke="#fff6dc" stroke-width="8"/><path d="M188 229h16l-8 20Z" fill="#74818a"/><path d="M221 223V85q0-30 35-30h83" fill="none" stroke="#dbaa66" stroke-width="7"/><path d="m327 47 12 8-12 8" fill="none" stroke="#dbaa66" stroke-width="4"/><text x="45" y="33" fill="#8e7453" font-size="13">① 钻头破岩</text><text x="255" y="32" fill="#8e7453" font-size="13">② 钻井液携带岩屑上返</text><text x="406" y="74" fill="#36596a" font-size="17">③ 地面样品存在“迟到”</text><text x="406" y="112" fill="#7f8c84" font-size="13">钻头此刻深度：3200 m</text><text x="406" y="144" fill="#7f8c84" font-size="13">假设钻速：12 m/h；迟到：30 分钟</text><rect x="402" y="171" width="280" height="65" rx="10" fill="#e1edf0"/><text x="420" y="196" fill="#527f91" font-size="13">样品来源深度的简化示意</text><text x="420" y="221" fill="#527f91" font-size="16">3200 − 12 × 30 ÷ 60 = 3194 m</text><text x="401" y="268" fill="#a19b83" font-size="11">教学设定；实际迟到校正需结合井眼、钻具与循环条件。</text></svg>';
@@ -11,7 +12,7 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 820 250" role="img" aria-label="四步可解释岩屑分类流程，每步的输入输出与实际参数">'+[['核验与分组','66 张原图与标签','42 参考 / 24 测试','#dda366'],['图像与特征','中心 72% → 96 × 96','输出 40 维特征','#7da9b7'],['近邻与投票','参考尺度标准化','距离 → k 票 → 候选','#a18bb8'],['复核与评价','24 张留出测试图','模型与人工分别记录','#8ca47e']].map((s,i)=>{const x=8+i*205;return '<g transform="translate('+x+',15)"><rect width="188" height="185" rx="12" fill="#fff9ee" stroke="#e4d6c0"/><circle cx="31" cy="30" r="18" fill="'+s[3]+'"/><text x="31" y="35" text-anchor="middle" font-size="15" fill="white">0'+(i+1)+'</text><text x="18" y="78" font-size="17" fill="#365261">'+s[0]+'</text><text x="18" y="114" font-size="12" fill="#869084">'+s[1]+'</text><text x="18" y="145" font-size="12" fill="#869084">'+s[2]+'</text></g>'+(i<3?'<path d="M'+(x+178)+' 224q28 10 48-10m-9 0h9v9" fill="none" stroke="'+s[3]+'" stroke-width="3"/>':'');}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 125" role="img" aria-label="40维图像特征的组成"><text x="0" y="18" fill="#8d866c" font-size="12">图像 → 40 维描述 → 加权距离 → 近邻证据</text>'+[[12,'12 维颜色','#c69570'],[16,'16 维局部纹理','#95a888'],[8,'8 维梯度方向','#86a7b6'],[4,'4 个统计量','#aa9abd']].map((s,i,all)=>{const start=all.slice(0,i).reduce((n,v)=>n+v[0],0)*17;return '<rect x="'+start+'" y="37" width="'+(s[0]*17-4)+'" height="35" rx="4" fill="'+s[2]+'"/><text x="'+start+'" y="101" fill="#8a9585" font-size="11">'+s[1]+'</text>';}).join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id);return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.0.0',updated:'2026-10-24',status:'ready',tabs:{
+const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.0.1',updated:'2026-10-24',status:'ready',tabs:{
 background:{label:'专业背景',lede:'在录井现场，钻头产生的岩屑被带回地面，供地质人员观察和记录岩性。本案例用公开真实岩屑图像，演示如何让颜色、纹理与近邻证据辅助重复性判断，并保留人工复核。',judge:[{label:'现场任务',value:'岩屑岩性',desc:'三类原始标签的辅助识别'},{label:'公开样本',value:'66 张',desc:'保留原图、井深和来源'},{label:'智能方法',value:'k 近邻',desc:'40 维特征，展示相似证据'},{label:'验证范围',value:'单井子集',desc:'不能直接代表新井效果'}],sections:[
 {en:'CONTEXT',title:'岩屑如何反映地层，为什么还要考虑迟到',html:style+'<p>钻头破碎岩石，岩屑随钻井液沿环空返回地面。观察颜色、颗粒与结构可为岩性判断提供线索。岩屑上返需要时间，地面取样时的钻头深度不能直接作为样品来源深度。</p><div class="m1c">'+well+'</div><p>下图数字是机理示意；可运行页面可调整迟到时间与钻速。本例样品使用源 CSV 的井深，不套用教学参数重新校正。</p>'},
 {en:'INTERVENTION',title:'从“反复看照片”到“展示候选与依据”',html:'<p>大量照片需要重复观察，光照、混样与相似外观会影响判断。本例用 12 维颜色、16 维局部纹理、8 维梯度方向和 4 个统计量描述图像，在带标签的参考库中找出最近的 k 张照片，再按类别计票。人与模型可以对照同一批相似证据。</p><div class="m1c">'+feature+'</div><p>这里的智能化价值是辅助筛选与证据组织。颜色或纹理无法独立确定矿物组成、孔隙度、渗透率和含油气情况。</p>'},
@@ -27,7 +28,22 @@ workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的
 demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'选择真实留出样品，调整 k、颜色与纹理权重，查看候选、近邻、混淆矩阵与原井深记录；人工复核与模型输出分别保存，可导出 CSV。',height:1040}
 }};
 fs.writeFileSync(path.join(pack,'case.json'),JSON.stringify(definition,null,2)+'\n');
-[['index.template.html','index.html'],['style.template.css','demo.css'],['app.template.js','demo.js']].forEach(([source,dest])=>fs.copyFileSync(path.join(__dirname,'m1',source),path.join(pack,'demo',dest)));
+// One directly-openable HTML document: no sibling resource reads, fetches or server needed.
+const artwork='data:image/webp;base64,'+fs.readFileSync(path.join(runtime,'m1-dioramas.webp')).toString('base64');
+let css=fs.readFileSync(path.join(__dirname,'m1/style.template.css'),'utf8');
+css=css.replace(/(\.(?:hero-art|well-art|scene-art|art-vision|art-review|art-lab\.scene-art)) img/g,'$1 .art-sheet');
+css+='\n:root{--m1-art-sheet:url("'+artwork+'")}\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
+let html=fs.readFileSync(path.join(__dirname,'m1/index.template.html'),'utf8');
+html=html.replace('<link rel="stylesheet" href="demo.css">','<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>');
+html=html.replace(/<img\b[^>]*\bsrc="\.\.\/assets\/m1-dioramas\.webp"[^>]*>/g,tag=>{
+  const alt=/\balt="([^"]*)"/.exec(tag);
+  return '<span class="art-sheet" role="img" aria-label="'+(alt?alt[1]:'教学设备插画')+'"></span>';
+});
+const scripts=[['data.js','dataset',fs.readFileSync(path.join(runtime,'data.js'),'utf8')],['model.js','model',fs.readFileSync(path.join(runtime,'model.js'),'utf8')],['demo.js','app',fs.readFileSync(path.join(__dirname,'m1/app.template.js'),'utf8')]];
+scripts.forEach(([name,label,source])=>{html=html.replace('<script src="'+name+'"></script>','<script data-m1="'+label+'">'+source.replace(/<\/script/gi,'<\\/script')+'</script>');});
+fs.writeFileSync(path.join(pack,'demo/index.html'),html);
+fs.writeFileSync(path.join(runtime,'demo.css'),fs.readFileSync(path.join(__dirname,'m1/style.template.css')));
+fs.writeFileSync(path.join(runtime,'demo.js'),fs.readFileSync(path.join(__dirname,'m1/app.template.js')));
 fs.copyFileSync(path.join(__dirname,'m1/tests.template.cjs'),path.join(root,'tests/m1-preview.cjs'));
 const wrapper=`/* Generated from m1-cuttings-case/case.json by tools/build-m1-case.cjs. */
 (function(global){'use strict';var definition=${JSON.stringify(definition)};
@@ -37,5 +53,5 @@ definition.tabs.demo.unmount=function(){global.removeEventListener('message',res
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');fs.writeFileSync(index,fs.readFileSync(index,'utf8').replace('m1p1','m1case1'));
+const index=path.join(root,'index.html');fs.writeFileSync(index,fs.readFileSync(index,'utf8').replace(/m1p1|m1case1/g,'m1case2'));
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

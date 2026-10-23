@@ -11,11 +11,11 @@
 
 数据选择与处理说明：
 - 从源仓库原始 data/output_*/*.jpg 中选取 66 张，不重复收录 labeled_dataset 中的副本。
-- 原 JPEG 字节未修改，以 data URL 收录在 demo/data.js；标签和井深保留源 CSV 值。
+- 原 JPEG 字节未修改，以 data URL 内嵌在 demo/index.html 中；标签和井深保留源 CSV 值。
 - 浏览器只为特征计算取中心区域并统一尺度，原图仍可查看。
 - 浏览器中的亮度/对比度扰动是显式实验操作，不会改写原始数据。
 - provenance.json 提供逐样本源 URL 与 SHA-256，便于追溯。
 
 数据核验：上游 README 概述 13 类，实际 CSV 存在 17 个不同标签；本案例仅使用其中明确列出的三类，不沿用未核验的全库类别计数，也不使用上游论文的识别精度作为本例结果。
 
-资产区分：assets/m1-dioramas.webp 为教学情境插画，由 OpenAI imagegen 生成；它不属于公开岩屑数据集，不参与分类、评价或真实样本展示。
+资产区分：入口 HTML 中内嵌的设备场景插画由 OpenAI imagegen 生成；它不属于公开岩屑数据集，不参与分类、评价或真实样本展示。

@@ -8,8 +8,10 @@ const { test } = require('node:test');
 const site = process.env.HW5_PORTAL_ROOT || path.resolve(__dirname,'..');
 const read = name => fs.readFileSync(path.join(site,name),'utf8');
 const plain = value => JSON.parse(JSON.stringify(value));
-const model = require(path.join(site,'m1-cuttings-case/demo/model.js'));
-const source = {window:{}};vm.runInNewContext(read('m1-cuttings-case/demo/data.js'),source);
+const entryHTML=read('m1-cuttings-case/demo/index.html');
+function inlineCode(label){const match=new RegExp('<script data-m1="'+label+'">([\\s\\S]*?)<\\/script>').exec(entryHTML);assert.ok(match,'Missing inline script '+label);return match[1];}
+const model = require(path.join(site,'tools/m1/runtime/model.js'));
+const source = {window:{}};vm.runInNewContext(inlineCode('dataset'),source);
 const data = plain(source.window.M1_DATA);
 const base = read('tests/regression.cjs').split("test('all JavaScript files compile'")[0];
 const support = {require,__dirname:path.join(site,'tests'),process,Buffer,Blob,TextEncoder,Event,console,setImmediate};
@@ -58,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.0.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.0.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -74,6 +76,20 @@ test('the complete m1 folder imports unchanged, persists within a conservative s
   const restored=support.makeRuntime({'atlas.casepack.v2':saved});assert.equal(restored.ctx.Cases.byScene('m1').id,pkg.id);
   const root=new support.El();restored.ctx.Cases.byScene('m1').tabs.demo.mount(root,{});const doc=root.children[0].srcdoc;
   assert.ok(doc.includes('window.M1_DATA=')&&doc.includes('M1Model'));assert.ok(doc.includes('data:image/webp;base64,'));assert.equal(/<(?:script|link)\b[^>]*\s(?:src|href)="(?:data|model|demo)\.(?:js|css)"/.test(doc),false);
+});
+test('the directly opened entry embeds its theme, artwork, data and executable scripts',()=>{
+  const markup=entryHTML.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');
+  assert.ok(entryHTML.includes('<style data-m1-style="theme">'));
+  assert.ok(entryHTML.includes('--paper:#fcf6eb'));
+  assert.ok(entryHTML.includes('--m1-art-sheet:url("data:image/webp;base64,'));
+  assert.equal((entryHTML.match(/data:image\/webp;base64,/g)||[]).length,1,'one shared illustration sheet');
+  assert.equal(/<script\b[^>]*\bsrc\s*=/.test(entryHTML),false);
+  assert.equal(/<link\b[^>]*\brel="stylesheet"/.test(entryHTML),false);
+  assert.equal(/<img\b[^>]*\bsrc="(?!data:)/.test(markup),false);
+  assert.equal(/\.\.\/assets\/m1-dioramas/.test(entryHTML),false);
+  assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,6);
+  for(const name of ['dataset','model','app'])new vm.Script(inlineCode(name));
+  assert.equal(inlineCode('model').trim(),read('tools/m1/runtime/model.js').trim());
 });
 
 // UI fixture only: deterministic synthetic pixel matrices exercise events and state transitions.
@@ -94,7 +110,7 @@ function appRuntime(embedded=false,reduced=false){
   const stats={predict:0,evaluate:0},wrapped={...model,predict(...args){stats.predict++;return model.predict(...args);},evaluate(...args){stats.evaluate++;return model.evaluate(...args);}};
   const blobs=[],messages=[],media={matches:reduced,addEventListener(){}};
   const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(){},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
-  ctx.window=ctx;ctx.parent=embedded?{postMessage:message=>messages.push(message)}:ctx;vm.createContext(ctx);vm.runInContext(read('m1-cuttings-case/demo/demo.js'),ctx);
+  ctx.window=ctx;ctx.parent=embedded?{postMessage:message=>messages.push(message)}:ctx;vm.createContext(ctx);vm.runInContext(inlineCode('app'),ctx);
   return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
