@@ -24,6 +24,8 @@
 
 `firstbreak-pick-case/` 是原格式初至波案例包，可以直接导入。`assets/cases/` 中包含原模板及默认测井案例。详细字段见 [接入指南](docs/如何添加新案例.md)。
 
+m1 岩屑识别初版已接入 `#/scene/m1?tab=demo`。也可直接打开 `m1-cuttings-case/demo/index.html`，或通过“添加案例”导入 `m1-cuttings-case/` 文件夹。页面采用暖米色立体插画、HTML 文字与 SVG 流动箭头，支持悬浮突出、点击解释、自动讲解和动效暂停。当前为流程原型，公开数据与分类模型尚未接入；教学插画不作为训练数据。包内保留素材生成提示与来源说明。
+
 上传记录保存在当前浏览器的 `localStorage`，不会写回源码目录。换浏览器或电脑时需要重新导入；提交作业时请保留完整案例包。
 
 ## 检查
@@ -31,7 +33,7 @@
 安装 Node.js 后运行：
 
 ```sh
-node --test tests/regression.cjs
+node --test tests/regression.cjs tests/m1-preview.cjs
 ```
 
 测试使用内存存储与 DOM 模拟，覆盖旧包导入、演示挂载、旧存档恢复、场景字段保留、路由行为、河流几何、筛选重排、动效开关与资源清理；不能替代真实浏览器的视觉检查。河流采用原生 SVG 与 CSS 动画，系统偏好减少动态效果时默认暂停。

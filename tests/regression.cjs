@@ -66,7 +66,7 @@ function runtime(seed = {}) {
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
   };
-  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
+  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/cases/m1-cuttings.case.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
   let shell = read('assets/core/shell.js').replaceAll('\r', '');
   const marker = '  render();\n\n  // 启动自检';
   assert.ok(shell.includes(marker), 'shell test hook must match exactly');
@@ -340,8 +340,8 @@ test('map search, empty results, clearing and case-only filtering update visible
   input.value = ''; input.listeners.input();
   assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
   click(scopeButtons[1], 'scope');
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '1 个场景');
-  assert.equal(stages.flatMap(s => s.leaves).filter(l => !l.hidden).length, 1);
+  assert.equal(root.querySelector('#atlas-map-count').textContent, '2 个场景');
+  assert.equal(stages.flatMap(s => s.leaves).filter(l => !l.hidden).length, 2);
   click(scopeButtons[0], 'scope');
   assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
 });
@@ -542,7 +542,7 @@ test('original-format mud logging case packs remain importable and the illustrat
   pkg.id = 'mudlogging-imported-example'; pkg.sceneId = 'm1'; pkg.title = '录井上传验证';
   await importThroughControls(rt, pkg, files);
   const html = rt.ctx.__shellTest.stageHTML(rt.ctx.ATLAS.index.byStage.mudlogging, { m: 'cv' });
-  assert.match(html, /查看讲解与案例 · 1 个已接入/);
+  assert.match(html, /查看讲解与案例 · 2 个已接入/);
   const sceneHtml = rt.ctx.__shellTest.sceneHTML(rt.ctx.ATLAS.index.byScene.m1, {});
   assert.match(sceneHtml, /案例 mudlogging-imported-example/);
   assert.match(sceneHtml, /data-tab="bg"/); assert.match(sceneHtml, /data-tab="flow"/); assert.match(sceneHtml, /data-tab="demo"/);
