@@ -456,32 +456,39 @@ test('river motion starts paused when reduced motion is preferred', () => {
 function mudControls(rt, query = {}, reduced = false, bindNow = true) {
   const root = new Element(), svg = new Element('svg');
   const ctx = { stage: rt.ctx.ATLAS.index.byStage.mudlogging, atlas: rt.ctx.ATLAS, cases: rt.ctx.Cases, K: rt.ctx.K, query };
-  const stats = { paused: 0, resumed: 0, mediaListeners: new Set() };
+  const stats = { paused: 0, resumed: 0, mediaListeners: new Set(), resizeListeners: new Set(), disconnected: 0 };
   const mq = { matches: reduced, addEventListener(type, fn) { stats.mediaListeners.add(fn); }, removeEventListener(type, fn) { stats.mediaListeners.delete(fn); } };
   rt.ctx.matchMedia = () => mq;
   const buttons = ['', 'cv', 'ts', 'nlp'].map(m => { const b = new Element('button'); b.dataset.mlMethodButton = m; return b; });
-  const spots = ['cv', 'ts', 'cv', 'ts', 'nlp'].map((m, i) => { const s = new Element('a'); s.dataset.mlTechMethod = m; s.dataset.mlSpot = 'm' + (i + 1); return s; });
-  const flows = spots.map(s => { const f = new Element('g'); f.dataset.mlFlow = s.dataset.mlSpot; return f; });
+  const spots = ['cv', 'ts', 'cv', 'ts', 'nlp'].map((m, i) => { const s = new Element('a'); s.dataset.mlTechMethod = m; s.dataset.mlSpot = 'm' + (i + 1); s.dataset.mlNode = s.dataset.mlSpot; return s; });
+  const processNodes = ['drill', 'return', 'align'].map(id => { const n = new Element('article'); n.dataset.mlNode = id; return n; });
+  const nodes = [...processNodes, ...spots];
+  const flows = spots.map(s => { const f = new Element('g'); f.dataset.mlFlow = s.dataset.mlSpot; f.dataset.mlFrom = s.dataset.mlSpot === 'm5' ? 'align' : 'return'; f.dataset.mlTo = s.dataset.mlSpot; return f; });
   svg.pauseAnimations = () => stats.paused++; svg.unpauseAnimations = () => stats.resumed++;
-  const lists = { '[data-ml-method-button]': buttons, '[data-ml-spot]': spots, '[data-ml-flow]': flows, '[data-ml-motion]': [svg] };
+  const lists = { '[data-ml-method-button]': buttons, '[data-ml-spot]': spots, '[data-ml-node]': nodes, '[data-ml-flow]': flows, '[data-ml-motion]': [svg] };
   root.querySelectorAll = selector => lists[selector] || [];
+  rt.ctx.addEventListener = (type, fn) => { if (type === 'resize') stats.resizeListeners.add(fn); };
+  rt.ctx.removeEventListener = (type, fn) => { if (type === 'resize') stats.resizeListeners.delete(fn); };
+  rt.ctx.ResizeObserver = class { observe() {} disconnect() { stats.disconnected++; } };
   const handle = bindNow ? rt.ctx.MudloggingStage.bind(root, ctx) : null;
   const choose = m => {
     const b = buttons.find(b => b.dataset.mlMethodButton === m);
     root.listeners.click({ target: { closest: selector => selector === '[data-ml-method-button]' ? b : null } });
   };
   const toggle = () => root.listeners.click({ target: { closest: selector => selector === '[data-ml-toggle]' ? root.querySelector('[data-ml-toggle]') : null } });
-  return { root, ctx, buttons, spots, flows, svg, stats, mq, handle, choose, toggle };
+  return { root, ctx, buttons, spots, nodes, processNodes, flows, svg, stats, mq, handle, choose, toggle };
 }
 
-test('mud logging artwork links all five techniques to valid explanations and keeps new admin scenes accessible', () => {
+test('native mud logging diagram uses coded text and SVG, links five techniques, and retains new admin scenes', () => {
   const rt = runtime(), P = rt.ctx.__shellTest, A = rt.ctx.ATLAS;
   const html = P.stageHTML(A.index.byStage.mudlogging, {});
   assert.equal((html.match(/data-ml-spot=/g) || []).length, 5);
   assert.ok((html.match(/<animateMotion /g) || []).length >= 20);
   for (const id of ['m1', 'm2', 'm3', 'm4', 'm5']) assert.match(html, new RegExp('href="#/scene/' + id + '"'));
   for (const match of html.matchAll(/href="#\/scene\/([^"?]+)(?:[^"]*)"/g)) assert.ok(A.index.byScene[match[1]]);
-  assert.ok(fs.existsSync(path.join(site, 'assets/images/mudlogging-process.png')));
+  assert.doesNotMatch(html, /<img\b|<image\b|mudlogging-process\.png|ml-crop/);
+  assert.equal((html.match(/data-ml-node=/g) || []).length, 8);
+  for (const label of ['钻头破岩，向下钻进', '振动筛', '脱气器', '四条证据通道', '深度 / m']) assert.ok(html.includes(label), label);
   assert.doesNotMatch(P.stageHTML(A.index.byStage.welllog, {}), /data-ml-stage/);
   assert.equal(A.saveScene({ id: 'mud-new', name: '扩展录井场景', stageId: 'mudlogging', methods: ['cv'], diff: '中', point: '新增场景' }).ok, true);
   assert.match(P.stageHTML(A.index.byStage.mudlogging, {}), /href="#\/scene\/mud-new"/);
@@ -535,6 +542,55 @@ test('mud logging pauses both native SVG and CSS motion, observes system prefere
   rt.ctx.location.hash = '#/chain'; rt.ctx.__shellTest.render();
   assert.equal(root.listeners.click, undefined); assert.equal(root.listeners.keydown, undefined);
   assert.equal(stats.mediaListeners.size, 0);
+  for (const name of ['pointerover', 'pointerout', 'focusin', 'focusout']) assert.equal(root.listeners[name], undefined);
+  assert.equal(stats.resizeListeners.size, 0); assert.equal(stats.disconnected, 1);
+});
+
+test('hovering one illustration blurs its peers and leaving restores the chosen method without changing its URL', () => {
+  const rt = runtime(), { root, nodes, spots, flows, choose } = mudControls(rt);
+  choose('cv'); const hash = rt.ctx.location.hash;
+  const target = node => ({ closest: selector => selector === '[data-ml-node]' ? node : null });
+  root.listeners.pointerover({ target: target(spots[0]), pointerType: 'mouse' });
+  assert.equal(root.dataset.mlInspect, 'm1'); assert.equal(spots[0].classList.contains('is-peeked'), true);
+  assert.equal(nodes.filter(n => n.classList.contains('is-blurred')).length, 7);
+  assert.equal(flows[0].classList.contains('is-relevant'), true);
+  assert.equal(flows[2].classList.contains('is-dim'), true);
+  root.listeners.pointerout({ relatedTarget: target(spots[0]) });
+  assert.equal(root.dataset.mlInspect, 'm1', 'moving between SVG children keeps the same inspected node');
+  root.listeners.pointerout({ relatedTarget: null });
+  assert.equal(root.dataset.mlInspect, ''); assert.equal(nodes.some(n => n.classList.contains('is-blurred')), false);
+  assert.deepEqual(spots.filter(n => n.classList.contains('is-relevant')).map(n => n.dataset.mlSpot), ['m1', 'm3']);
+  assert.equal(rt.ctx.location.hash, hash); assert.equal(root.dataset.mlMethod, 'cv');
+});
+
+test('keyboard inspection works on process and technique illustrations, and touch hover is ignored', () => {
+  const rt = runtime(), { root, spots, processNodes, nodes } = mudControls(rt);
+  const target = node => ({ closest: selector => selector === '[data-ml-node]' ? node : null });
+  root.listeners.pointerover({ target: target(spots[0]), pointerType: 'touch' });
+  assert.equal(root.dataset.mlInspect, '');
+  root.listeners.focusin({ target: target(processNodes[0]) });
+  assert.equal(processNodes[0].classList.contains('is-peeked'), true);
+  assert.equal(nodes.filter(n => n.classList.contains('is-blurred')).length, 7);
+  root.listeners.focusout({ relatedTarget: target(spots[3]) });
+  assert.equal(root.dataset.mlInspect, 'm4');
+  root.listeners.focusout({ relatedTarget: null });
+  assert.equal(root.dataset.mlInspect, '');
+});
+
+test('diagram connectors follow measured layout, remain valid after resizing and stop redrawing after destroy', () => {
+  const rt = runtime(), { root, nodes, svg, handle } = mudControls(rt);
+  const map = root.querySelector('[data-ml-map]');
+  map.getBoundingClientRect = () => ({ left: 10, top: 20, width: 1400, height: 1100 });
+  const boxes = { drill:[40,40,500,250], return:[620,40,1380,250], m1:[40,350,340,690], m2:[380,350,680,690], m3:[720,350,1020,690], m4:[1060,350,1380,690], align:[40,820,780,1060], m5:[940,820,1380,1060] };
+  nodes.forEach(n => { n.getBoundingClientRect = () => { const b=boxes[n.dataset.mlNode]; return {left:b[0]+10,top:b[1]+20,right:b[2]+10,bottom:b[3]+20}; }; });
+  handle.refresh();
+  assert.equal(svg.attributes.viewBox, '0 0 1400 1100');
+  assert.match(svg.innerHTML, /M505 145C560 145 560 145 615 145/);
+  assert.equal((svg.innerHTML.match(/data-ml-flow=/g)||[]).length, 10);
+  boxes.m1[1] = 400; handle.refresh();
+  assert.match(svg.innerHTML, /190 395/);
+  assert.doesNotMatch(svg.innerHTML, /NaN|undefined|Infinity/);
+  const before=svg.innerHTML; handle.destroy(); boxes.m1[1]=500; handle.refresh(); assert.equal(svg.innerHTML,before);
 });
 
 test('original-format mud logging case packs remain importable and the illustrated entrance displays the registered case', async () => {
