@@ -1,64 +1,208 @@
-/* Mud logging stage: HTML labels + procedural 3D views + animated SVG connections. */
-(function(global){
+/* The supplied illustration stays intact. Native elements add focus, motion and links. */
+(function (global) {
   'use strict';
-  var TECH=[
-    {id:'m1',method:'cv',color:'#e58b32',short:'岩屑照片 · 识别岩性',desc:'清洗、拍照，识别岩屑中的岩性与组分。',input:'岩屑图像',output:'岩性类别',action:'操作显微镜'},
-    {id:'m2',method:'ts',color:'#409bc4',short:'气体曲线 · 解释异常',desc:'从全烃和组分曲线中寻找异常，结合工况解释。',input:'全烃 / C1—C5',output:'异常层段',action:'指向气测曲线'},
-    {id:'m3',method:'cv',color:'#9871c5',short:'紫外荧光 · 评价显示',desc:'观察颜色、强度与分布，辅助评价含油显示。',input:'荧光图像',output:'显示评价',action:'检查荧光样品'},
-    {id:'m4',method:'ts',color:'#6b9f76',short:'钻时与工况 · 划分地层',desc:'联合钻时、钻压、转速等信息，寻找候选层界。',input:'钻时 / 钻压 / 转速 / 泵压',output:'候选层界',action:'录入并核对曲线'},
-    {id:'m5',method:'nlp',color:'#e89558',short:'汇总证据 · 生成报告',desc:'综合对齐后的资料，形成可追溯的报告初稿。',input:'分层 / 显示 / 工况',output:'录井报告初稿',action:'编写与审核报告'}
+
+  var IMAGE = 'assets/images/mudlogging-process.png';
+  var WIDTH = 1448, HEIGHT = 1086;
+  var METHODS = [
+    { id: '', abbr: 'ALL', name: '完整流程', note: '从井底取样，到地面分析，再到同一深度轴上的证据汇总。' },
+    { id: 'cv', abbr: 'CV', name: '计算机视觉', note: '看图识岩、看光识显示。m1 与 m3 已放大，点击图画进入对应讲解。' },
+    { id: 'ts', abbr: 'TS', name: '时序分析', note: '读懂随时间与深度变化的曲线。m2 与 m4 已放大，点击图画进入对应讲解。' },
+    { id: 'nlp', abbr: 'NLP', name: '自然语言处理', note: '把多源证据组织成可追溯的文字。m5 已放大，点击图画进入报告生成讲解。' }
   ];
-  var METHODS=[{id:'',abbr:'ALL',name:'完整流程',note:'悬停工作站，让石油工人开始操作；点击技术板块，进入相应讲解。'},{id:'cv',abbr:'CV',name:'计算机视觉',note:'m1 与 m3 已放大。悬停时，工人将操作显微镜或检查荧光样品。'},{id:'ts',abbr:'TS',name:'时序分析',note:'m2 与 m4 已放大。悬停时，工人将指示曲线或核对工况数据。'},{id:'nlp',abbr:'NLP',name:'自然语言处理',note:'m5 已放大。悬停查看报告编写与审核，点击进入场景讲解。'}];
-  function selected(v){return METHODS.some(function(m){return m.id===v;})?v:'';}
-  function method(v){return METHODS.filter(function(m){return m.id===v;})[0]||METHODS[0];}
-  function available(ctx){return TECH.filter(function(t){return ctx.stage.scenes.some(function(s){return s.id===t.id;});});}
-  function scene(ctx,id){return ctx.stage.scenes.filter(function(s){return s.id===id;})[0];}
-  function viewport(id,label){return '<div class="ml-model-view ml-model-'+id+'" data-ml-model="'+id+'" role="img" aria-label="'+label+'"><span class="ml-model-loading" data-ml-loading><i></i>正在布置现场</span></div>';}
-  function techNode(ctx,t,focus){var sc=scene(ctx,t.id),esc=ctx.K.esc;return '<a class="ml-node ml-spot ml-spot-'+t.id+(focus===t.method?' is-relevant':focus?' is-dim':'')+'" data-ml-node="'+t.id+'" data-ml-spot="'+t.id+'" data-ml-tech-method="'+t.method+'" href="#/scene/'+t.id+'" style="--tech:'+t.color+'" aria-label="'+esc(sc.name)+'，'+t.action+'，点击查看讲解"><div class="ml-node-copy"><span class="ml-node-kicker"><b>'+t.id.toUpperCase()+'</b><i>'+method(t.method).abbr+'</i></span><h3>'+t.short+'</h3><p>'+t.desc+'</p></div>'+viewport(t.id,'三维石油工人在工作台前'+t.action)+'<div class="ml-node-foot"><span>'+t.input+'</span><i>→</i><b>'+t.output+'</b><em>↗</em></div><span class="ml-hover-cue"><i></i>悬停 · '+t.action+'</span></a>';}
-  function processNode(id,step,title,desc,labels){return '<article class="ml-node ml-process ml-node-'+id+'" data-ml-node="'+id+'" tabindex="0" style="--tech:#ba986b" aria-label="'+title+'"><div class="ml-node-copy"><span class="ml-process-step">'+step+'</span><h3>'+title+'</h3><p>'+desc+'</p></div>'+viewport(id,title+'的三维设备与石油工人')+'<div class="ml-process-labels">'+labels.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div></article>';}
-  function flow(path,c,id,from,to,dur){return '<g class="ml-flow" data-ml-flow="'+id+'" data-ml-from="'+from+'" data-ml-to="'+to+'" style="--flow:'+c+'"><path class="ml-flow-track" d="'+path+'"/><path class="ml-flow-current" d="'+path+'"/>'+[0,1].map(function(i){return '<g class="ml-moving-arrow"><path d="M-9-5 0 0-9 5"/><animateMotion dur="'+dur+'s" begin="'+(-dur*i/2)+'s" repeatCount="indefinite" rotate="auto" path="'+path+'"/></g>';}).join('')+'</g>';}
-  function between(a,b){var x1,y1,x2,y2,mid;if(b.left>=a.right-4&&b.top<a.bottom){x1=a.right+3;y1=(a.top+a.bottom)/2;x2=b.left-3;y2=(b.top+b.bottom)/2;mid=(x1+x2)/2;return 'M'+x1+' '+y1+'C'+mid+' '+y1+' '+mid+' '+y2+' '+x2+' '+y2;}x1=(a.left+a.right)/2;y1=a.bottom+5;x2=(b.left+b.right)/2;y2=b.top-5;mid=(y1+y2)/2;return 'M'+x1+' '+y1+'C'+x1+' '+mid+' '+x2+' '+mid+' '+x2+' '+y2;}
-  function drawing(model){var n=model.nodes,out='';function add(a,b,c,id,duration){if(n[a]&&n[b])out+=flow(between(n[a],n[b]),c,id,a,b,duration);}add('drill','return','#d9a251','source',4.5);TECH.filter(function(t){return t.id!=='m5';}).forEach(function(t){add('return',t.id,'#78bdd5',t.id,5.6);add(t.id,'align',t.color,t.id,4.5);});add('align','m5','#e8a05b','m5',3.5);return out;}
-  function initial(){var boxes={drill:[20,20,190,930],return:[230,20,1400,260],m1:[230,350,495,675],m2:[530,350,795,675],m3:[830,350,1095,675],m4:[1130,350,1400,675],align:[230,780,770,1040],m5:[900,780,1400,1040]},nodes={};Object.keys(boxes).forEach(function(id){var b=boxes[id];nodes[id]={left:b[0],top:b[1],right:b[2],bottom:b[3]};});nodes.drill={left:20,top:20,right:190,bottom:260};return {width:1448,height:1060,nodes:nodes};}
-  function deck(ctx,focus){var esc=ctx.K.esc;return available(ctx).filter(function(t){return !focus||t.method===focus;}).map(function(t){var sc=scene(ctx,t.id),count=ctx.cases.bySceneAll(t.id).length;return '<a class="ml-read-card" href="#/scene/'+t.id+'" style="--tech:'+t.color+'"><span class="ml-read-id">'+t.id.toUpperCase()+' / '+method(t.method).abbr+'</span><h3>'+esc(sc.name)+'</h3><p>'+esc(sc.point)+'</p><span class="ml-read-link">'+(count?'查看讲解与案例 · '+count+' 个已接入':'查看场景讲解')+'<b>↗</b></span></a>';}).join('');}
-  function extras(ctx){var extra=ctx.stage.scenes.filter(function(sc){return !TECH.some(function(t){return t.id===sc.id;});});if(!extra.length)return '';var esc=ctx.K.esc;return '<section class="ml-extra"><h2>更多录井场景</h2>'+extra.map(function(sc){return '<a href="#/scene/'+esc(sc.id)+'"><b>'+esc(sc.name)+'</b><span>'+esc(sc.point||'')+'</span><i>↗</i></a>';}).join('')+'</section>';}
-  function render(ctx){var focus=selected((ctx.query||{}).m),tech=available(ctx),esc=ctx.K.esc,idx=ctx.atlas.stages.indexOf(ctx.stage),prev=ctx.atlas.stages[idx-1],next=ctx.atlas.stages[idx+1];
-    return '<main class="ml-page" data-ml-stage data-ml-method="'+focus+'"><nav class="crumb"><a href="#/">总览</a><span class="sep">/</span><a href="#/chain">作业链</a><span class="sep">/</span><span class="cur">录井</span></nav><header class="ml-head"><div><div class="ml-eyebrow"><span>04 / 13</span> MUD LOGGING · 录井</div><h1>跟着一片岩屑，<br class="ml-mobile-break">走进录井现场<span>。</span></h1><p>从井底到地面，从多源线索到一份有据可查的报告。</p></div><div class="ml-head-note"><span class="ml-live-dot"></span><span>一个可以走近的录井现场<small>悬停让工人开始工作 · 点击图示进入讲解</small></span></div></header>'+
-      '<section class="ml-lab" aria-label="2.5D 录井现场交互总览"><div class="ml-toolbar"><div class="ml-methods" role="group" aria-label="选择智能方法并放大相关工作站">'+METHODS.map(function(m){return '<button type="button" data-ml-method-button="'+m.id+'" aria-pressed="'+(focus===m.id)+'" aria-controls="ml-map ml-deck"><b>'+m.abbr+'</b><span>'+m.name+'</span></button>';}).join('')+'</div><button class="ml-motion" data-ml-toggle type="button" aria-pressed="true"><span data-ml-toggle-icon>Ⅱ</span><span data-ml-toggle-label>暂停动效</span></button></div><div class="ml-status"><span>↳</span><p data-ml-status role="status">'+method(focus).note+'</p><small>让石油工人动起来 <b>↗</b></small></div>'+
-      '<div class="ml-world'+(focus?' has-focus':'')+'" id="ml-map" data-ml-map><div class="ml-ground" aria-hidden="true"></div><svg class="ml-flows" data-ml-motion="" viewBox="0 0 1448 1060" preserveAspectRatio="none" aria-hidden="true">'+drawing(initial())+'</svg>'+
-      processNode('drill','01 / 钻进','钻头破岩，向下钻进','钻井液到达井底，携带岩屑与地层气体返回地面。',['钻头破岩','岩屑返出'])+processNode('return','02 / 分离与循环','钻井液携带岩屑与气体返回地面','振动筛分离岩屑，脱气器提取气体；钻井液通过循环系统再次入井。',['振动筛','脱气器','钻井液循环池','现场取样'])+
-      tech.filter(function(t){return t.id!=='m5';}).map(function(t){return techNode(ctx,t,focus);}).join('')+processNode('align','05 / 对齐','统一到同一条深度轴','迟到校正后，将岩屑、气测、荧光与钻时资料放在同一深度综合对照。',['深度 / m','岩屑','气测','荧光','钻时'])+tech.filter(function(t){return t.id==='m5';}).map(function(t){return techNode(ctx,t,focus);}).join('')+'</div><div class="ml-map-footer"><span class="ml-live-dot"></span><span data-ml-running>信号正在流动 · 悬停激活工人</span><i>教学示意</i><p>气测与岩屑需做迟到校正；钻时还需结合钻压、转速等工况解读。</p></div></section>'+
-      '<section class="ml-reading'+(focus?' has-focus':'')+'" data-ml-reading aria-labelledby="ml-reading-title"><div class="ml-reading-head"><div><span class="ml-eyebrow">EXPLORE THE SCENES</span><h2 id="ml-reading-title" data-ml-reading-title>'+(focus?method(focus).name+' · 相关场景':'继续走进每一个场景')+'</h2></div><span data-ml-reading-count>'+tech.filter(function(t){return !focus||t.method===focus;}).length+' 个讲解入口 ↗</span></div><div class="ml-deck" id="ml-deck" data-ml-deck>'+deck(ctx,focus)+'</div></section>'+extras(ctx)+'<div class="pager">'+(prev?'<a class="prev" href="#/stage/'+esc(prev.id)+'"><span class="dir">← 上一环节</span><span class="nm">'+esc(prev.name)+'</span></a>':'')+(next?'<a class="next" href="#/stage/'+esc(next.id)+'"><span class="dir">下一环节 →</span><span class="nm">'+esc(next.name)+'</span></a>':'')+'</div></main>';
+  var TECH = [
+    { id: 'm1', method: 'cv', title: '岩屑里的地层线索', color: '#f28a24', box: [211, 438, 295, 305], art: [211, 548, 295, 197], input: '清洗、拍照后的岩屑图像', output: '岩性类别与组分比例' },
+    { id: 'm2', method: 'ts', title: '气测曲线中的异常', color: '#2d9ed8', box: [520, 439, 277, 301], art: [520, 548, 277, 191], input: '全烃、组分与工况序列', output: '异常层段与解释线索' },
+    { id: 'm3', method: 'cv', title: '紫外光下的含油显示', color: '#9262ce', box: [809, 439, 290, 305], art: [809, 548, 290, 195], input: '固定灯源与曝光的荧光图像', output: '荧光区域与级别建议' },
+    { id: 'm4', method: 'ts', title: '钻时变化中的层界', color: '#4b9b68', box: [1115, 439, 322, 307], art: [1115, 551, 322, 195], input: '钻时、钻压、转速等工况', output: '候选层界与交叉验证' },
+    { id: 'm5', method: 'nlp', title: '让每条结论都有出处', color: '#ef7028', box: [1040, 802, 404, 284], art: [1040, 920, 404, 166], input: '分层、油气显示与异常记录', output: '带证据来源的报告初稿' }
+  ];
+
+  function selected(value) {
+    return METHODS.some(function (m) { return m.id === value; }) ? value : '';
   }
-  function bind(root,ctx){
-    if(!root)return {destroy:function(){}};
-    var focus=selected((ctx.query||{}).m),hovered='',focused='',disposed=false,frame=0,lastFrame=0,elapsed=0,resizeFrame=0;
-    var buttons=[].slice.call(root.querySelectorAll('[data-ml-method-button]')),nodes=[].slice.call(root.querySelectorAll('[data-ml-node]')),spots=[].slice.call(root.querySelectorAll('[data-ml-spot]')),slots=[].slice.call(root.querySelectorAll('[data-ml-model]')),svgs=[].slice.call(root.querySelectorAll('[data-ml-motion]')),map=root.querySelector('[data-ml-map]'),views={};
-    var mq=global.matchMedia?global.matchMedia('(prefers-reduced-motion: reduce)'):null,paused=!!(mq&&mq.matches),hidden=!!global.document.hidden;
-    function ensure(slot){var id=slot.dataset.mlModel;if(views[id]||disposed||!global.Mudlogging3D)return;try{var view=global.Mudlogging3D.createView(slot,id);view.amount=0;views[id]=view;slot.classList.add('is-ready');}catch(error){slot.classList.add('has-error');var loading=slot.querySelector('[data-ml-loading]');if(loading)loading.textContent='场景暂时无法加载';}}
-    function activeId(){return hovered||focused;}
-    function tick(stamp){frame=0;if(disposed||paused||hidden)return;if(lastFrame&&stamp-lastFrame<28&&global.requestAnimationFrame){frame=global.requestAnimationFrame(tick);return;}var dt=lastFrame?Math.min((stamp-lastFrame)/1000,.06):.016;lastFrame=stamp;elapsed+=dt;var active=activeId(),needs=false;Object.keys(views).forEach(function(id){var v=views[id],target=id===active?1:0;v.amount+=(target-v.amount)*Math.min(1,dt*8);if(v.amount<.002)v.amount=0;if(v.amount||target){v.render(elapsed,v.amount);needs=true;}else if(v.wasMoving){v.render(0,0);}v.wasMoving=!!(v.amount||target);});if(needs&&global.requestAnimationFrame)frame=global.requestAnimationFrame(tick);}
-    function start(){if(!frame&&!paused&&!hidden&&activeId()&&global.requestAnimationFrame){lastFrame=0;frame=global.requestAnimationFrame(tick);}}
-    function visual(){var active=activeId();map.classList.toggle('has-peek',!!active);root.dataset.mlInspect=active;nodes.forEach(function(node){node.classList.toggle('is-peeked',node.dataset.mlNode===active);node.classList.toggle('is-blurred',!!active&&node.dataset.mlNode!==active);node.classList.toggle('is-relevant',!!focus&&node.dataset.mlTechMethod===focus);node.classList.toggle('is-dim',!!focus&&node.dataset.mlTechMethod!==focus);});[].forEach.call(root.querySelectorAll('[data-ml-flow]'),function(f){var t=TECH.filter(function(x){return x.id===f.dataset.mlFlow;})[0],on=active?(f.dataset.mlFrom===active||f.dataset.mlTo===active||f.dataset.mlFlow===active):!!focus&&t&&t.method===focus;f.classList.toggle('is-relevant',!!on);f.classList.toggle('is-dim',active?!on:!!focus&&!on);});slots.forEach(function(slot){if(slot.dataset.mlModel===active)ensure(slot);});Object.keys(views).forEach(function(id){views[id].setActive(id===active);});start();}
-    function applyFocus(value,url){focus=selected(value);root.dataset.mlMethod=focus;map.classList.toggle('has-focus',!!focus);root.querySelector('[data-ml-reading]').classList.toggle('has-focus',!!focus);buttons.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.mlMethodButton===focus));});root.querySelector('[data-ml-status]').textContent=method(focus).note;root.querySelector('[data-ml-reading-title]').textContent=focus?method(focus).name+' · 相关场景':'继续走进每一个场景';root.querySelector('[data-ml-reading-count]').textContent=available(ctx).filter(function(t){return !focus||t.method===focus;}).length+' 个讲解入口 ↗';root.querySelector('[data-ml-deck]').innerHTML=deck(ctx,focus);visual();if(url){try{global.history.replaceState(null,'','#/stage/mudlogging'+(focus?'?m='+focus:''));}catch(e){}var first=spots.filter(function(s){return s.dataset.mlTechMethod===focus;})[0];if(first&&global.innerHeight){var b=first.getBoundingClientRect();if(b.top<130||b.bottom>global.innerHeight-25)first.scrollIntoView({block:'center',inline:'nearest',behavior:mq&&mq.matches?'auto':'smooth'});}}}
-    function motion(){root.classList.toggle('is-paused',paused);root.classList.toggle('is-playing',!paused);root.querySelector('[data-ml-toggle]').setAttribute('aria-pressed',String(!paused));root.querySelector('[data-ml-toggle-icon]').textContent=paused?'▶':'Ⅱ';root.querySelector('[data-ml-toggle-label]').textContent=paused?'播放动效':'暂停动效';root.querySelector('[data-ml-running]').textContent=paused?'动效已暂停 · 仍可点击探索':'信号正在流动 · 悬停激活工人';svgs.forEach(function(svg){var fn=paused?'pauseAnimations':'unpauseAnimations';if(typeof svg[fn]==='function')svg[fn]();});if(paused&&frame){global.cancelAnimationFrame(frame);frame=0;}else start();}
-    function refresh(){if(disposed)return;Object.keys(views).forEach(function(id){views[id].resize();});var r=map.getBoundingClientRect();if(!r.width||!r.height||!svgs[0])return;var model={width:r.width,height:r.height,nodes:{}};nodes.forEach(function(node){var b=node.getBoundingClientRect();model.nodes[node.dataset.mlNode]={left:b.left-r.left,right:b.right-r.left,top:b.top-r.top,bottom:b.bottom-r.top};});if(model.nodes.drill&&model.nodes.return){var d=model.nodes.drill,ret=model.nodes.return;d.bottom=Math.min(d.bottom,ret.bottom);}svgs[0].setAttribute('viewBox','0 0 '+r.width+' '+r.height);svgs[0].innerHTML=drawing(model);visual();motion();}
-    function schedule(){if(disposed||resizeFrame)return;if(global.requestAnimationFrame)resizeFrame=global.requestAnimationFrame(function(){resizeFrame=0;refresh();});else refresh();}
-    function closest(target){return target&&target.closest?target.closest('[data-ml-node]'):null;}
-    function over(e){if(e.pointerType==='touch')return;var n=closest(e.target),id=n?n.dataset.mlNode:'';if(hovered!==id){hovered=id;visual();}}
-    function out(e){var n=closest(e.relatedTarget),id=n?n.dataset.mlNode:'';if(hovered!==id){hovered=id;visual();}}
-    function focusIn(e){var n=closest(e.target);focused=n?n.dataset.mlNode:'';visual();}
-    function focusOut(e){var n=closest(e.relatedTarget);focused=n?n.dataset.mlNode:'';visual();}
-    function click(e){var choice=e.target.closest('[data-ml-method-button]');if(choice){applyFocus(choice.dataset.mlMethodButton,true);return;}if(e.target.closest('[data-ml-toggle]')){paused=!paused;motion();}}
-    function keydown(e){var choice=e.target.closest('[data-ml-method-button]');if(!choice)return;var i=buttons.indexOf(choice),n=i;if(e.key==='ArrowRight'||e.key==='ArrowDown')n=(i+1)%buttons.length;else if(e.key==='ArrowLeft'||e.key==='ArrowUp')n=(i-1+buttons.length)%buttons.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=buttons.length-1;else return;e.preventDefault();buttons[n].focus();applyFocus(buttons[n].dataset.mlMethodButton,true);}
-    function preference(){if(!disposed){paused=!!mq.matches;motion();}}
-    function visibility(){hidden=!!global.document.hidden;if(hidden&&frame){global.cancelAnimationFrame(frame);frame=0;}else start();}
-    var handlers={click:click,keydown:keydown,pointerover:over,pointerout:out,focusin:focusIn,focusout:focusOut};Object.keys(handlers).forEach(function(k){root.addEventListener(k,handlers[k]);});if(mq&&mq.addEventListener)mq.addEventListener('change',preference);global.addEventListener('resize',schedule);global.document.addEventListener('visibilitychange',visibility);
-    var observer=global.ResizeObserver?new global.ResizeObserver(schedule):null;if(observer)observer.observe(map);
-    var intersection=global.IntersectionObserver?new global.IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){ensure(e.target);intersection.unobserve(e.target);}});},{rootMargin:'200px'}):null;
-    slots.forEach(function(slot){if(intersection)intersection.observe(slot);else ensure(slot);});
-    if(global.document.fonts&&global.document.fonts.ready)global.document.fonts.ready.then(schedule);applyFocus(focus,false);motion();refresh();
-    return {refresh:refresh,destroy:function(){if(disposed)return;disposed=true;Object.keys(handlers).forEach(function(k){root.removeEventListener(k,handlers[k]);});if(mq&&mq.removeEventListener)mq.removeEventListener('change',preference);if(observer)observer.disconnect();if(intersection)intersection.disconnect();global.removeEventListener('resize',schedule);if(global.document.removeEventListener)global.document.removeEventListener('visibilitychange',visibility);if(frame&&global.cancelAnimationFrame)global.cancelAnimationFrame(frame);if(resizeFrame&&global.cancelAnimationFrame)global.cancelAnimationFrame(resizeFrame);Object.keys(views).forEach(function(id){views[id].dispose();});svgs.forEach(function(svg){if(typeof svg.pauseAnimations==='function')svg.pauseAnimations();});}};
+  function method(value) { return METHODS.filter(function (m) { return m.id === value; })[0] || METHODS[0]; }
+  function available(ctx) {
+    return TECH.filter(function (t) { return ctx.stage.scenes.some(function (s) { return s.id === t.id; }); });
   }
-  global.MudloggingStage={render:render,bind:bind};
+  function scene(ctx, id) { return ctx.stage.scenes.filter(function (s) { return s.id === id; })[0]; }
+  function crop(box, className) {
+    return '<span class="ml-crop ' + (className || '') + '" style="aspect-ratio:' + box[2] + '/' + box[3] + '">' +
+      '<img src="' + IMAGE + '" alt="" width="1448" height="1086" draggable="false" style="width:' +
+      (WIDTH / box[2] * 100).toFixed(5) + '%;left:' + (-box[0] / box[2] * 100).toFixed(5) +
+      '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
+  }
+  function effect(t) {
+    var shapes = {
+      m1: '<path class="ml-trace ml-trace-vision" d="M129 126h112v66H129z"/><path class="ml-crosshair" d="M166 159h24m-12-12v24"/>',
+      m2: '<path class="ml-trace ml-trace-gas" d="M87 198l9-3 6-18 6 15 10-7 8 3 7-33 7 29 10-8 8 6 8-14 8 7 9-54 8 47 8 15 10-5"/><path class="ml-monitor-scan" d="M86 132v78"/>',
+      m3: '<g class="ml-uv-glow"><circle cx="177" cy="167" r="13"/><circle cx="226" cy="171" r="10"/><circle cx="70" cy="176" r="9"/></g><path class="ml-uv-star" d="M177 148v38m-19-19h38m-32-13 26 26m0-26-26 26"/>',
+      m4: '<path class="ml-trace ml-trace-drill" d="M130 137l-5 10 11 7-12 10 15 7-11 12 8 9-10 10 6 13"/><path class="ml-trace ml-trace-rpm" d="M199 137l5 10-11 7 12 10-15 7 11 12-8 9 10 10-6 13"/>',
+      m5: '<g class="ml-report-lines"><path d="M105 157l99-18m-96 28 99-18m-96 28 81-15"/></g><circle class="ml-report-pulse" cx="288" cy="229" r="13"/>'
+    };
+    return '<svg class="ml-tech-effect" viewBox="0 0 ' + t.box[2] + ' ' + t.box[3] + '" aria-hidden="true">' + shapes[t.id] + '</svg>';
+  }
+  function spot(ctx, t, focus) {
+    var sc = scene(ctx, t.id), b = t.box, active = focus && focus === t.method, esc = ctx.K.esc;
+    return '<a class="ml-spot ml-spot-' + t.id + (active ? ' is-relevant' : focus ? ' is-dim' : '') +
+      '" href="#/scene/' + t.id + '" data-ml-spot="' + t.id + '" data-ml-tech-method="' + t.method +
+      '" aria-label="' + esc(sc.name + '，' + method(t.method).name + '，查看场景讲解') +
+      '" style="--tech:' + t.color + ';left:' + (b[0] / WIDTH * 100).toFixed(5) + '%;top:' +
+      (b[1] / HEIGHT * 100).toFixed(5) + '%;width:' + (b[2] / WIDTH * 100).toFixed(5) +
+      '%;height:' + (b[3] / HEIGHT * 100).toFixed(5) + '%">' + crop(b) + effect(t) +
+      '<span class="ml-spot-tag"><b>' + method(t.method).abbr + '</b> 点击图画 · 查看讲解 <span>↗</span></span></a>';
+  }
+  function flow(path, color, duration, id) {
+    var tag = id ? ' data-ml-flow="' + id + '"' : '';
+    return '<g class="ml-flow"' + tag + ' style="--flow:' + color + '">' +
+      '<path class="ml-flow-track" d="' + path + '"/><path class="ml-flow-current" d="' + path + '"/>' +
+      [0, 1].map(function (i) {
+        return '<g class="ml-moving-arrow"><path d="M-10-6 0 0-10 6M-19-6-9 0-19 6"/>' +
+          '<animateMotion dur="' + duration + 's" begin="' + (-duration * i / 2) + 's" repeatCount="indefinite" rotate="auto" path="' + path + '"/></g>';
+      }).join('') + '</g>';
+  }
+  function drawing() {
+    return '<svg class="ml-flows" data-ml-motion="" viewBox="0 0 1448 1086" aria-hidden="true">' +
+      flow('M132 359V663', '#ffc238', 4.4) + flow('M144 658V353', '#ff8c35', 4.8) +
+      flow('M172 332C238 343 263 378 321 343S449 266 551 268L581 277', '#fcbf46', 6.6) +
+      flow('M720 249V224Q720 206 746 205H815', '#efb347', 3.2) +
+      flow('M779 374Q779 403 745 403H449Q411 403 397 433', '#58b6ee', 5.2, 'm1') +
+      flow('M779 374Q785 406 753 406H685Q666 406 652 432', '#58b6ee', 3.7, 'm2') +
+      flow('M792 375Q792 403 829 403H861Q894 403 908 433', '#58b6ee', 3.8, 'm3') +
+      flow('M794 375Q794 403 842 403H1176Q1204 403 1212 433', '#58b6ee', 5.5, 'm4') +
+      flow('M325 740C370 783 419 767 482 770S562 763 586 785', '#ffab40', 4.8, 'm1') +
+      flow('M597 735C619 751 689 751 701 784', '#40a7d4', 3.3, 'm2') +
+      flow('M890 739C863 762 791 754 750 784', '#a18bd6', 3.6, 'm3') +
+      flow('M1157 748C1098 783 1029 766 979 770S912 770 894 785', '#8ab578', 5.1, 'm4') +
+      flow('M1016 908Q1046 929 1085 939', '#ff963c', 3.4, 'm5') +
+      '<g class="ml-steam"><circle cx="858" cy="151" r="8"/><circle cx="881" cy="144" r="6"/><circle cx="867" cy="131" r="9"/></g>' +
+      '<path class="ml-depth-scan" d="M628 851H929"/><circle class="ml-drill-pulse" cx="134" cy="697" r="26"/>' +
+      '</svg>';
+  }
+  function deck(ctx, focus) {
+    var esc = ctx.K.esc;
+    return available(ctx).filter(function (t) { return !focus || t.method === focus; }).map(function (t) {
+      var sc = scene(ctx, t.id), count = ctx.cases.bySceneAll(t.id).length;
+      return '<a class="ml-read-card" href="#/scene/' + t.id + '" style="--tech:' + t.color + '">' +
+        '<span class="ml-read-art">' + crop(t.art) + '<span class="ml-read-id">' + t.id.toUpperCase() + ' · ' + method(t.method).abbr + '</span></span>' +
+        '<div class="ml-read-text"><h3>' + esc(sc.name) + '</h3><p>' + esc(sc.point) + '</p>' +
+        '<dl><div><dt>输入</dt><dd>' + esc(t.input) + '</dd></div><div><dt>输出</dt><dd>' + esc(t.output) + '</dd></div></dl>' +
+        '<span class="ml-read-link">' + (count ? '查看讲解与案例 · ' + count + ' 个已接入' : '查看场景讲解') + '<b>↗</b></span></div></a>';
+    }).join('');
+  }
+  function extraScenes(ctx) {
+    var extra = ctx.stage.scenes.filter(function (sc) { return !TECH.some(function (t) { return t.id === sc.id; }); });
+    if (!extra.length) return '';
+    var esc = ctx.K.esc;
+    return '<section class="ml-extra"><h2>更多录井场景</h2>' + extra.map(function (sc) {
+      return '<a href="#/scene/' + esc(sc.id) + '"><b>' + esc(sc.name) + '</b><span>' + esc(sc.point || '') + '</span><i>↗</i></a>';
+    }).join('') + '</section>';
+  }
+  function render(ctx) {
+    var focus = selected((ctx.query || {}).m), esc = ctx.K.esc;
+    var index = ctx.atlas.stages.indexOf(ctx.stage), prev = ctx.atlas.stages[index - 1], next = ctx.atlas.stages[index + 1];
+    return '<main class="ml-page" data-ml-stage data-ml-method="' + focus + '">' +
+      '<nav class="crumb"><a href="#/">总览</a><span class="sep">/</span><a href="#/chain">作业链</a><span class="sep">/</span><span class="cur">录井</span></nav>' +
+      '<header class="ml-head"><div><div class="ml-eyebrow"><span>04 / 13</span> MUD LOGGING · 录井</div>' +
+      '<h1>看见地下，读懂每一米<span>。</span></h1><p>跟着岩屑与气体回到地面，看看智能方法在哪里发挥作用。</p></div>' +
+      '<div class="ml-head-note"><span class="ml-live-dot"></span><span>一张图，串起 <b>' + ctx.stage.scenes.length + ' 个场景</b><small>选择方法放大 · 点击图画进入讲解</small></span></div></header>' +
+      '<section class="ml-lab" aria-label="录井现场交互总览">' +
+      '<div class="ml-toolbar"><div class="ml-methods" role="group" aria-label="选择智能方法并放大对应图画">' + METHODS.map(function (m) {
+        return '<button type="button" data-ml-method-button="' + m.id + '" aria-pressed="' + (focus === m.id) + '" aria-controls="ml-map ml-deck"><b>' + m.abbr + '</b><span>' + m.name + '</span></button>';
+      }).join('') + '</div><button class="ml-motion" type="button" data-ml-toggle aria-pressed="true"><span data-ml-toggle-icon>Ⅱ</span><span data-ml-toggle-label>暂停动效</span></button></div>' +
+      '<div class="ml-status"><span class="ml-status-icon">↳</span><p data-ml-status role="status">' + method(focus).note + '</p><span class="ml-status-hint">图画可点击 <b>↗</b></span></div>' +
+      '<div class="ml-map' + (focus ? ' has-focus' : '') + '" id="ml-map" data-ml-map>' +
+      '<img class="ml-base" src="' + IMAGE + '" width="1448" height="1086" draggable="false" alt="录井流程：钻头破岩，钻井液携带岩屑与气体返回地面，经过岩性、气测、荧光、钻时分析，统一深度并汇总报告。">' +
+      '<div class="ml-veil" aria-hidden="true"></div>' + available(ctx).map(function (t) { return spot(ctx, t, focus); }).join('') + drawing() +
+      '<div class="ml-map-caption"><span class="ml-live-dot"></span><span data-ml-running>信号正在流动</span><i>示意动画</i></div></div>' +
+      '<div class="ml-map-footer"><span><b>01</b> 井底取样 <i>→</i> <b>02</b> 地面分析 <i>→</i> <b>03</b> 深度对齐 <i>→</i> <b>04</b> 证据汇总</span><p>岩屑与气测需做迟到校正；钻时还需结合钻压、转速等工况解读。</p></div></section>' +
+      '<section class="ml-reading' + (focus ? ' has-focus' : '') + '" data-ml-reading aria-labelledby="ml-reading-title"><div class="ml-reading-head"><div><span class="ml-eyebrow">EXPLORE THE SCENES</span><h2 id="ml-reading-title" data-ml-reading-title>' + (focus ? method(focus).name + ' · 放大看细节' : '从图画，走进每一个场景') + '</h2></div><span data-ml-reading-count>' + (focus ? available(ctx).filter(function (t) { return t.method === focus; }).length : available(ctx).length) + ' 个图画入口 ↗</span></div>' +
+      '<div class="ml-deck" id="ml-deck" data-ml-deck>' + deck(ctx, focus) + '</div></section>' + extraScenes(ctx) +
+      '<div class="pager">' + (prev ? '<a class="prev" href="#/stage/' + esc(prev.id) + '"><span class="dir">← 上一环节</span><span class="nm">' + esc(prev.name) + '</span></a>' : '') +
+      (next ? '<a class="next" href="#/stage/' + esc(next.id) + '"><span class="dir">下一环节 →</span><span class="nm">' + esc(next.name) + '</span></a>' : '') + '</div></main>';
+  }
+
+  function bind(root, ctx) {
+    if (!root) return { destroy: function () {} };
+    var focus = selected((ctx.query || {}).m), disposed = false;
+    var buttons = [].slice.call(root.querySelectorAll('[data-ml-method-button]'));
+    var spots = [].slice.call(root.querySelectorAll('[data-ml-spot]'));
+    var flows = [].slice.call(root.querySelectorAll('[data-ml-flow]'));
+    var svgs = [].slice.call(root.querySelectorAll('[data-ml-motion]'));
+    var mq = global.matchMedia ? global.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    var paused = !!(mq && mq.matches);
+
+    function applyFocus(value, updateUrl) {
+      focus = selected(value);
+      root.dataset.mlMethod = focus;
+      root.querySelector('[data-ml-map]').classList.toggle('has-focus', !!focus);
+      root.querySelector('[data-ml-reading]').classList.toggle('has-focus', !!focus);
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mlMethodButton === focus)); });
+      spots.forEach(function (s) {
+        s.classList.toggle('is-relevant', !!focus && s.dataset.mlTechMethod === focus);
+        s.classList.toggle('is-dim', !!focus && s.dataset.mlTechMethod !== focus);
+      });
+      flows.forEach(function (f) {
+        var t = TECH.filter(function (x) { return x.id === f.dataset.mlFlow; })[0];
+        f.classList.toggle('is-dim', !!focus && t && t.method !== focus);
+        f.classList.toggle('is-relevant', !!focus && t && t.method === focus);
+      });
+      root.querySelector('[data-ml-status]').textContent = method(focus).note;
+      root.querySelector('[data-ml-reading-title]').textContent = focus ? method(focus).name + ' · 放大看细节' : '从图画，走进每一个场景';
+      root.querySelector('[data-ml-reading-count]').textContent = available(ctx).filter(function (t) { return !focus || t.method === focus; }).length + ' 个图画入口 ↗';
+      root.querySelector('[data-ml-deck]').innerHTML = deck(ctx, focus);
+      if (updateUrl) {
+        try { global.history.replaceState(null, '', '#/stage/mudlogging' + (focus ? '?m=' + focus : '')); }
+        catch (e) { /* file:// can reject replaceState; the selected UI remains usable. */ }
+        var first = spots.filter(function (s) { return s.dataset.mlTechMethod === focus; })[0];
+        if (first && global.innerHeight) {
+          var rect = first.getBoundingClientRect();
+          if (rect.top < 130 || rect.bottom > global.innerHeight - 25) {
+            first.scrollIntoView({ block: 'center', inline: 'nearest', behavior: mq && mq.matches ? 'auto' : 'smooth' });
+          }
+        }
+      }
+    }
+    function applyMotion() {
+      root.classList.toggle('is-paused', paused);
+      root.classList.toggle('is-playing', !paused);
+      root.querySelector('[data-ml-toggle]').setAttribute('aria-pressed', String(!paused));
+      root.querySelector('[data-ml-toggle-icon]').textContent = paused ? '▶' : 'Ⅱ';
+      root.querySelector('[data-ml-toggle-label]').textContent = paused ? '播放动效' : '暂停动效';
+      root.querySelector('[data-ml-running]').textContent = paused ? '动效已暂停 · 仍可点击探索' : '信号正在流动';
+      svgs.forEach(function (svg) {
+        var action = paused ? 'pauseAnimations' : 'unpauseAnimations';
+        if (typeof svg[action] === 'function') svg[action]();
+      });
+    }
+    function click(e) {
+      var choice = e.target.closest('[data-ml-method-button]');
+      if (choice) { applyFocus(choice.dataset.mlMethodButton, true); return; }
+      if (e.target.closest('[data-ml-toggle]')) { paused = !paused; applyMotion(); }
+    }
+    function keydown(e) {
+      var choice = e.target.closest('[data-ml-method-button]');
+      if (!choice) return;
+      var i = buttons.indexOf(choice), n = i;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % buttons.length;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + buttons.length) % buttons.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = buttons.length - 1;
+      else return;
+      e.preventDefault(); buttons[n].focus(); applyFocus(buttons[n].dataset.mlMethodButton, true);
+    }
+    function preference() { if (!disposed) { paused = !!mq.matches; applyMotion(); } }
+    root.addEventListener('click', click);
+    root.addEventListener('keydown', keydown);
+    if (mq && mq.addEventListener) mq.addEventListener('change', preference);
+    applyFocus(focus, false); applyMotion();
+    return { destroy: function () {
+      if (disposed) return;
+      disposed = true;
+      root.removeEventListener('click', click); root.removeEventListener('keydown', keydown);
+      if (mq && mq.removeEventListener) mq.removeEventListener('change', preference);
+      svgs.forEach(function (svg) { if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations(); });
+    } };
+  }
+  global.MudloggingStage = { render: render, bind: bind };
 })(window);
