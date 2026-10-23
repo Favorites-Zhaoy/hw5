@@ -66,11 +66,11 @@ function runtime(seed = {}) {
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
   };
-  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js'].forEach(run);
+  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
   let shell = read('assets/core/shell.js').replaceAll('\r', '');
   const marker = '  render();\n\n  // 启动自检';
   assert.ok(shell.includes(marker), 'shell test hook must match exactly');
-  shell = shell.replace(marker, '  global.__shellTest = {bindTabs,parseHash,homeHTML,chainHTML,stageHTML,methodHTML,sceneHTML,casesHTML,guideHTML};\n\n  // 启动自检');
+  shell = shell.replace(marker, '  global.__shellTest = {bindTabs,parseHash,homeHTML,chainHTML,stageHTML,methodHTML,sceneHTML,casesHTML,guideHTML,render,unmountCurrent};\n\n  // 启动自检');
   vm.runInContext(shell, ctx, { filename: 'shell.js' });
   return { ctx, values, nodes, panels, timers, document };
 }
@@ -451,4 +451,99 @@ test('river motion starts paused when reduced motion is preferred', () => {
   const rt = runtime(), { tree, toggle, stats, handle } = measuredRiver(rt, true);
   assert.ok(tree.classList.contains('is-paused')); assert.equal(toggle.attributes['aria-pressed'], 'false');
   assert.equal(stats.resumed, 0); assert.ok(stats.paused > 0); handle.destroy();
+});
+
+function mudControls(rt, query = {}, reduced = false, bindNow = true) {
+  const root = new Element(), svg = new Element('svg');
+  const ctx = { stage: rt.ctx.ATLAS.index.byStage.mudlogging, atlas: rt.ctx.ATLAS, cases: rt.ctx.Cases, K: rt.ctx.K, query };
+  const stats = { paused: 0, resumed: 0, mediaListeners: new Set() };
+  const mq = { matches: reduced, addEventListener(type, fn) { stats.mediaListeners.add(fn); }, removeEventListener(type, fn) { stats.mediaListeners.delete(fn); } };
+  rt.ctx.matchMedia = () => mq;
+  const buttons = ['', 'cv', 'ts', 'nlp'].map(m => { const b = new Element('button'); b.dataset.mlMethodButton = m; return b; });
+  const spots = ['cv', 'ts', 'cv', 'ts', 'nlp'].map((m, i) => { const s = new Element('a'); s.dataset.mlTechMethod = m; s.dataset.mlSpot = 'm' + (i + 1); return s; });
+  const flows = spots.map(s => { const f = new Element('g'); f.dataset.mlFlow = s.dataset.mlSpot; return f; });
+  svg.pauseAnimations = () => stats.paused++; svg.unpauseAnimations = () => stats.resumed++;
+  const lists = { '[data-ml-method-button]': buttons, '[data-ml-spot]': spots, '[data-ml-flow]': flows, '[data-ml-motion]': [svg] };
+  root.querySelectorAll = selector => lists[selector] || [];
+  const handle = bindNow ? rt.ctx.MudloggingStage.bind(root, ctx) : null;
+  const choose = m => {
+    const b = buttons.find(b => b.dataset.mlMethodButton === m);
+    root.listeners.click({ target: { closest: selector => selector === '[data-ml-method-button]' ? b : null } });
+  };
+  const toggle = () => root.listeners.click({ target: { closest: selector => selector === '[data-ml-toggle]' ? root.querySelector('[data-ml-toggle]') : null } });
+  return { root, ctx, buttons, spots, flows, svg, stats, mq, handle, choose, toggle };
+}
+
+test('mud logging artwork links all five techniques to valid explanations and keeps new admin scenes accessible', () => {
+  const rt = runtime(), P = rt.ctx.__shellTest, A = rt.ctx.ATLAS;
+  const html = P.stageHTML(A.index.byStage.mudlogging, {});
+  assert.equal((html.match(/data-ml-spot=/g) || []).length, 5);
+  assert.ok((html.match(/<animateMotion /g) || []).length >= 20);
+  for (const id of ['m1', 'm2', 'm3', 'm4', 'm5']) assert.match(html, new RegExp('href="#/scene/' + id + '"'));
+  for (const match of html.matchAll(/href="#\/scene\/([^"?]+)(?:[^"]*)"/g)) assert.ok(A.index.byScene[match[1]]);
+  assert.ok(fs.existsSync(path.join(site, 'assets/images/mudlogging-process.png')));
+  assert.doesNotMatch(P.stageHTML(A.index.byStage.welllog, {}), /data-ml-stage/);
+  assert.equal(A.saveScene({ id: 'mud-new', name: '扩展录井场景', stageId: 'mudlogging', methods: ['cv'], diff: '中', point: '新增场景' }).ok, true);
+  assert.match(P.stageHTML(A.index.byStage.mudlogging, {}), /href="#\/scene\/mud-new"/);
+});
+
+test('method selection magnifies the correct illustrations and updates deep links, flow emphasis and enlarged cards', () => {
+  const rt = runtime(), { root, choose, spots, flows, buttons } = mudControls(rt);
+  const active = () => spots.filter(s => s.classList.contains('is-relevant')).map(s => s.dataset.mlSpot);
+  const deckIds = () => [...root.querySelector('[data-ml-deck]').innerHTML.matchAll(/href="#\/scene\/(m\d)"/g)].map(m => m[1]);
+  for (const [m, ids] of [['cv', ['m1', 'm3']], ['ts', ['m2', 'm4']], ['nlp', ['m5']]]) {
+    choose(m);
+    assert.deepEqual(active(), ids); assert.deepEqual(deckIds(), ids);
+    assert.deepEqual(flows.filter(f => f.classList.contains('is-relevant')).map(f => f.dataset.mlFlow), ids);
+    assert.equal(buttons.find(b => b.dataset.mlMethodButton === m).attributes['aria-pressed'], 'true');
+    assert.equal(rt.ctx.location.hash, '#/stage/mudlogging?m=' + m);
+  }
+  choose('');
+  assert.deepEqual(active(), []); assert.equal(deckIds().length, 5);
+  assert.equal(spots.some(s => s.classList.contains('is-dim')), false);
+  assert.equal(rt.ctx.location.hash, '#/stage/mudlogging');
+});
+
+test('mud logging restores method URLs, supports keyboard focus, and still works when file history rejects writes', () => {
+  const rt = runtime(), { root, spots, buttons, choose } = mudControls(rt, { m: 'cv' });
+  assert.deepEqual(spots.filter(s => s.classList.contains('is-relevant')).map(s => s.dataset.mlSpot), ['m1', 'm3']);
+  rt.ctx.history.replaceState = () => { throw new Error('file history refused'); };
+  choose('ts');
+  assert.equal(root.dataset.mlMethod, 'ts'); assert.match(root.querySelector('[data-ml-status]').textContent, /m2 与 m4/);
+  const ts = buttons[2];
+  rt.ctx.innerHeight = 720;
+  spots[4].getBoundingClientRect = () => ({ top: 1000, bottom: 1250 });
+  root.listeners.keydown({ target: { closest: () => ts }, key: 'ArrowRight', preventDefault() {} });
+  assert.equal(buttons[3].focused, true); assert.equal(root.dataset.mlMethod, 'nlp');
+  assert.equal(spots[4].scrollOptions.block, 'center');
+  root.listeners.keydown({ target: { closest: () => buttons[3] }, key: 'Home', preventDefault() {} });
+  assert.equal(buttons[0].focused, true); assert.equal(root.dataset.mlMethod, '');
+  const invalid = mudControls(runtime(), { m: 'unknown' });
+  assert.equal(invalid.root.dataset.mlMethod, '');
+});
+
+test('mud logging pauses both native SVG and CSS motion, observes system preferences and cleans up on navigation', () => {
+  const rt = runtime(), ui = mudControls(rt, {}, true, false), { root, stats, mq } = ui;
+  rt.nodes.get('view').nodes.set('[data-ml-stage]', root);
+  rt.ctx.location.hash = '#/stage/mudlogging'; rt.ctx.__shellTest.render();
+  assert.equal(root.classList.contains('is-paused'), true); assert.ok(stats.paused > 0); assert.equal(stats.resumed, 0);
+  ui.toggle();
+  assert.equal(root.classList.contains('is-playing'), true); assert.equal(root.querySelector('[data-ml-toggle]').attributes['aria-pressed'], 'true');
+  assert.ok(stats.resumed > 0);
+  mq.matches = true; [...stats.mediaListeners].forEach(fn => fn());
+  assert.equal(root.classList.contains('is-paused'), true);
+  rt.ctx.location.hash = '#/chain'; rt.ctx.__shellTest.render();
+  assert.equal(root.listeners.click, undefined); assert.equal(root.listeners.keydown, undefined);
+  assert.equal(stats.mediaListeners.size, 0);
+});
+
+test('original-format mud logging case packs remain importable and the illustrated entrance displays the registered case', async () => {
+  const rt = runtime(), { pkg, files } = sample();
+  pkg.id = 'mudlogging-imported-example'; pkg.sceneId = 'm1'; pkg.title = '录井上传验证';
+  await importThroughControls(rt, pkg, files);
+  const html = rt.ctx.__shellTest.stageHTML(rt.ctx.ATLAS.index.byStage.mudlogging, { m: 'cv' });
+  assert.match(html, /查看讲解与案例 · 1 个已接入/);
+  const sceneHtml = rt.ctx.__shellTest.sceneHTML(rt.ctx.ATLAS.index.byScene.m1, {});
+  assert.match(sceneHtml, /案例 mudlogging-imported-example/);
+  assert.match(sceneHtml, /data-tab="bg"/); assert.match(sceneHtml, /data-tab="flow"/); assert.match(sceneHtml, /data-tab="demo"/);
 });

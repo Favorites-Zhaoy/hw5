@@ -17,6 +17,7 @@
   var mounted = null;          // 当前挂载中的示范，切页时调用其 unmount
   var mountedKey = '';
   var homeHandle = null;
+  var stageHandle = null;
 
   /* =========================================================
      一、路由
@@ -185,6 +186,9 @@
      五、环节页
      ========================================================= */
   function stageHTML(st, q) {
+    if (st.id === 'mudlogging' && global.MudloggingStage) {
+      return global.MudloggingStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
     var counts = {};
     st.scenes.forEach(function (s) { counts[s.diff] = (counts[s.diff] || 0) + 1; });
     var mFilter = q.m || '';
@@ -913,6 +917,7 @@
      ========================================================= */
   function unmountCurrent() {
     if (homeHandle) { homeHandle.destroy(); homeHandle = null; }
+    if (stageHandle) { stageHandle.destroy(); stageHandle = null; }
     if (mounted && mounted.unmount) {
       try { mounted.unmount(); } catch (e) { }
     }
@@ -948,7 +953,11 @@
     if (!p.length && global.AtlasHome) homeHandle = global.AtlasHome.bind(view.querySelector('.atlas-home'));
 
     // 页面级交互
-    if (p[0] === 'stage') bindFilters(view);
+    if (p[0] === 'stage') {
+      if (p[1] === 'mudlogging' && global.MudloggingStage) {
+        stageHandle = global.MudloggingStage.bind(view.querySelector('[data-ml-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else bindFilters(view);
+    }
     if (p[0] === 'scene') {
       var sc2 = A.index.byScene[p[1]];
       var all2 = sc2 && Cases.bySceneAll(sc2.id);
