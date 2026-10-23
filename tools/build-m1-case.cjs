@@ -27,6 +27,21 @@ workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的
 ],metrics:{title:'把每一步的目的与输出连起来',html:style+'<div class="m1c">'+workflow+'</div><p>可运行示范会实时给出准确率、宏平均 F1 和混淆矩阵。准确率 = 与原标签一致的数量 ÷ 24；宏平均 F1 为三个类别 F1 的等权平均。当前查询的光照扰动只用于观察敏感性，批量评价保持原始图像条件。</p>'},fails:[{name:'拍摄条件替代岩性特征',why:'颜色与纹理会受光照、背景、拍摄批次影响，应检查相似样本与跨井验证。'},{name:'混样或标签不确定',why:'原标签作为本例对照依据，但不能消除现场混样与人工标注误差。'},{name:'把候选当成最终解释',why:'需要样品、取样记录与其他地质证据共同复核。'}]},
 demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'选择真实留出样品，调整 k、颜色与纹理权重，查看候选、近邻、混淆矩阵与原井深记录；人工复核与模型输出分别保存，可导出 CSV。',height:1040}
 }};
+definition.version='1.1.0';
+definition.tabs.background.page={html:'demo/index.html',view:'background',height:1040};
+definition.tabs.workflow.page={html:'demo/index.html',view:'workflow',height:1040};
+definition.tabs.demo.view='demo';
+// Retain the same teaching points in original-protocol HTML for older portals.
+const rockOverview='<svg viewBox="0 0 780 230" role="img" aria-label="三类岩性结构与孔隙通道的概念示意">'+data.classes.map((c,i)=>{
+  let shapes='';if(i===0)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<ellipse cx="'+(27+x*41)+'" cy="'+(65+y*32)+'" rx="15" ry="12" fill="#d3b083" stroke="#b99565"/>';
+  if(i===1)for(let y=0;y<5;y++)shapes+='<path d="M14 '+(57+y*18)+'q55-8 110 0t110 0" fill="none" stroke="#8d9fac" stroke-width="9"/>';
+  if(i===2)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<path d="m'+(13+x*44)+' '+(53+y*32)+' 23-7 13 20-23 7Z" fill="#acba97" stroke="#8c9f7b"/>';
+  return '<g transform="translate('+(i*260)+',0)"><rect x="0" y="34" width="245" height="126" rx="10" fill="#e9dfcb"/>'+shapes+'<text x="8" y="20" fill="#65808b" font-size="15">'+c.name+'</text><text x="8" y="187" fill="#8b947e" font-size="12">'+['颗粒与孔隙：储集空间的线索','细粒与层理：需核验岩层作用','晶体与裂缝：需验证内部通道'][i]+'</text></g>';
+}).join('')+'<text x="7" y="220" fill="#a29477" font-size="11">概念示意，不表示样本实测孔渗。岩性识别不能直接证明油气存在。</text></svg>';
+definition.tabs.background.sections.unshift({en:'WHY LITHOLOGY',title:'录井为什么要识别岩性：从结构线索到地质问题',html:style+'<p>孔隙提供储存流体的空间，通道的连通性影响流体能否通过。岩性帮助地质人员描述钻遇岩层，并提出储层、封盖与地层对比的问题；最终解释仍需结合岩心、测井和物性分析。</p><div class="m1c">'+rockOverview+'</div><p>完整互动页面可切换三类岩性，查看结构与通道的机理示意；本图同样保留在原规范背景段落中。</p>'});
+const grouped={};data.samples.forEach(s=>{if(!grouped[s.group])grouped[s.group]=[];grouped[s.group].push(s);});
+const groupDiagram='<svg viewBox="0 0 820 265" role="img" aria-label="本案例实际17个20米井段分组及其参考测试归属">'+Object.keys(grouped).sort((a,b)=>Number(a.split('-').pop())-Number(b.split('-').pop())).map((key,i)=>{const start=Number(key.split('-').pop()),samples=grouped[key],test=samples[0].split==='test',x=(i%6)*137,y=Math.floor(i/6)*78;return '<g transform="translate('+x+','+y+')"><rect width="126" height="65" rx="6" fill="'+(test?'#efd0a9':'#c9dadd')+'"/><text x="10" y="25" fill="#6b7e80" font-size="12">'+start+'—'+(start+19)+' m</text><text x="10" y="49" fill="#83907e" font-size="10">'+samples.length+' 张 / '+(test?'测试':'参考')+'</text></g>';}).join('')+'<text x="0" y="257" fill="#a3957a" font-size="11">整组划分：42 张参考图、24 张测试图；颜色表示集合，不是岩性。</text></svg>';
+definition.tabs.workflow.metrics.html+='<div class="m1c"><h4>第一步的真实数据：17 个井段分组，5 组留出</h4>'+groupDiagram+'</div>';
 fs.writeFileSync(path.join(pack,'case.json'),JSON.stringify(definition,null,2)+'\n');
 // One directly-openable HTML document: no sibling resource reads, fetches or server needed.
 const artwork='data:image/webp;base64,'+fs.readFileSync(path.join(runtime,'m1-dioramas.webp')).toString('base64');
@@ -47,11 +62,15 @@ fs.writeFileSync(path.join(runtime,'demo.js'),fs.readFileSync(path.join(__dirnam
 fs.copyFileSync(path.join(__dirname,'m1/tests.template.cjs'),path.join(root,'tests/m1-preview.cjs'));
 const wrapper=`/* Generated from m1-cuttings-case/case.json by tools/build-m1-case.cjs. */
 (function(global){'use strict';var definition=${JSON.stringify(definition)};
-var frame=null;function resize(event){if(!frame||event.source!==frame.contentWindow)return;var h=event.data&&event.data.__m1Height;if(typeof h==='number'&&isFinite(h))frame.style.height=Math.max(700,Math.min(10000,h+2))+'px';}
-definition.tabs.demo.mount=function(root){definition.tabs.demo.unmount();frame=document.createElement('iframe');frame.src='m1-cuttings-case/demo/index.html';frame.setAttribute('title','M1 岩屑岩性辅助识别 · 真实样本实验');frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='display:block;width:100%;height:1040px;border:0;border-radius:12px;background:#fcf6eb';global.addEventListener('message',resize);root.appendChild(frame);};
-definition.tabs.demo.unmount=function(){global.removeEventListener('message',resize);if(frame)frame.remove();frame=null;};
+function attachSection(name,section){var frame=null;var tab=definition.tabs[name];
+function resize(event){if(!frame||event.source!==frame.contentWindow)return;var h=event.data&&event.data.__m1Height;if(typeof h==='number'&&isFinite(h))frame.style.height=Math.max(700,Math.min(10000,h+2))+'px';}
+tab.mount=function(root){tab.unmount();frame=document.createElement('iframe');frame.src='m1-cuttings-case/demo/index.html?embed=portal&section='+section;frame.setAttribute('title','M1 · '+tab.label);frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='display:block;width:100%;height:1040px;border:0;border-radius:12px;background:#fcf6eb';global.addEventListener('message',resize);root.appendChild(frame);};
+tab.unmount=function(){global.removeEventListener('message',resize);if(frame)frame.remove();frame=null;};}
+['background','workflow','demo'].forEach(function(name){attachSection(name,name);});
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');fs.writeFileSync(index,fs.readFileSync(index,'utf8').replace(/m1p1|m1case1/g,'m1case2'));
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/m1p1|m1case[12]/g,'m1case3');
+['case-demo-host','case-upload','shell'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261024-sections1');});
+fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

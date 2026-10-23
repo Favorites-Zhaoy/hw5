@@ -14,8 +14,7 @@
   var esc = K.esc, pad = K.pad, rich = K.rich;
 
   var view = document.getElementById('view');
-  var mounted = null;          // 当前挂载中的示范，切页时调用其 unmount
-  var mountedKey = '';
+  var sectionMounts = Object.create(null); // Keep lesson state when switching tabs; clean up on route changes.
   var homeHandle = null;
   var stageHandle = null;
 
@@ -405,6 +404,7 @@
   /* ---- 有案例：三块内容由案例提供，这里只套版式 ---- */
   function renderBackground(sc, c) {
     var b = c.tabs.background;
+    if (typeof b.mount === 'function') return '<div id="case-bg-root"></div>';
     var out = '';
     if (b.judge) out += K.judge(b.judge);
     if (b.lede) out += '<div class="lede-block"><span class="kicker plain">专业场景介绍</span><p>' + rich(b.lede) + '</p></div>';
@@ -416,6 +416,7 @@
 
   function renderWorkflow(sc, c) {
     var w = c.tabs.workflow;
+    if (typeof w.mount === 'function') return '<div id="case-flow-root"></div>';
     var out = '<div class="case-lead"><div>' +
       '<span class="kicker clay">CASE WALKTHROUGH</span>' +
       '<h3 style="margin-top:10px">' + esc(w.title || '案例流程') + '</h3>' +
@@ -500,7 +501,7 @@
       [].forEach.call(document.querySelectorAll('.panel'), function (p) {
         p.classList.toggle('on', p.dataset.panel === key);
       });
-      if (key === 'demo') mountDemo(sc, c);
+        mountCaseSection(sc, c, key);
       if (scroll) {
         var y = tabsEl.getBoundingClientRect().top + window.scrollY - 62;
         window.scrollTo({ top: y, behavior: 'smooth' });
@@ -516,26 +517,26 @@
 
     var want = { 1: 'bg', 2: 'flow', 3: 'demo' }[parseHash().q.tab] || parseHash().q.tab;
     if (want && tabsEl.querySelector('[data-tab="' + want + '"]')) activate(want, false);
+      else if (tabsEl.children.length) activate(tabsEl.children[0].dataset.tab, false);
 
     bindChecklist();
   }
 
-  function mountDemo(sc, c) {
-    var d = c.tabs.demo;
+  function mountCaseSection(sc, c, section) {
+    var names = { bg: 'background', flow: 'workflow', demo: 'demo' };
+    var d = c.tabs[names[section]];
     if (!d || typeof d.mount !== 'function') return;
-    var key = c.id;
-    if (mountedKey === key) return;
-    var root = document.getElementById('case-demo-root');
+    var key = c.id + ':' + section;
+    if (sectionMounts[key]) return;
+    var root = document.getElementById('case-' + section + '-root');
     if (!root) return;
-    if (mounted && mounted.unmount) { try { mounted.unmount(); } catch (e) { } }
     root.innerHTML = '';
-    mounted = d;
-    mountedKey = key;
+    sectionMounts[key] = d;
     try {
       d.mount(root, { scene: sc, kase: c, K: K, atlas: A });
     } catch (err) {
-      root.innerHTML = '<div class="callout warn"><span class="ci">错误</span><span>示范挂载失败：' +
-        esc(err.message) + '。检查 <b>' + esc(c.id) + '</b> 的 tabs.demo.mount。</span></div>';
+        root.innerHTML = '<div class="callout warn"><span class="ci">错误</span><span>案例部分挂载失败：' +
+          esc(err.message) + '。检查 <b>' + esc(c.id) + '</b> 的 tabs.' + names[section] + '.mount。</span></div>';
       console.error('[case:' + c.id + '] demo mount failed', err);
     }
   }
@@ -918,11 +919,11 @@
   function unmountCurrent() {
     if (homeHandle) { homeHandle.destroy(); homeHandle = null; }
     if (stageHandle) { stageHandle.destroy(); stageHandle = null; }
-    if (mounted && mounted.unmount) {
-      try { mounted.unmount(); } catch (e) { }
-    }
-    mounted = null;
-    mountedKey = '';
+    Object.keys(sectionMounts).forEach(function (key) {
+      var section = sectionMounts[key];
+      if (section && section.unmount) { try { section.unmount(); } catch (e) { } }
+    });
+    sectionMounts = Object.create(null);
   }
 
   function render() {

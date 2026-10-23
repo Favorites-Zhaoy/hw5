@@ -228,6 +228,28 @@
       };
     }
 
+    /* Optional full-page lessons; old packages keep their original static sections. */
+    ['background', 'workflow'].forEach(function (name) {
+      var page = t[name] && t[name].page;
+      if (!page || !tabs[name]) return;
+      var entry = global.CaseDemoHost.findFile(files, page.html);
+      if (!entry || !isHtml(entry.name)) return;
+      var pageHandle = null;
+      tabs[name].page = page;
+      tabs[name].mount = function (root, ctx) {
+        if (pageHandle) pageHandle.destroy();
+        pageHandle = global.CaseDemoHost.create(root, {
+          files: files,
+          demo: { mode: 'page', html: page.html, view: page.view, height: page.height },
+          meta: rec.meta
+        }, ctx);
+      };
+      tabs[name].unmount = function () {
+        if (pageHandle) pageHandle.destroy();
+        pageHandle = null;
+      };
+    });
+
     /* --- 示范：三种来源 --- */
     var mode = files.length ? global.CaseDemoHost.resolveMode({ files: files, demo: cfg }) : 'none';
     var handle = null;
@@ -365,6 +387,15 @@
         else ok('案例流程：' + steps.length + ' 步');
       }
     }
+
+    ['background', 'workflow'].forEach(function (name) {
+      var page = t[name] && t[name].page;
+      if (!page) return;
+      var entry = global.CaseDemoHost.findFile(files, page.html);
+      if (!entry || !isHtml(entry.name)) err(name + '.page 指向的 HTML 不存在', '保留原文字与图解，并检查 page.html 的包内路径');
+      else ok(name + '：交互讲解页', entry.name);
+      if (page.view && ['background', 'workflow', 'demo'].indexOf(page.view) < 0) err(name + '.page.view 无效', '支持 background、workflow 或 demo');
+    });
 
     /* 6 示范 */
     var mode = (files.length || cfg.mode === 'page' || cfg.mode === 'module')

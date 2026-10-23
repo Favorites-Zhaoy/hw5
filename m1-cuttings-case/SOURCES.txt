@@ -28,3 +28,13 @@ Beerra et al. — Generating a Labeled Dataset to Train Machine Learning Algorit
 https://zenodo.org/records/5545058
 DOI: 10.5281/zenodo.5545058
 该数据以 SEM 岩屑图像为主，成像方式与本例 RGB 照片不同，不能混作同一训练域。
+
+[6] 孔隙、连通性与渗透性的关系
+SLB — The Defining Series: Defining and Determining Permeability
+https://www.slb.com/resource-library/oilfield-review/defining-series/defining-permeability
+岩性结构互动图为定性机理示意，不给出样本孔渗数值。
+
+[7] 封盖的概念与岩石作用的验证
+SLB Energy Glossary — Seal
+https://glossary.slb.com/terms/s/seal
+是否具有封盖能力需要岩层与物性证据，不能只由一张照片决定。

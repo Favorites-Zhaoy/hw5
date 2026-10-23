@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.0.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.1.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -94,11 +94,11 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
 
 // UI fixture only: deterministic synthetic pixel matrices exercise events and state transitions.
 // They are never shipped as samples and are not used to report real-data model performance.
-function appRuntime(embedded=false,reduced=false){
+function appRuntime(embedded=false,reduced=false,portalView=null){
   const html=read('m1-cuttings-case/demo/index.html'),nodes=new Map(),buttons=[];
   const create=tag=>{const e=new support.El(tag);e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;};e.closest=()=>e;return e;};
   for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){nodes.set(match[3],create(match[1]));}
-  for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step)="([^"]+)"/g))e.dataset[a[1]]=a[2];buttons.push(e);}
+  for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock)="([^"]+)"/g))e.dataset[a[1]]=a[2];buttons.push(e);}
   const defaults={'k-select':'5','color-weight':'50','review-threshold':'70',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
   const canvasContext=()=>{let rgba=pixelImage(96,96);return {drawImage(image){rgba=image.rgba;},getImageData(){return {data:rgba};},createImageData(w,h){return {data:new Uint8ClampedArray(w*h*4)};},putImageData(){}};};
@@ -109,7 +109,7 @@ function appRuntime(embedded=false,reduced=false){
   class FixtureImage{set src(value){const s=byImage.get(value);assert.ok(s);let seed=parseInt(s.sha256.slice(0,8),16);this.naturalWidth=180;this.naturalHeight=180;this.rgba=pixelImage(96,96);for(let i=0;i<this.rgba.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;this.rgba[i]=seed>>>24;this.rgba[i+1]=seed>>>23&255;this.rgba[i+2]=seed>>>22&255;}queueMicrotask(()=>this.onload());}}
   const stats={predict:0,evaluate:0},wrapped={...model,predict(...args){stats.predict++;return model.predict(...args);},evaluate(...args){stats.evaluate++;return model.evaluate(...args);}};
   const blobs=[],messages=[],media={matches:reduced,addEventListener(){}};
-  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(){},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
+  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URLSearchParams,__CASE_DEMO_VIEW__:portalView,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:'',search:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(){},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
   ctx.window=ctx;ctx.parent=embedded?{postMessage:message=>messages.push(message)}:ctx;vm.createContext(ctx);vm.runInContext(inlineCode('app'),ctx);
   return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
 }
@@ -136,6 +136,35 @@ test('keyboard navigation, workflow changes, lag calculation and motion preferen
   const background=rt.buttons.find(b=>b.dataset.view==='background');background.listeners.keydown({key:'ArrowRight',preventDefault(){}});assert.equal(rt.nodes.get('panel-workflow').hidden,false);
   const old=rt.nodes.get('flow-title').textContent;rt.event('flow-next','click');assert.notEqual(rt.nodes.get('flow-title').textContent,old);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/40 维/);
 });
-test('embedded mode opens the actual demo and reports content height',async()=>{
-  const rt=appRuntime(true);await settle();assert.equal(rt.body.classList.contains('embedded'),true);assert.equal(rt.nodes.get('panel-demo').hidden,false);assert.ok(rt.messages.some(m=>m.__m1Height===1800));
+test('an arbitrary browser frame keeps the background and three-part navigation visible',async()=>{
+  const rt=appRuntime(true);await settle();assert.equal(rt.body.classList.contains('embedded'),false);assert.equal(rt.nodes.get('panel-background').hidden,false);
+  const workflow=rt.buttons.find(b=>b.dataset.view==='workflow');workflow.listeners.click();assert.equal(rt.nodes.get('panel-workflow').hidden,false);
+});
+test('explicit portal requests open each corresponding lesson instead of always opening the demo',async()=>{
+  for(const name of ['background','workflow','demo']){const rt=appRuntime(true,false,name);await settle();assert.equal(rt.body.classList.contains('embedded'),true);assert.equal(rt.nodes.get('panel-'+name).hidden,false);assert.ok(rt.messages.some(m=>m.__m1Height===1800));}
+});
+test('the rock lesson changes geology concepts and the workflow explains actual grouped samples',async()=>{
+  const rt=appRuntime();await settle();const shale=rt.buttons.find(b=>b.dataset.rock==='shale');shale.listeners.click();assert.match(rt.nodes.get('rock-concept-title').textContent,/细粒/);assert.match(rt.nodes.get('reservoir-diagram').innerHTML,/页岩/);
+  const workflow=rt.buttons.find(b=>b.dataset.view==='workflow');workflow.listeners.click();assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-depth-group=/g)||[]).length,17);
+  rt.event('flow-next','click');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/data-image-stage="3"/);
+  const grayStage={dataset:{imageStage:'2'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-image-stage]'?grayStage:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/灰度图由当前样本实际像素计算/);assert.equal(rt.nodes.get('flow-snapshot').querySelector('.processing-figure').children[0].tagName,'canvas');
+  rt.event('flow-next','click');const reset={dataset:{flowAction:'vote-reset'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-flow-action]'?reset:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 5 票/);
+  const next={dataset:{flowAction:'vote-next'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-flow-action]'?next:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 1 \/ 5 票/);
+});
+test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{
+  const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
+  const tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
+  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.endsWith('section=background'));
+  const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});
+  click('flow');const flow=rt.document.getElementById('case-flow-root').children[0];assert.ok(flow.src.endsWith('section=workflow'));
+  click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.endsWith('section=demo'));
+  click('bg');click('demo');assert.equal(demo.removed,undefined);assert.equal(rt.document.getElementById('case-demo-root').children.length,1);
+  rt.ctx.__shellTest.unmountCurrent();assert.equal(bg.removed,true);assert.equal(flow.removed,true);assert.equal(demo.removed,true);
+});
+test('optional page lessons import with their view while legacy packages keep static rendering',()=>{
+  const rt=support.makeRuntime(),pkg=JSON.parse(read('m1-cuttings-case/case.json')),files=packFiles();
+  const c=rt.ctx.__importTest.toCase({pkg,meta:pkg,files});
+  for(const name of ['background','workflow','demo']){const root=new support.El();c.tabs[name].mount(root,{});assert.ok(root.children[0].srcdoc.includes('window.__CASE_DEMO_VIEW__="'+name+'";'));c.tabs[name].unmount();}
+  const legacy=JSON.parse(read('firstbreak-pick-case/case.json'));const old=rt.ctx.__importTest.toCase({pkg:legacy,meta:legacy,files:[]});assert.equal(typeof old.tabs.background.mount,'undefined');assert.equal(typeof old.tabs.workflow.mount,'undefined');
+  pkg.tabs.background.page.html='missing-lesson.html';assert.ok(rt.ctx.__importTest.checkAll(pkg,pkg,files).some(x=>x.level==='error'&&x.msg.includes('background.page')));
 });

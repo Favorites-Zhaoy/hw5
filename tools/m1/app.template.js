@@ -10,6 +10,7 @@
   var references = [], tests = [], scaler, evaluation, ready = false, currentId, currentResult, currentFeatures;
   var workflowStep = 0, view = 'background', motionPaused = false, revealed = false;
   var cropSize = 96, exposure = 0, contrast = 1, matrixFilter = null;
+  var imageStage = 0, flowVoteCount = null, voteContext = '', selectedDepthGroup = null;
   var className = function (id) { return byClass[id] ? byClass[id].name : '尚未复核'; };
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return { k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
@@ -82,6 +83,23 @@
     if (id === 'dolomite') for (var j=0;j<3;j++) for(var k=0;k<4;k++) inside += '<path d="m'+(13+k*25)+' '+(12+j*25)+' 15-5 7 15-15 5Z" fill="#a1b393" stroke="#7f9774" stroke-width="1"/>';
     return '<svg viewBox="0 0 118 90" role="img" aria-label="岩性概念示意，不表示照片中的定量矿物组成">'+inside+'</svg>';
   }
+  function renderRockLesson(id) {
+    var lessons={
+      sandstone:{title:'颗粒之间的空间，为什么值得关注？',copy:'孔隙提供储存流体的空间，连通的通道影响流体能否通过。识别砂岩可为寻找和描述储集层提供岩性线索；但胶结、压实等作用会改变孔隙，不能把“砂岩”直接等同于“好储层”。',question:'有哪些孔隙与连通证据？还要结合岩心、测井或实验。',caption:'颗粒 → 孔隙 → 连通性问题'},
+      shale:{title:'细粒与层理，让我们提出不同的地质问题。',copy:'页岩的细粒和层理是观察线索。相对不易透流的岩层可能参与封盖；岩层在油气系统中的实际作用，还需要厚度、裂缝、物性等证据。图像分类先提供描述线索，不能代替封盖或储集评价。',question:'层理、裂缝和物性是否支持后续解释？',caption:'细粒 / 层理 → 封盖与地层对比线索'},
+      dolomite:{title:'看到晶体外观，还需要核验内部通道。',copy:'灰质白云岩属于本例的碳酸盐岩标签。晶间空间、溶蚀与裂缝可能影响储集和流动条件，外观相似的样品也可能具有不同物性。岩屑照片可辅助识别候选，矿物组成和孔渗仍需其他分析。',question:'是否存在晶间孔、溶孔或裂缝？证据来自哪里？',caption:'晶体 / 裂缝 → 进一步验证的线索'}
+    };
+    var lesson=lessons[id]||lessons.sandstone,shapes='',flow='M44 155C90 145 95 182 139 167S210 145 259 166S321 172 380 148';
+    if(id==='sandstone')for(var y=0;y<4;y++)for(var x=0;x<8;x++){var cx=61+x*43+(y%2)*9,cy=96+y*35;shapes+='<ellipse cx="'+cx+'" cy="'+cy+'" rx="15" ry="12" fill="#d4b384" stroke="#bd9868" stroke-width="1.2"/>';}
+    if(id==='shale'){for(var n=0;n<8;n++)shapes+='<path d="M42 '+(88+n*17)+'q88-11 172 0t168 0" stroke="'+(n%2?'#a6b2ba':'#8297a7')+'" stroke-width="9" fill="none"/>';flow='M43 155C82 153 86 145 112 146';}
+    if(id==='dolomite'){for(var j=0;j<4;j++)for(var k=0;k<7;k++)shapes+='<path d="m'+(49+k*48)+' '+(87+j*34)+' 24-9 15 21-24 9Z" fill="#b5c0a0" stroke="#91a27f" stroke-width="1.2"/>';shapes+='<path d="M58 212 148 167 201 175 279 112 380 90" fill="none" stroke="#f3edda" stroke-width="9"/>';flow='M58 212 148 167 201 175 279 112 380 90';}
+    $('reservoir-diagram').innerHTML='<svg viewBox="0 0 500 335" aria-hidden="true"><path d="M40 75 100 42H445L385 75Z" fill="#f1e5cf"/><path d="M385 75 445 42V200L385 233Z" fill="#c7b797"/><path d="M40 75H385V233H40Z" fill="#e4dbc7"/><path d="M40 233H385L445 280H100Z" fill="#d6c3a2" opacity=".45"/>'+shapes+'<path class="concept-channel" d="'+flow+'"/><path class="concept-current" d="'+flow+'"/><text x="40" y="25">'+className(id)+' / 结构与通道概念图</text><text x="40" y="301">'+lesson.caption+'</text><text class="concept-note" x="40" y="324">示意结构，不对应样本实测孔渗；不表示已经发现油气。</text></svg>';
+    $('rock-concept-title').textContent=lesson.title;$('rock-concept-copy').textContent=lesson.copy;$('rock-concept-question').textContent=lesson.question;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.setAttribute('aria-pressed',String(button.dataset.rock===id));});
+    reportHeight();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){renderRockLesson(button.dataset.rock);});});
+  renderRockLesson('sandstone');
   var descriptions = {
     sandstone:{text:'沉积颗粒形成的碎屑岩。粒度与颗粒形态是观察线索，但照片不能直接给出孔隙度、渗透率。',concept:'颗粒结构示意'},
     shale:{text:'细粒沉积岩，层理或薄片状构造是常见观察要点。混样、风化和相近外观会影响图像判断。',concept:'细粒与层理示意'},
@@ -195,16 +213,41 @@
     var d=flowText[workflowStep];$('flow-kicker').textContent=d.kicker;$('flow-title').textContent=d.title;$('flow-copy').textContent=d.copy;$('flow-output').textContent=d.output;$('flow-trap').textContent=d.trap;$('flow-count').textContent=(workflowStep+1)+' / 4';
     Array.prototype.forEach.call(document.querySelectorAll('[data-step]'),function(button){var active=Number(button.dataset.step)===workflowStep;button.classList.toggle('is-selected',active);button.setAttribute('aria-pressed',String(active));});
     var snapshot=$('flow-snapshot');
-    if(workflowStep===0){snapshot.innerHTML='<h4>本例真实划分 / 井 2</h4>'+splitMarkup()+'<p class="fine-print">共 17 个 20 米井段分组，测试采用其中 5 组。同组样本不跨集合。</p>';return;}
+    if(workflowStep===0){
+      var grouped={};DATA.samples.forEach(function(s){if(!grouped[s.group])grouped[s.group]=[];grouped[s.group].push(s);});
+      var groupNames=Object.keys(grouped).sort(function(a,b){return Number(a.split('-').pop())-Number(b.split('-').pop());});
+      if(!selectedDepthGroup)selectedDepthGroup=groupNames.filter(function(name){return grouped[name][0].split==='test';})[0];
+      var selected=grouped[selectedDepthGroup],start=Number(selectedDepthGroup.split('-').pop());
+      snapshot.innerHTML='<h4>点击一个真实 20 米分组，查看它被分到哪里</h4><div class="depth-group-picker">'+groupNames.map(function(name){var samples=grouped[name],begin=Number(name.split('-').pop());return '<button type="button" data-depth-group="'+name+'" class="'+samples[0].split+'" aria-pressed="'+String(name===selectedDepthGroup)+'"><b>'+begin+'—'+(begin+19)+' m</b><small>本例 '+samples.length+' 张</small></button>';}).join('')+'</div><div class="group-readout"><b>'+start+'—'+(start+19)+' m · '+(selected[0].split==='test'?'整个分组留作测试':'整个分组进入参考库')+'</b><p>'+classes.map(function(c){return c.name+' '+selected.filter(function(s){return s.classId===c.id;}).length+' 张';}).join(' / ')+'</p></div><p class="fine-print">17 组中 5 组用于测试；同组样本不跨两边。颜色表示集合，不是岩性。蓝灰：参考；橙色：测试。</p>';return;
+    }
     if(!ready){snapshot.innerHTML='<p>正在准备实际样本与计算结果…</p>';return;}
     var sample=byId[currentId],f=computed[currentId].features;
-    if(workflowStep===1){snapshot.innerHTML='<h4>'+sample.id+' / 从照片到 40 维特征</h4><div class="snapshot-pair"><img class="snapshot-image" src="'+sample.image+'" alt="用于流程说明的真实测试样品"><span>→</span><div class="snapshot-vector" aria-label="当前图像特征向量">'+f.vector.map(function(v){return '<i style="height:'+Math.min(100,Math.max(3,v*100))+'%"></i>';}).join('')+'</div></div><p class="fine-print">图中每根柱对应一个特征。实际距离计算前还会按参考库尺度标准化。</p>';}
-    if(workflowStep===2){snapshot.innerHTML='<h4>当前候选：'+className(currentResult.classId)+'</h4><div class="snapshot-neighbors">'+currentResult.neighbors.map(function(n){return '<img style="--lith-color:'+byClass[n.classId].color+'" src="'+byId[n.id].image+'" alt="相似参考样本 '+n.id+'">';}).join('')+'</div><div class="snapshot-votes">'+voteMarkup(currentResult)+'</div>';}
-    if(workflowStep===3){snapshot.innerHTML='<h4>24 张留出图的实际结果</h4><div class="evaluation-stats"><div class="evaluation-stat"><span>准确率</span><strong>'+pct(evaluation.accuracy)+'</strong><small>'+evaluation.hit+' / '+evaluation.count+' 张</small></div><div class="evaluation-stat"><span>宏平均 F1</span><strong>'+evaluation.macroF1.toFixed(3)+'</strong><small>三个类别等权</small></div></div><p class="fine-print">这是当前 k 与权重的真实输出。人工复核单独保留，不修饰模型分数。</p>';}
+    if(workflowStep===1){
+      var labels=['原始照片','中心取样','灰度与纹理','40 维特征'];
+      snapshot.innerHTML='<h4>'+sample.id+' / 从照片到 40 维特征</h4><div class="processing-stages">'+labels.map(function(label,index){return '<button type="button" data-image-stage="'+index+'" aria-pressed="'+String(index===imageStage)+'">'+(index+1)+'. '+label+'</button>';}).join('')+'</div><div class="processing-figure">'+(imageStage<2?'<div class="processing-photo"><img src="'+sample.image+'" alt="'+labels[imageStage]+'">'+(imageStage===1?'<span class="roi-outline"></span>':'')+'</div>':imageStage===3?'<div class="snapshot-vector">'+f.vector.map(function(v){return '<i style="height:'+Math.min(100,Math.max(3,v*100))+'%"></i>';}).join('')+'</div>':'')+'</div><p class="fine-print">'+['保留原图与来源信息，分类不读取井深或文件名。','统一取中心 72% 区域，再缩放为 96 × 96，减少边框与编号干扰。','灰度图由当前样本实际像素计算，用于观察局部纹理与边缘。','12 维颜色 + 16 维局部纹理 + 8 维梯度方向 + 4 个统计量；距离计算前按参考库尺度标准化。'][imageStage]+'</p>';
+      if(imageStage===2){var canvas=document.createElement('canvas');canvas.width=cropSize;canvas.height=cropSize;canvas.className='processing-canvas';var context=canvas.getContext('2d'),pixels=context.createImageData(cropSize,cropSize);for(var g=0;g<f.gray.length;g++){pixels.data[g*4]=pixels.data[g*4+1]=pixels.data[g*4+2]=f.gray[g];pixels.data[g*4+3]=255;}context.putImageData(pixels,0,0);snapshot.querySelector('.processing-figure').appendChild(canvas);}
+    }
+    if(workflowStep===2){
+      var contextKey=currentId+'|'+JSON.stringify(config())+'|'+exposure+'|'+contrast;
+      if(contextKey!==voteContext){voteContext=contextKey;flowVoteCount=null;}
+      var count=flowVoteCount===null?currentResult.k:Math.min(flowVoteCount,currentResult.k),partial={votes:{},k:currentResult.k};
+      currentResult.neighbors.slice(0,count).forEach(function(n){partial.votes[n.classId]=(partial.votes[n.classId]||0)+1;});
+      snapshot.innerHTML='<h4>'+(count===currentResult.k?'计票完成：'+className(currentResult.classId):'已计 '+count+' / '+currentResult.k+' 票，尚未完成')+'</h4><div class="snapshot-vote-gallery">'+currentResult.neighbors.map(function(n,i){return '<figure class="'+(i<count?'is-counted':'')+'" style="--lith-color:'+byClass[n.classId].color+'"><img src="'+byId[n.id].image+'" alt="近邻 '+(i+1)+'，'+className(n.classId)+'"><figcaption>#'+(i+1)+' '+className(n.classId)+'<small>距离 '+n.distance.toFixed(3)+'</small></figcaption></figure>';}).join('')+'</div><div class="snapshot-votes">'+voteMarkup(partial)+'</div><div class="vote-controls"><button type="button" data-flow-action="vote-reset" class="quiet-button">从零计票</button><button type="button" data-flow-action="vote-next" class="quiet-button" '+(count===currentResult.k?'disabled':'')+'>计入下一张近邻 →</button></div><p class="fine-print">每张近邻投一票。票数相同，比较该类近邻平均距离。这里展示实际近邻的标签与距离。</p>';
+    }
+    if(workflowStep===3){snapshot.innerHTML='<h4>24 张留出图 / 行为原标签，列为预测</h4><div class="flow-confusion">'+evaluation.matrix.map(function(row,i){return '<div><b>'+className(classes[i].id)+'</b>'+row.map(function(n,j){return '<span class="'+(i===j?'diagonal':'')+'" title="'+className(classes[i].id)+' → '+className(classes[j].id)+'">'+n+'</span>';}).join('')+'</div>';}).join('')+'</div><p class="fine-print">列顺序：细砂岩 / 页岩 / 灰质白云岩。非对角线是误判。</p><div class="evaluation-stats"><div class="evaluation-stat"><span>准确率</span><strong>'+pct(evaluation.accuracy)+'</strong><small>'+evaluation.hit+' / '+evaluation.count+' 张</small></div><div class="evaluation-stat"><span>宏平均 F1</span><strong>'+evaluation.macroF1.toFixed(3)+'</strong><small>三个类别等权</small></div></div><button type="button" data-flow-action="inspect-errors" class="quiet-button">在示范里检查一份误判样本 →</button><p class="fine-print">人工复核单独保留，不修饰模型分数。</p>';}
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-step]'),function(button){button.addEventListener('click',function(){workflowStep=Number(button.dataset.step);renderWorkflow();reportHeight();});});
   $('flow-prev').addEventListener('click',function(){workflowStep=(workflowStep+3)%4;renderWorkflow();reportHeight();});
   $('flow-next').addEventListener('click',function(){workflowStep=(workflowStep+1)%4;renderWorkflow();reportHeight();});
+  $('flow-snapshot').addEventListener('click',function(event){
+    var group=event.target.closest('[data-depth-group]');if(group){selectedDepthGroup=group.dataset.depthGroup;renderWorkflow();reportHeight();return;}
+    var stage=event.target.closest('[data-image-stage]');if(stage){imageStage=Number(stage.dataset.imageStage);renderWorkflow();reportHeight();return;}
+    var action=event.target.closest('[data-flow-action]');if(!action||!ready)return;
+    if(action.dataset.flowAction==='vote-reset')flowVoteCount=0;
+    if(action.dataset.flowAction==='vote-next')flowVoteCount=Math.min(currentResult.k,(flowVoteCount===null?currentResult.k:flowVoteCount)+1);
+    if(action.dataset.flowAction==='inspect-errors'){var wrong=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;})[0];$('exposure').value='0';$('contrast').value='100';exposure=0;contrast=1;$('exposure-value').textContent='0';$('contrast-value').textContent='1.0×';setView('demo',true);if(wrong){selectSample(wrong.id);renderMatrixSelection(wrong.truth,wrong.result.classId);}return;}
+    renderWorkflow();reportHeight();
+  });
 
   $('sample-select').addEventListener('change',function(){selectSample(this.value);});
   $('k-select').addEventListener('change',function(){drawQuery();updateEvaluation();});
@@ -229,9 +272,13 @@
     a.href=url;a.download='m1-cuttings-predictions-and-review.csv';document.body.appendChild(a);a.click();a.remove();window.setTimeout(function(){URL.revokeObjectURL(url);},1000);
   });
   $('review-class').innerHTML=classes.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
-  var embedded=window.parent!==window;
-  if(embedded)document.body.classList.add('embedded');
-  setView(embedded?'demo':window.location.hash.slice(1)||'background',false);renderWorkflow();
+  // An app/browser preview can also be framed. Only an explicit portal request
+  // selects compact section mode; being inside a frame must not hide the lessons.
+  var sectionQuery=new URLSearchParams(window.location.search||'');
+  var portalSection=window.__CASE_DEMO_VIEW__||sectionQuery.get('section');
+  var embedded=Boolean(window.__CASE_DEMO_VIEW__)||sectionQuery.get('embed')==='portal';
+  if(embedded){document.body.classList.add('embedded');var brand=document.querySelector?document.querySelector('.wordmark'):null;if(brand){brand.removeAttribute('href');brand.setAttribute('aria-label','M1 岩屑岩性辅助识别');}}
+  setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
   var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv'];
   demoControls.forEach(function(id){$(id).disabled=true;});

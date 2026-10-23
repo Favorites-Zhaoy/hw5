@@ -169,9 +169,11 @@
 
     /* 5. 注入资源表与高度上报 */
     var assetsJson = JSON.stringify(map).replace(/</g, '\\u003c');
+    var selectedView = ['background', 'workflow', 'demo'].indexOf(d.view) >= 0 ? d.view : null;
     var head =
       '<script>window.__ASSETS__=' + assetsJson + ';' +
       'window.caseAsset=function(n){return window.__ASSETS__[n]||""};' +
+      (selectedView ? 'window.__CASE_DEMO_VIEW__=' + JSON.stringify(selectedView) + ';' : '') +
       '(function(){var last=-1;function send(){' +
       'var h=Math.max(document.body?document.body.scrollHeight:0,document.documentElement.scrollHeight);' +
       'h=Math.min(h,4200);if(Math.abs(h-last)>2){last=h;' +
