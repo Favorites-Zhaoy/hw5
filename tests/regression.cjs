@@ -29,6 +29,7 @@ class Element {
     return [];
   }
   addEventListener(type, fn) { this.listeners[type] = fn; }
+  removeEventListener(type, fn) { if (this.listeners[type] === fn) delete this.listeners[type]; }
   appendChild(child) { this.children.push(child); child.parentNode = this; return child; }
   setAttribute(k, v) { this.attributes[k] = v; }
   getBoundingClientRect() { return { top: 100 }; }
@@ -65,7 +66,7 @@ function runtime(seed = {}) {
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
   };
-  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/home.js'].forEach(run);
+  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js'].forEach(run);
   let shell = read('assets/core/shell.js').replaceAll('\r', '');
   const marker = '  render();\n\n  // 启动自检';
   assert.ok(shell.includes(marker), 'shell test hook must match exactly');
@@ -373,6 +374,81 @@ test('matrix modes distinguish candidate counts from covered scenes and retain t
 
 test('index loads the local homepage code before the shell and all linked files exist', () => {
   const html = read('index.html').replace(/<!--[\s\S]*?-->/g, '');
+  assert.ok(html.indexOf('src="assets/core/river.js') < html.indexOf('src="assets/core/home.js'));
   assert.ok(html.indexOf('src="assets/core/home.js') < html.indexOf('src="assets/core/shell.js'));
   for (const m of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[^" ]*)"/g)) assert.ok(fs.existsSync(path.join(site, m[1])), m[1]);
+});
+
+test('river geometry follows ordered nodes and keeps original input intact', () => {
+  const rt = runtime();
+  const input = [{ id: 'end', x: 580, y: 800, edgeX: 700, edgeY: 805 }, { id: 'start', x: 500, y: 180, edgeX: 420, edgeY: 180 }];
+  const before = plain(input), model = rt.ctx.AtlasRiver.geometry(input, 1100, 1000);
+  assert.deepEqual(input, before);
+  assert.deepEqual(plain(model.branches.map(b => b.id)), ['start', 'end']);
+  assert.match(model.trunk, /500 180/); assert.match(model.trunk, /580 800/);
+  assert.ok(model.body.endsWith(' Z')); assert.equal(model.lanes.length, 3);
+  for (const size of [[375, 500], [1200, 2600]]) {
+    const empty = rt.ctx.AtlasRiver.geometry([], ...size);
+    assert.doesNotMatch(empty.body + empty.trunk, /NaN|undefined|Infinity/);
+    assert.equal(empty.branches.length, 0);
+  }
+});
+
+test('river markup includes native particles, thirteen tributaries and accessible stage links', () => {
+  const rt = runtime(), html = rt.ctx.__shellTest.homeHTML();
+  assert.equal((html.match(/data-river-node=/g) || []).length, 13);
+  assert.equal((html.match(/data-river-branch=/g) || []).length, 13);
+  assert.ok((html.match(/<animateMotion /g) || []).length >= 30);
+  assert.match(html, /data-river-motion aria-pressed="true"/);
+  for (const stage of rt.ctx.ATLAS.stages) assert.ok(html.includes('data-river-node="' + stage.id + '"'));
+});
+
+function measuredRiver(rt, reduced = false) {
+  const tree = new Element(), svg = new Element('svg'), toggle = new Element('button');
+  const stats = { paused: 0, resumed: 0, disconnected: 0, resizeListeners: new Set(), styles: {} };
+  svg.pauseAnimations = () => stats.paused++; svg.unpauseAnimations = () => stats.resumed++;
+  tree.nodes.set('[data-river-svg]', svg); tree.nodes.set('[data-river-motion]', toggle);
+  tree.getBoundingClientRect = () => ({ top: 0, left: 0, width: 1100, height: 1000 });
+  tree.style.setProperty = (k, v) => stats.styles[k] = v;
+  const stages = [0, 1].map(i => {
+    const stage = new Element(), node = new Element(), island = new Element(), leaf = new Element();
+    node.dataset.riverNode = 'stage-' + i;
+    node.getBoundingClientRect = () => ({ left: 510 + i * 50, top: 180 + i * 400, width: 60, height: 60 });
+    island.getBoundingClientRect = () => i ? ({ left: 700, right: 1060, top: 520, width: 360, height: 180 }) : ({ left: 30, right: 440, top: 120, width: 410, height: 180 });
+    stage.nodes.set('[data-river-node]', node); stage.nodes.set('.atlas-river-island', island);
+    leaf.dataset.ready = i ? '1' : '0'; stage.querySelectorAll = () => [leaf];
+    return stage;
+  });
+  tree.querySelectorAll = selector => selector === '[data-home-stage]' ? stages : [];
+  rt.ctx.addEventListener = (type, fn) => { if (type === 'resize') stats.resizeListeners.add(fn); };
+  rt.ctx.removeEventListener = (type, fn) => { if (type === 'resize') stats.resizeListeners.delete(fn); };
+  rt.ctx.ResizeObserver = class { observe() {} disconnect() { stats.disconnected++; } };
+  rt.ctx.matchMedia = () => ({ matches: reduced });
+  const handle = rt.ctx.AtlasRiver.mount(tree);
+  return { tree, svg, toggle, stages, stats, handle };
+}
+
+test('measured river redraw follows filters and pause controls stop native motion', () => {
+  const rt = runtime(), { tree, svg, toggle, stages, stats, handle } = measuredRiver(rt);
+  assert.match(svg.innerHTML, /data-river-branch="stage-0"/);
+  assert.match(svg.innerHTML, /data-river-branch="stage-1"/);
+  stages[0].hidden = true; handle.refresh();
+  assert.doesNotMatch(svg.innerHTML, /data-river-branch="stage-0"/);
+  assert.match(svg.innerHTML, /data-river-branch="stage-1"/);
+  tree.listeners.pointermove({ clientX: 550, clientY: 300 });
+  assert.equal(stats.styles['--river-pointer-x'], '50%');
+  toggle.listeners.click(); assert.ok(tree.classList.contains('is-paused'));
+  assert.equal(toggle.attributes['aria-pressed'], 'false'); assert.ok(stats.paused > 0);
+  toggle.listeners.click(); assert.equal(tree.classList.contains('is-paused'), false);
+  assert.equal(toggle.attributes['aria-pressed'], 'true'); assert.ok(stats.resumed > 0);
+  handle.destroy();
+  assert.equal(stats.disconnected, 1); assert.equal(stats.resizeListeners.size, 0);
+  assert.equal(tree.listeners.pointermove, undefined); assert.equal(toggle.listeners.click, undefined);
+  const old = svg.innerHTML; stages[1].hidden = true; handle.refresh(); assert.equal(svg.innerHTML, old);
+});
+
+test('river motion starts paused when reduced motion is preferred', () => {
+  const rt = runtime(), { tree, toggle, stats, handle } = measuredRiver(rt, true);
+  assert.ok(tree.classList.contains('is-paused')); assert.equal(toggle.attributes['aria-pressed'], 'false');
+  assert.equal(stats.resumed, 0); assert.ok(stats.paused > 0); handle.destroy();
 });

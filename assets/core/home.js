@@ -43,15 +43,18 @@
   }
   function stageMap() {
     var tree = A.stages.map(function (st) {
-      return '<div class="atlas-map-stage" data-home-stage><a class="atlas-stage-label" href="#/stage/' + esc(st.id) + '"><span class="atlas-stage-no">STAGE ' + pad(st.idx) + '</span><h3>' + esc(st.name) + '</h3><span class="atlas-stage-en">' + esc(st.en) + '</span><span class="atlas-stage-count">' + st.scenes.length + ' 个场景 ' + arrow + '</span></a>' +
-        '<div class="atlas-stage-junction" aria-hidden="true"><span>' + pad(st.idx) + '</span></div><div class="atlas-map-branch"><div class="atlas-map-leaves">' + st.scenes.map(function (sc) { return sceneLeaf(sc, st); }).join('') + '</div></div></div>';
+      return '<div class="atlas-map-stage" data-home-stage><div class="atlas-river-island"><a class="atlas-stage-label" href="#/stage/' + esc(st.id) + '"><span class="atlas-stage-no">STAGE ' + pad(st.idx) + ' / ' + pad(A.stages.length) + '</span><h3>' + esc(st.name) + '</h3><span class="atlas-stage-en">' + esc(st.en) + '</span><span class="atlas-stage-count">' + st.scenes.length + ' 个场景 ' + arrow + '</span></a>' +
+        '<div class="atlas-map-leaves">' + st.scenes.map(function (sc) { return sceneLeaf(sc, st); }).join('') + '</div></div>' +
+        '<a class="atlas-stage-junction" href="#/stage/' + esc(st.id) + '" data-river-node="' + esc(st.id) + '" aria-label="探索第 ' + st.idx + ' 阶段：' + esc(st.name) + '"><span class="atlas-node-orbit" aria-hidden="true"></span><b>' + pad(st.idx) + '</b></a></div>';
     }).join('');
     return '<section class="atlas-section atlas-map-section" id="stage-map"><div class="atlas-width">' +
-      sectionHead('01', 'BY STAGE', '一条作业链，<em>很多种可能。</em>', '从专业场景出发，沿着地图向下探索。每一条分支，都是一个可以被智能方法改进的具体问题。') +
+      sectionHead('01', 'BY STAGE · FOLLOW THE CURRENT', '让智能，<em>沿作业链流动。</em>', '顺流探索 ' + A.stages.length + ' 个作业环节。主河道连接专业现场，每一条支流，通向一个可以被智能方法改进的具体问题。') +
       '<div class="atlas-map-toolbar"><div class="atlas-segment" role="group" aria-label="地图场景范围"><button class="is-active" data-home-scope="all" aria-pressed="true">全部场景 <span>' + A.allScenes.length + '</span></button><button data-home-scope="ready" aria-pressed="false">已有案例 <span>' + C.stats().coveredScenes + '</span></button></div>' +
       '<label class="atlas-search"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6"/></svg><input id="atlas-map-search" type="search" placeholder="搜索环节、场景或方法" aria-label="搜索场景地图"></label></div>' +
-      '<div class="atlas-map-caption"><span><i></i> 石油勘探开发 · 场景地图</span><span id="atlas-map-count" role="status">' + A.allScenes.length + ' 个场景</span></div>' +
-      '<div class="atlas-map-tree">' + tree + '</div><div class="atlas-map-empty" id="atlas-map-empty" hidden>没有找到匹配的场景。试试更短的关键词，或切换到全部场景。</div>' +
+      '<div class="atlas-map-caption"><span><i></i> THE CURRENT / 石油勘探开发</span><span id="atlas-map-count" role="status">' + A.allScenes.length + ' 个场景</span></div>' +
+      '<div class="atlas-map-tree atlas-river-tree" data-river-map><div class="atlas-river-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>' + global.AtlasRiver.initial(A.stages) +
+      '<div class="atlas-river-topbar"><div><span class="atlas-current-dot"></span> KNOWLEDGE IN MOTION <small>顺着光，发现下一种可能</small></div><button data-river-motion aria-pressed="true"><span class="atlas-motion-symbol" aria-hidden="true"></span><span data-river-motion-label>暂停动效</span></button></div>' +
+      '<div class="atlas-river-stages">' + tree + '</div><div class="atlas-river-outro"><span>↓</span> THE EXPLORATION CONTINUES</div></div><div class="atlas-map-empty" id="atlas-map-empty" hidden>没有找到匹配的场景。试试更短的关键词，或切换到全部场景。</div>' +
       '<div class="atlas-map-end"><span></span><p>一张持续生长的地图。<b>下一个案例，可以由你补上。</b></p><button class="atlas-text-link" data-import>添加你的案例 ' + plus + '</button></div></div></section>';
   }
   function methodPanel(key) {
@@ -117,6 +120,7 @@
   function bind(root) {
     var scope = 'all';
     var search = root.querySelector('#atlas-map-search');
+    var river = global.AtlasRiver.mount(root.querySelector('[data-river-map]'));
     function filterMap() {
       var query = (search.value || '').trim().toLowerCase(), count = 0;
       [].forEach.call(root.querySelectorAll('[data-home-stage]'), function (stage) {
@@ -129,6 +133,7 @@
       });
       root.querySelector('#atlas-map-count').textContent = count + ' 个场景';
       root.querySelector('#atlas-map-empty').hidden = !!count;
+      river.refresh();
     }
     root.addEventListener('click', function (e) {
       var jump = e.target.closest('[data-home-jump]');
@@ -168,6 +173,7 @@
       activateMethod(buttons[i]); buttons[i].focus();
     });
     if (search) search.addEventListener('input', filterMap);
+    return river;
   }
   global.AtlasHome = { render: render, bind: bind, footer: footer };
 })(window);

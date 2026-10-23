@@ -16,6 +16,7 @@
   var view = document.getElementById('view');
   var mounted = null;          // 当前挂载中的示范，切页时调用其 unmount
   var mountedKey = '';
+  var homeHandle = null;
 
   /* =========================================================
      一、路由
@@ -911,6 +912,7 @@
      十、调度
      ========================================================= */
   function unmountCurrent() {
+    if (homeHandle) { homeHandle.destroy(); homeHandle = null; }
     if (mounted && mounted.unmount) {
       try { mounted.unmount(); } catch (e) { }
     }
@@ -943,7 +945,7 @@
 
     view.innerHTML = header() + html + footer();
 
-    if (!p.length && global.AtlasHome) global.AtlasHome.bind(view.querySelector('.atlas-home'));
+    if (!p.length && global.AtlasHome) homeHandle = global.AtlasHome.bind(view.querySelector('.atlas-home'));
 
     // 页面级交互
     if (p[0] === 'stage') bindFilters(view);
