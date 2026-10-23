@@ -1,0 +1,30 @@
+核验日期：2026-10-24
+
+[1] 真实 RGB 岩屑图像、岩性与井深标签
+nature9420/-ResNet-HMM-Lithology
+https://github.com/nature9420/-ResNet-HMM-Lithology
+固定提交 c5d9fc0c2ab99c983677e3b26c1e523c0d9401ca
+本例使用 data/output_2090-2288-2、data/output_2490-2688-2、data/output_2690-2888-2 中的部分原图及 CSV 标签。
+使用说明见原 README 与本包 DATA-LICENSE.txt；逐样本出处见 provenance.json。
+不运行原仓库的训练脚本，不使用其论文结果冒充本例结果。
+
+[2] 录井、钻井液循环、岩屑返回与解释背景
+SLB — The Defining Series: Mud Logging
+https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging
+页面中迟到深度公式为恒定钻速下的教学简化，不作为工程迟到计算。
+
+[3] k 近邻分类的一般方法
+scikit-learn 官方文档 — Nearest Neighbors
+https://scikit-learn.org/stable/modules/neighbors.html
+本例用原生 JavaScript 实现加权欧氏距离与多数投票，未在运行时加载 Python 或 scikit-learn。
+
+[4] 分组留出与防止相关样本跨分区
+scikit-learn 官方文档 — Cross-validation
+https://scikit-learn.org/stable/modules/cross_validation.html
+本例采用固定的 20 米井段分组留出，种子 42，仅按类别数量约束分区，不按模型表现挑选。
+
+[5] 另一公开岩屑数据来源（仅作扩展参考，本包没有使用）
+Beerra et al. — Generating a Labeled Dataset to Train Machine Learning Algorithms for Lithological Classification of Drill Cuttings
+https://zenodo.org/records/5545058
+DOI: 10.5281/zenodo.5545058
+该数据以 SEM 岩屑图像为主，成像方式与本例 RGB 照片不同，不能混作同一训练域。

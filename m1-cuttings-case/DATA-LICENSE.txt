@@ -1,0 +1,21 @@
+真实岩屑图像及标签的来源与使用说明
+
+来源仓库：https://github.com/nature9420/-ResNet-HMM-Lithology
+固定提交：c5d9fc0c2ab99c983677e3b26c1e523c0d9401ca
+源声明：https://github.com/nature9420/-ResNet-HMM-Lithology/blob/c5d9fc0c2ab99c983677e3b26c1e523c0d9401ca/README.md#license
+
+原仓库 README 的原文使用说明：
+“This project is available for academic use. For other uses, please contact the authors.”
+
+本子集仅用于可视化导论课程的非商业教学与学术演示。原始图像和标签的权利归原权利人；不把上游数据另行声明为 MIT、CC0 或 CC BY。其他用途请联系原作者。
+
+数据选择与处理说明：
+- 从源仓库原始 data/output_*/*.jpg 中选取 66 张，不重复收录 labeled_dataset 中的副本。
+- 原 JPEG 字节未修改，以 data URL 收录在 demo/data.js；标签和井深保留源 CSV 值。
+- 浏览器只为特征计算取中心区域并统一尺度，原图仍可查看。
+- 浏览器中的亮度/对比度扰动是显式实验操作，不会改写原始数据。
+- provenance.json 提供逐样本源 URL 与 SHA-256，便于追溯。
+
+数据核验：上游 README 概述 13 类，实际 CSV 存在 17 个不同标签；本案例仅使用其中明确列出的三类，不沿用未核验的全库类别计数，也不使用上游论文的识别精度作为本例结果。
+
+资产区分：assets/m1-dioramas.webp 为教学情境插画，由 OpenAI imagegen 生成；它不属于公开岩屑数据集，不参与分类、评价或真实样本展示。

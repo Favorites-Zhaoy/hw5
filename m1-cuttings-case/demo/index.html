@@ -1,78 +1,53 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>m1 · 岩屑岩性识别</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light"><title>M1 岩屑岩性辅助识别 · 交互案例</title>
   <link rel="stylesheet" href="demo.css">
 </head>
 <body>
-  <main class="page">
-    <header class="masthead">
-      <a class="wordmark" href="#overview" aria-label="回到岩屑识别流程顶部"><span class="brand-icon">m1</span><span>岩屑岩性识别<small>MUD LOGGING LAB</small></span></a>
-      <span class="edition"><span></span>交互流程 · 初版</span>
-    </header>
+<main class="case-page">
+  <header class="masthead"><a class="wordmark" href="#background"><b>m1</b><span>岩屑岩性辅助识别<small>MUD LOGGING / COMPUTER VISION</small></span></a><span class="edition">录井案例 · 纯前端运行</span><button id="motion-toggle" class="quiet-button" type="button" aria-pressed="false">暂停动效</button></header>
+  <section class="hero"><div><p class="eyebrow">从一盘岩屑，走向可复核的岩性记录</p><h1>看见岩屑的细节，<br><em>理解机器的判断。</em></h1><p>钻头带回的是碎屑，地质人员需要的是地层线索。<br>这个案例用公开岩屑照片与可解释的近邻分类，连接现场问题、识别过程和人工复核。</p><div class="hero-facts"><span><b>66</b> 张公开原图</span><span><b>3</b> 类岩性</span><span><b>40</b> 维图像特征</span></div></div><div class="hero-art art-lab" aria-hidden="true"><img src="../assets/m1-dioramas.webp" width="1254" height="1254" alt=""></div></section>
+  <nav class="case-tabs" aria-label="案例的三个部分" role="tablist"><button id="tab-background" data-view="background" role="tab" aria-selected="true" aria-controls="panel-background" type="button"><span>01</span>专业背景<small>为什么识别岩屑</small></button><button id="tab-workflow" data-view="workflow" role="tab" aria-selected="false" aria-controls="panel-workflow" type="button" tabindex="-1"><span>02</span>案例流程<small>图像怎样变成候选</small></button><button id="tab-demo" data-view="demo" role="tab" aria-selected="false" aria-controls="panel-demo" type="button" tabindex="-1"><span>03</span>可视化示范<small>亲手运行与复核</small></button></nav>
 
-    <section class="intro" id="overview" aria-labelledby="page-title">
-      <div><p class="eyebrow">从井底到屏幕 / FROM ROCK TO RECOGNITION</p>
-      <h1 id="page-title">一粒岩屑，<span>读懂地下的岩层。</span></h1>
-      <p class="intro-copy">跟随一份岩屑样品，看计算机视觉如何帮助地质人员识别岩性。<br class="desktop-break">从取样、观察到识别与复核，把地下的信息一步步带到眼前。</p></div>
-      <div class="intro-side"><span class="section-index">01—04</span><p>四个环节，一条识别路径</p><button class="play-button" id="play" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg><span>自动讲解</span></button></div>
-    </section>
+  <section class="case-panel" id="panel-background" role="tabpanel" aria-labelledby="tab-background">
+    <div class="section-heading"><div><p class="eyebrow">01 / THE PETROLEUM CONTEXT</p><h2>岩屑，是地下岩层送到地面的线索。</h2></div><p>先理解样品从哪里来，<br>再理解图像能告诉我们什么。</p></div>
+    <article class="background-grid warm-board">
+      <div class="well-visual"><div class="well-art" aria-hidden="true"><img src="../assets/m1-dioramas.webp" width="1254" height="1254" alt=""></div><svg viewBox="0 0 480 360" class="well-overlay" role="img" aria-label="钻井液带岩屑上返与迟到深度示意"><defs><marker id="lag-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="m1 1 7 4-7 4" stroke="#e59648" stroke-width="2" fill="none"/></marker></defs><path class="lag-current" d="M155 278V107Q155 78 199 78H350" stroke="#e9a660" stroke-width="7" fill="none" marker-end="url(#lag-arrow)"/><path class="white-current" d="M155 278V107Q155 78 199 78H350"/><text x="210" y="57">岩屑随钻井液返回地面</text><line x1="301" y1="258" x2="436" y2="258" stroke="#b28e6b" stroke-dasharray="4 5"/><text x="310" y="249">钻头：3200 m</text><g id="lag-marker"><line x1="301" y1="221" x2="436" y2="221" stroke="#4e90af" stroke-width="2"/><text x="310" y="211" id="lag-source-label">样品来源示意：3194 m</text></g></svg><span class="visual-caption">机理示意 · 参数为教学设定，与下方公开样本井深无关</span></div>
+      <div class="context-copy"><span class="mini-label">专业概念 / 迟到时间</span><h3>地面拿到的样品，<br>不是钻头此刻所在的位置。</h3><p>钻头破碎岩石，岩屑随钻井液沿环空上返。地质人员清洗、观察并记录岩性，用来认识钻遇的地层。上返需要时间，解释样品前必须考虑这段“迟到”。</p><div class="lag-controls"><label for="lag-minutes">上返迟到时间 <output id="lag-value">30 分钟</output></label><input id="lag-minutes" type="range" min="10" max="80" step="5" value="30"><label for="rop">钻速 <output id="rop-value">12 m/h</output></label><input id="rop" type="range" min="5" max="40" step="1" value="12"><div class="lag-equation">3200 − 钻速 × 迟到时间 ÷ 60 = <b id="source-depth">3194 m</b></div></div><p class="fine-print">这里假设钻速恒定，用于说明方向和量级。实际迟到校正需结合井眼、钻具与循环条件。</p></div>
+    </article>
+    <div class="section-heading compact"><div><p class="eyebrow">WHAT DO WE RECOGNIZE?</p><h2>这次只识别三类，先把问题做具体。</h2></div><p>下图为公开数据中的真实照片。<br>矿物组成与储层性质还需其他证据。</p></div>
+    <div class="lithology-grid" id="lithology-cards"></div>
+    <article class="ai-explainer"><div><p class="eyebrow">AI 的价值 / 把相似性变成可见证据</p><h3>让机器先给候选，<br>让人知道为什么。</h3><p>大量岩屑照片需要重复观察。光照变化、混样和相近外观会影响判断。本例把颜色分布与纹理变成数值，找出参考库中最相似的照片；地质人员可检查这些依据，再决定是否接受。</p></div><div class="evidence-path"><span>原始图像<small>保留样品来源</small></span><i>→</i><span>40 维特征<small>颜色与纹理</small></span><i>→</i><span>k 个近邻<small>展示相似证据</small></span><i>→</i><span>人工复核<small>保留修改记录</small></span></div></article>
+    <article class="data-section"><div class="section-heading compact"><div><p class="eyebrow">DATA & LIMITS</p><h2>数据从哪里来，结果又能说明多少。</h2></div><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">打开原始数据仓库 ↗</a></div><div class="data-layout"><div><p>本例从公开 RGB 岩屑资料选取井 2 的 66 张照片，保留原始岩性标签、井深与来源。上游声明用于学术用途；本包仅用于课程教学。</p><p>按 <b>20 米井段</b>分组，42 张组成参考库，24 张留作测试。同一分组不会同时出现在两边。它仍是单井、三类、小样本演示，不代表新井上的识别能力。</p><details><summary>查看准备清单与方法边界</summary><ul><li>图像、标签、井深、井号、分组和来源校验值均随包提供。</li><li>分类仅使用图像特征，不把井深、文件名或原标签作为输入。</li><li>取中心 72% 区域，减少样品盘边框与手写编号干扰。</li><li>颜色和纹理无法独立确定矿物组成、孔渗性质或含油气情况。</li><li>正式改进方向：更多独立井数据、成像标准化、卷积网络迁移学习。</li></ul></details></div><div><div id="split-bars" class="split-bars"></div><p class="fine-print">参考库用于近邻搜索；测试集只用于查询和评价。标准化参数也仅由参考库计算。</p></div></div></article>
+    <div class="part-next"><span>理解了现场问题，接着拆解识别流程。</span><button type="button" data-go="workflow" class="primary-button">进入案例流程 →</button></div>
+  </section>
 
-    <section class="journey" aria-label="岩屑识别的四个环节">
-      <div class="landscape" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="journey-top"><span>岩屑的旅程</span><span class="interaction-tip">悬浮观察 · 点击探索</span></div>
-      <div class="scenes" id="scenes">
-        <button class="scene is-selected" type="button" data-step="0" aria-pressed="true" aria-controls="step-detail" style="--accent:#dd702b;--tint:#f9e7d0">
-          <span class="scene-heading"><span class="number">01</span><span class="scene-title">从井底带回岩屑<small>钻进与取样</small></span></span>
-          <span class="scene-art art-drilling"><img src="../assets/m1-dioramas.webp" alt="钻井塔与地下地层剖面的立体示意" width="1254" height="1254" draggable="false"></span>
-          <span class="scene-caption">钻头破岩，钻井液把岩屑<br>带回地面，留下地层的线索。</span>
-          <span class="scene-tag">地层 → 样品</span>
-        </button>
-        <button class="scene" type="button" data-step="1" aria-pressed="false" aria-controls="step-detail" style="--accent:#3989b5;--tint:#dfeef3">
-          <span class="scene-heading"><span class="number">02</span><span class="scene-title">让岩屑清晰可见<small>清洗与成像</small></span></span>
-          <span class="scene-art art-lab"><img src="../assets/m1-dioramas.webp" alt="技术人员在显微镜前准备岩屑样品的立体示意" width="1254" height="1254" draggable="false"></span>
-          <span class="scene-caption">清洗、铺样、统一光照，<br>把样品变成可比较的图像。</span>
-          <span class="scene-tag">样品 → 图像</span>
-        </button>
-        <button class="scene" type="button" data-step="2" aria-pressed="false" aria-controls="step-detail" style="--accent:#8870b5;--tint:#ebe3f4">
-          <span class="scene-heading"><span class="number">03</span><span class="scene-title">用视觉寻找特征<small>智能辅助识别</small></span></span>
-          <span class="scene-art art-vision"><img src="../assets/m1-dioramas.webp" alt="计算机视觉工作站与岩屑图像分析的立体示意" width="1254" height="1254" draggable="false"></span>
-          <span class="scene-caption">比较颜色与纹理等特征，<br>给出岩性候选与相似样本。</span>
-          <span class="scene-tag">图像 → 候选岩性</span>
-          <span class="scan-line" aria-hidden="true"></span>
-        </button>
-        <button class="scene" type="button" data-step="3" aria-pressed="false" aria-controls="step-detail" style="--accent:#57895f;--tint:#e5eddb">
-          <span class="scene-heading"><span class="number">04</span><span class="scene-title">回到地质证据中<small>人工复核与记录</small></span></span>
-          <span class="scene-art art-review"><img src="../assets/m1-dioramas.webp" alt="地质人员复核岩性并查看深度记录的立体示意" width="1254" height="1254" draggable="false"></span>
-          <span class="scene-caption">把候选结果交给人复核，<br>结合取样记录理解地层变化。</span>
-          <span class="scene-tag">候选 → 可追溯记录</span>
-        </button>
-      </div>
-      <svg class="flow" viewBox="0 0 1200 102" fill="none" aria-hidden="true">
-        <defs><marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="2.7" markerHeight="2.7" orient="auto"><path d="m1 1 7 4-7 4" stroke="#e9a65c" stroke-width="2"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="2.7" markerHeight="2.7" orient="auto"><path d="m1 1 7 4-7 4" stroke="#81bbcf" stroke-width="2"/></marker><marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="2.7" markerHeight="2.7" orient="auto"><path d="m1 1 7 4-7 4" stroke="#b1a3cd" stroke-width="2"/></marker></defs>
-        <path class="river" d="M150 14 C200 100 365 3 450 62" stroke="#e9a65c" marker-end="url(#arrow-orange)"/><path class="flow-dashes" d="M150 14 C200 100 365 3 450 62"/>
-        <path class="river" d="M450 20 C520 98 670 0 750 62" stroke="#81bbcf" marker-end="url(#arrow-blue)"/><path class="flow-dashes" d="M450 20 C520 98 670 0 750 62"/>
-        <path class="river" d="M750 14 C820 98 970 0 1050 62" stroke="#b1a3cd" marker-end="url(#arrow-purple)"/><path class="flow-dashes" d="M750 14 C820 98 970 0 1050 62"/>
-        <g class="travel-arrow"><path d="m-9-5 8 5-8 5m-9-10 8 5-8 5"/><animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="M150 14 C200 100 365 3 450 62"/></g>
-        <g class="travel-arrow"><path d="m-9-5 8 5-8 5m-9-10 8 5-8 5"/><animateMotion dur="5s" begin="-1.6s" repeatCount="indefinite" rotate="auto" path="M450 20 C520 98 670 0 750 62"/></g>
-        <g class="travel-arrow"><path d="m-9-5 8 5-8 5m-9-10 8 5-8 5"/><animateMotion dur="5s" begin="-3.2s" repeatCount="indefinite" rotate="auto" path="M750 14 C820 98 970 0 1050 62"/></g>
-      </svg>
-      <div class="journey-bottom"><span>FOLLOW THE EVIDENCE</span><button class="motion-toggle" id="motion" type="button" aria-pressed="false">暂停动效</button></div>
-    </section>
+  <section class="case-panel" id="panel-workflow" role="tabpanel" aria-labelledby="tab-workflow" hidden>
+    <div class="section-heading"><div><p class="eyebrow">02 / AN EXPLAINABLE WORKFLOW</p><h2>每一步，都看得见输入与输出。</h2></div><p>点击四个场景，<br>查看本例的实际数据怎样流动。</p></div>
+    <div class="journey warm-board"><div class="workflow-scenes" id="workflow-scenes"><button data-step="0" class="workflow-scene is-selected" type="button" aria-pressed="true"><span class="step-title"><b>01</b>核验与分组</span><span class="scene-art art-drilling"><img src="../assets/m1-dioramas.webp" alt="钻井与取样立体示意" width="1254" height="1254"></span><small>66 张原图 → 互斥的两个集合</small></button><button data-step="1" class="workflow-scene" type="button" aria-pressed="false"><span class="step-title"><b>02</b>图像与特征</span><span class="scene-art art-lab"><img src="../assets/m1-dioramas.webp" alt="显微观察立体示意" width="1254" height="1254"></span><small>中心区域 → 40 维描述</small></button><button data-step="2" class="workflow-scene" type="button" aria-pressed="false"><span class="step-title"><b>03</b>近邻与投票</span><span class="scene-art art-vision"><img src="../assets/m1-dioramas.webp" alt="视觉分析立体示意" width="1254" height="1254"></span><small>特征距离 → 岩性候选</small></button><button data-step="3" class="workflow-scene" type="button" aria-pressed="false"><span class="step-title"><b>04</b>复核与评价</span><span class="scene-art art-review"><img src="../assets/m1-dioramas.webp" alt="地质复核立体示意" width="1254" height="1254"></span><small>检查证据 → 记录局限</small></button></div><svg class="flow" viewBox="0 0 1200 100" aria-hidden="true"><path d="M140 18C235 100 350 0 448 58" stroke="#e5a25d"/><path d="M450 18C545 100 650 0 748 58" stroke="#85b8ca"/><path d="M750 18C845 100 950 0 1048 58" stroke="#afa0c5"/><g class="flow-arrow"><path d="m-8-5 8 5-8 5m-10-10 8 5-8 5"/><animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="M140 18C235 100 350 0 448 58"/></g><g class="flow-arrow"><path d="m-8-5 8 5-8 5m-10-10 8 5-8 5"/><animateMotion dur="5s" begin="-1.5s" repeatCount="indefinite" rotate="auto" path="M450 18C545 100 650 0 748 58"/></g><g class="flow-arrow"><path d="m-8-5 8 5-8 5m-10-10 8 5-8 5"/><animateMotion dur="5s" begin="-3s" repeatCount="indefinite" rotate="auto" path="M750 18C845 100 950 0 1048 58"/></g></svg></div>
+    <article class="workflow-detail" aria-live="polite"><div><p class="eyebrow" id="flow-kicker">STEP 01 / 数据</p><h3 id="flow-title">先分组，再比较。</h3><p id="flow-copy"></p><dl><dt>这一环节的输出</dt><dd id="flow-output"></dd><dt>容易踩的坑</dt><dd id="flow-trap"></dd></dl><div class="flow-controls"><button id="flow-prev" type="button" class="quiet-button">← 上一步</button><span id="flow-count">1 / 4</span><button id="flow-next" type="button" class="quiet-button">下一步 →</button></div></div><div class="flow-snapshot" id="flow-snapshot"><p>正在准备实际样本…</p></div></article>
+    <article class="method-note"><span class="mini-label">为什么先用 kNN？</span><h3>把“像不像”展开给读者看。</h3><p>k 近邻不训练深层网络，而是储存带标签的参考样本。新图像经过同样的特征处理后，寻找距离最近的 k 张参考图，再按类别投票。本例能直接展示照片、特征、距离与票数，适合解释智能方法如何进入录井任务。</p><p class="fine-print">投票占比不是经过校准的概率；外观相近也不等于地质成因相同。</p></article>
+    <div class="part-next"><span>现在用同一套流程，亲手运行真实样本。</span><button type="button" data-go="demo" class="primary-button">进入可视化示范 →</button></div>
+  </section>
 
-    <section class="step-detail" id="step-detail" aria-live="polite" aria-atomic="true" style="--accent:#dd702b;--tint:#f9e7d0">
-      <div class="detail-number" id="detail-number">01</div>
-      <div class="detail-main"><p class="eyebrow" id="detail-kicker">专业背景 / 岩屑从哪里来？</p><h2 id="detail-title">小小岩屑，是井底带回来的地质线索。</h2><p id="detail-copy">钻头破碎岩石，产生的碎屑随钻井液沿环空返回地面。现场人员收集岩屑，观察颜色、颗粒和结构，帮助判断钻遇的岩层。岩屑返回需要时间，因此地面取样时的钻头深度并不直接等于岩屑来源深度。</p><div class="concepts" id="concepts"><span>钻头破岩</span><span>钻井液返出</span><span>迟到时间</span></div></div>
-      <aside class="detail-aside"><span>这一环节要回答</span><strong id="detail-question">这份样品来自哪里？</strong><p id="detail-output">保留样品编号、采集时间和井段信息，让后续识别结果能追溯到原始样品。</p><div class="detail-controls"><button id="prev" type="button" aria-label="上一个环节">←</button><span id="step-count">1 / 4</span><button id="next" type="button" aria-label="下一个环节">→</button></div></aside>
-    </section>
-
-    <section class="data-note" aria-labelledby="data-title"><div class="data-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="8" rx="10" ry="4"/><path d="M6 8v8c0 5 20 5 20 0V8M6 16v8c0 5 20 5 20 0v-8"/></svg></div><div><p class="eyebrow">下一步 / OPEN DATA</p><h2 id="data-title">让识别建立在公开样本上。</h2><p>优先核验 Zenodo 公开岩屑数据。该数据以扫描电镜图像为主，后续将按实际标签和成像方式选择特征与模型。</p></div><a class="data-link" href="https://zenodo.org/records/5545058" target="_blank" rel="noopener noreferrer">查看候选数据集 <span>↗</span></a></section>
-    <footer><p>流程原型 · 当前插画为教学示意，尚未接入真实岩屑样本与分类模型。</p><a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">录井背景参考 ↗</a></footer>
-  </main>
-  <noscript><p class="no-script">启用 JavaScript 后可以切换环节与自动讲解。当前仍可阅读四步流程。</p></noscript>
-  <script src="demo.js"></script>
-</body>
-</html>
+  <section class="case-panel" id="panel-demo" role="tabpanel" aria-labelledby="tab-demo" hidden>
+    <div class="section-heading"><div><p class="eyebrow">03 / RUN THE CASE</p><h2>选一份样品，看机器如何给出候选。</h2></div><p>图像计算与分类均在浏览器完成。<br>可调整参数，也可复核并导出记录。</p></div>
+    <p class="loading-status" id="loading-status" role="status">正在解码公开样本并计算图像特征…</p>
+    <div class="demo-toolbar"><label>测试样品<select id="sample-select" disabled aria-label="选择测试样品"></select></label><label>近邻数 k<select id="k-select"><option>1</option><option>3</option><option selected>5</option><option>7</option></select></label><label class="weight-control" for="color-weight">颜色 / 纹理 <output id="weight-value">50 / 50</output><input id="color-weight" type="range" min="0" max="100" value="50" step="10"></label><button type="button" id="reset-parameters" class="quiet-button">恢复参数</button></div>
+    <div class="lab-grid">
+      <article class="lab-panel query-panel"><div class="panel-heading"><span class="mini-label">INPUT / 待识别图像</span><span class="test-badge">测试集</span></div><div class="query-image"><img id="query-image" alt="当前测试样品的原始公开岩屑照片"><span class="roi-outline" aria-hidden="true"></span></div><div class="query-info"><strong id="query-id">—</strong><span id="query-depth">源记录井深 —</span></div><p class="fine-print">虚线为中心取样区域。保留原图，分类不读取边框、井深与文件名。</p><details class="disturbance"><summary>试试光照与对比度变化</summary><label for="exposure">亮度偏移 <output id="exposure-value">0</output></label><input id="exposure" type="range" min="-50" max="50" value="0" step="5"><label for="contrast">对比度 <output id="contrast-value">1.0×</output></label><input id="contrast" type="range" min="60" max="140" value="100" step="10"><button id="reset-image" class="quiet-button" type="button">恢复原图条件</button><p class="fine-print">扰动仅作用于当前查询。下方批量评价始终使用原始条件。</p></details></article>
+      <article class="lab-panel feature-panel"><div class="panel-heading"><span class="mini-label">FEATURES / 看到了什么</span><span>40 维</span></div><canvas id="processed-canvas" width="96" height="96" aria-label="当前样品中心区域的实际处理结果"></canvas><div id="image-statistics" class="image-statistics"></div><h4>颜色分布 <small>每个通道 4 个亮度区间</small></h4><div id="feature-histogram" class="feature-histogram"></div><p class="fine-print">另提取 16 维局部二值纹理、8 维梯度方向和 4 个统计量。各维用参考库均值与尺度标准化。</p></article>
+      <article class="lab-panel result-panel"><div class="panel-heading"><span class="mini-label">OUTPUT / 岩性候选</span><span class="result-state" id="result-state">等待计算</span></div><h3 id="prediction">—</h3><p id="vote-summary">从参考库寻找近邻</p><div class="vote-bars" id="vote-bars"></div><div class="review-threshold"><label for="review-threshold">投票复核门槛 <output id="threshold-value">70%</output></label><input id="review-threshold" type="range" min="40" max="100" step="10" value="70"><p class="fine-print">低于门槛时提示优先复核。票数占比不等于地质可靠概率，高票结果仍需核验。</p></div><button id="reveal-label" type="button" class="quiet-button">显示原数据标签</button><p id="original-label" class="original-label" hidden></p></article>
+    </div>
+    <article class="neighbors-section"><div class="section-heading compact"><div><p class="eyebrow">THE EVIDENCE / 相似样本</p><h3>这次判断，参考了哪些照片？</h3></div><p>仅从 42 张参考库中检索。<br>距离越小，表示本特征空间内越接近。</p></div><div class="neighbors" id="neighbors"></div></article>
+    <article class="review-board"><div><p class="eyebrow">HUMAN IN THE LOOP</p><h3>检查证据，再留下你的复核意见。</h3><p>确认或修改不会覆盖模型原始结果，也不会改变下方模型评价。</p></div><div class="review-form"><label for="review-class">人工复核岩性</label><select id="review-class"></select><button id="save-review" type="button" class="primary-button">保存本次复核</button><span id="review-status" role="status">尚未复核</span></div></article>
+    <article class="evaluation-board"><div class="section-heading compact"><div><p class="eyebrow">CHECK THE MODEL / 24 张分组留出样本</p><h3>效果有多好，错误又集中在哪里？</h3></div><p>重新计算当前 k 与特征权重下的全部测试结果。<br>展示原始模型输出，不计入人工修改。</p></div><div class="evaluation-stats" id="evaluation-stats"></div><div class="evaluation-grid"><div><div id="confusion-matrix"></div><p class="fine-print">行：原数据标签；列：模型预测。点击格子查看对应测试样品。</p><p class="matrix-selection" id="matrix-selection" role="status"></p></div><div><h4>用两个可理解的量观察样本</h4><div id="feature-map"></div><p class="fine-print">横轴为中心区域平均亮度，纵轴为边缘像素比例。圆点是参考样本，菱形是测试样本；这不是 40 维距离的完整投影。</p></div></div><p class="limit-note">这是一项单井、三类、小样本基线实验。可见的准确率仅适用于本包留出样本；分组仍不能排除批次相似性，不能推断新井效果。</p></article>
+    <article class="depth-section"><div class="section-heading compact"><div><p class="eyebrow">BACK TO THE WELL / 回到原始井深记录</p><h3>把候选与复核，放在同一条记录上。</h3></div><button id="export-csv" type="button" class="quiet-button">导出预测与复核 CSV ↓</button></div><div class="depth-legend" id="depth-legend"></div><div id="depth-log" class="depth-log"></div><p class="fine-print">仅展示被选入测试集的原记录井深，缺失井段以断开标记显示；不插值，不把抽样结果当作连续地层剖面。复核意见仅保留在本次页面会话，可导出保存。</p></article>
+  </section>
+  <footer><span>M1 · 岩屑岩性辅助识别 / 可视化导论课程案例</span><div><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">原始样本 ↗</a><a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">专业背景 ↗</a><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">近邻方法 ↗</a></div></footer>
+</main>
+<noscript><p>本案例需要 JavaScript 进行图像特征计算与交互。启用后可离线运行。</p></noscript>
+<script src="data.js"></script><script src="model.js"></script><script src="demo.js"></script>
+</body></html>
