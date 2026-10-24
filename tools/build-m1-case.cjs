@@ -12,7 +12,7 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 820 250" role="img" aria-label="四步可解释岩屑分类流程，每步的输入输出与实际参数">'+[['核验与分组','66 张原图与标签','42 参考 / 24 测试','#dda366'],['图像与特征','中心 72% → 96 × 96','输出 40 维特征','#7da9b7'],['近邻与投票','参考尺度标准化','距离 → k 票 → 候选','#a18bb8'],['复核与评价','24 张留出测试图','模型与人工分别记录','#8ca47e']].map((s,i)=>{const x=8+i*205;return '<g transform="translate('+x+',15)"><rect width="188" height="185" rx="12" fill="#fff9ee" stroke="#e4d6c0"/><circle cx="31" cy="30" r="18" fill="'+s[3]+'"/><text x="31" y="35" text-anchor="middle" font-size="15" fill="white">0'+(i+1)+'</text><text x="18" y="78" font-size="17" fill="#365261">'+s[0]+'</text><text x="18" y="114" font-size="12" fill="#869084">'+s[1]+'</text><text x="18" y="145" font-size="12" fill="#869084">'+s[2]+'</text></g>'+(i<3?'<path d="M'+(x+178)+' 224q28 10 48-10m-9 0h9v9" fill="none" stroke="'+s[3]+'" stroke-width="3"/>':'');}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 125" role="img" aria-label="40维图像特征的组成"><text x="0" y="18" fill="#8d866c" font-size="12">图像 → 40 维描述 → 加权距离 → 近邻证据</text>'+[[12,'12 维颜色','#c69570'],[16,'16 维局部纹理','#95a888'],[8,'8 维梯度方向','#86a7b6'],[4,'4 个统计量','#aa9abd']].map((s,i,all)=>{const start=all.slice(0,i).reduce((n,v)=>n+v[0],0)*17;return '<rect x="'+start+'" y="37" width="'+(s[0]*17-4)+'" height="35" rx="4" fill="'+s[2]+'"/><text x="'+start+'" y="101" fill="#8a9585" font-size="11">'+s[1]+'</text>';}).join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id);return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.2.0',updated:'2026-10-24',status:'ready',tabs:{
+const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.2.1',updated:'2026-10-24',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的四步流程',lead:['每一步都有明确输入、可见计算与可保存的输出。第三部分实际执行同一套流程。'],stats:[['真实照片','66 张'],['参考 / 测试','42 / 24'],['类别 / 特征','3 / 40']],steps:[
 {name:'核验图像并按井段分组',role:'数据',do:'核对原图、岩性标签与源井深，选取三类共 66 张，按 20 米井段分组留出。',effect:'42 张参考图与 24 张测试图，同组不跨集合；原图 SHA-256 可追溯。',trap:'相邻照片随机拆分会高估效果；选样与分组不使用模型分数。'},
@@ -41,10 +41,13 @@ fs.writeFileSync(path.join(pack,'case.json'),JSON.stringify(definition,null,2)+'
 const artwork='data:image/webp;base64,'+fs.readFileSync(path.join(runtime,'m1-dioramas.webp')).toString('base64');
 let css=fs.readFileSync(path.join(__dirname,'m1/style.template.css'),'utf8');
 css=css.replace(/(\.(?:hero-art|well-art|scene-art|art-vision|art-review|art-lab\.scene-art)) img/g,'$1 .art-sheet');
-css+='\n:root{--m1-art-sheet:url("'+artwork+'")}\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
+// Keep the small layout theme independent of the larger shared illustration.
+// Both styles travel with body-only HTML previews as well as the complete page.
+css+='\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
+const artworkCSS=':root{--m1-art-sheet:url("'+artwork+'")}';
 let html=fs.readFileSync(path.join(__dirname,'m1/index.template.html'),'utf8');
 html=html.replace('<!-- M1_BACKGROUND -->',fs.readFileSync(path.join(__dirname,'m1/background.template.html'),'utf8'));
-html=html.replace('<link rel="stylesheet" href="demo.css">','<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>');
+html=html.replace('<link rel="stylesheet" href="demo.css">',()=>'<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>\n<style data-m1-style="artwork">'+artworkCSS+'</style>');
 html=html.replace(/<img\b[^>]*\bsrc="\.\.\/assets\/m1-dioramas\.webp"[^>]*>/g,tag=>{
   const alt=/\balt="([^"]*)"/.exec(tag);
   return '<span class="art-sheet" role="img" aria-label="'+(alt?alt[1]:'教学设备插画')+'"></span>';
@@ -65,7 +68,7 @@ tab.unmount=function(){global.removeEventListener('message',resize);if(frame)fra
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261024-m1case4');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261024-m1case5');
 ['case-demo-host','case-upload','shell'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261024-sections1');});
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

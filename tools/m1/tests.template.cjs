@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.2.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.2.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -80,6 +80,13 @@ test('the complete m1 folder imports unchanged, persists within a conservative s
 test('the directly opened entry embeds its theme, artwork, data and executable scripts',()=>{
   const markup=entryHTML.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');
   assert.ok(entryHTML.includes('<style data-m1-style="theme">'));
+  // A local preview that retains only body markup must retain the layout theme.
+  const bodyMarkup=/<body\b[^>]*>([\s\S]*?)<\/body>/.exec(entryHTML)[1];
+  const theme=/<style data-m1-style="theme">([\s\S]*?)<\/style>/.exec(bodyMarkup)[1];
+  assert.ok(theme.includes('.background-chapter')&&theme.includes('.case-page'));
+  assert.ok(Buffer.byteLength(theme)<64*1024,'critical layout stays separate from artwork');
+  assert.equal(theme.includes('data:image/'),false);
+  assert.ok(bodyMarkup.includes('<style data-m1-style="artwork">'));
   assert.ok(entryHTML.includes('--paper:#fcf6eb'));
   assert.ok(entryHTML.includes('--m1-art-sheet:url("data:image/webp;base64,'));
   assert.equal((entryHTML.match(/data:image\/webp;base64,/g)||[]).length,1,'one shared illustration sheet');
