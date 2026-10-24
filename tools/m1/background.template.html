@@ -1,0 +1,68 @@
+    <div class="background-intro">
+      <p class="eyebrow">01 / PROFESSIONAL BACKGROUND · 岩屑录井</p>
+      <h2>把岩屑照片放回录井现场，明确机器要辅助的任务。</h2>
+      <p>岩屑录井利用随钻井液返回地面的岩石碎屑，描述钻遇岩层的岩性与变化，为地层对比和后续解释提供实物线索。M1 聚焦其中的<strong>岩屑图像岩性辅助分类</strong>：依据已有标签给照片生成候选，供录井人员检查和复核。</p>
+      <div class="background-judges" aria-label="任务条件概览"><div><span>数据形态</span><b>RGB 岩屑照片</b><small>附井号、井深与原始标签</small></div><div><span>标注成本</span><b>需专业复核</b><small>统一命名与混合样品处理规则</small></div><div><span>可见收益</span><b>候选与依据可查</b><small>实际节时效果需要现场验证</small></div><div><span>技术难度</span><b>演示中 / 应用高</b><small>主要难在样品质量与跨井泛化</small></div></div>
+    </div>
+
+    <section class="background-chapter" data-background-topic="problem" aria-labelledby="bg-problem-title">
+      <div class="chapter-heading"><span class="chapter-number">01</span><div><p class="eyebrow">PROBLEM</p><h2 id="bg-problem-title">当前做法与问题</h2><p>现场人员观察什么，为什么一张照片不足以完成整份岩性描述？</p></div></div>
+      <div class="professional-copy"><p>岩屑由钻头破岩产生，经钻井液沿环空携带到振动筛。录井人员按取样制度采集、清洗和筛分，并在放大观察下识别岩石类型，记录颜色、颗粒、结构等特征；实际样品可能含多种岩性，还需估计各组分比例。岩性记录与深度对应后，才能用于井段对比。<a class="source-ref" href="https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis" target="_blank" rel="noopener noreferrer">[1]</a></p></div>
+      <div class="field-chain" aria-label="岩屑录井的现场工作链"><div><b>井底破岩</b><small>生成钻遇岩层碎屑</small></div><i aria-hidden="true">→</i><div><b>上返与取样</b><small>迟到校正 · 样品代表性</small></div><i aria-hidden="true">→</i><div class="is-focus"><b>观察与描述</b><small>M1 辅助岩性分类</small></div><i aria-hidden="true">→</i><div><b>记录与对比</b><small>按深度核对岩性变化</small></div></div>
+      <div class="observation-board warm-board"><div class="subsection-intro"><span class="mini-label">人工描述的依据</span><h3>从“看起来像”走向有依据的岩性记录。</h3></div><div class="observation-grid">
+        <article><svg viewBox="0 0 100 50" role="img" aria-label="由浅到深的岩石颜色观察示意"><circle cx="20" cy="25" r="13" fill="#d9c9a7"/><circle cx="50" cy="25" r="13" fill="#9b8d78"/><circle cx="80" cy="25" r="13" fill="#525b60"/></svg><h4>颜色与表面状态</h4><p>记录综合色调及变化，同时关注光照、干湿和泥浆附着；颜色只能提供一类线索。</p></article>
+        <article><svg viewBox="0 0 100 50" role="img" aria-label="不同颗粒与岩屑碎块大小的区别示意"><path d="m12 35 4-18 19-8 16 13-5 17Z" fill="#d6b185"/><circle cx="23" cy="25" r="3" fill="#8e7355"/><circle cx="32" cy="18" r="3" fill="#8e7355"/><circle cx="37" cy="31" r="3" fill="#8e7355"/><path d="m65 33 6-17 13 4 4 16Z" fill="#d6b185"/><circle cx="74" cy="26" r="3" fill="#8e7355"/></svg><h4>粒度与颗粒特征</h4><p>观察原岩颗粒的大小、形态和分选。钻碎后的岩屑块径还受钻头影响，不能直接代替沉积粒度。</p></article>
+        <article><svg viewBox="0 0 100 50" role="img" aria-label="颗粒、基质与胶结关系概念示意"><rect x="10" y="7" width="80" height="36" rx="8" fill="#c2b59b"/><circle cx="29" cy="25" r="11" fill="#e8d9b9"/><circle cx="55" cy="20" r="9" fill="#e8d9b9"/><circle cx="75" cy="30" r="8" fill="#e8d9b9"/></svg><h4>组分、基质与胶结</h4><p>识别可观察的组成与结合关系。矿物判定必要时结合酸反应、显微或其他分析。</p></article>
+        <article><svg viewBox="0 0 100 50" role="img" aria-label="层理和裂缝概念示意"><path d="M10 13Q50 6 90 13M10 25Q50 18 90 25M10 37Q50 30 90 37" stroke="#8e9da7" stroke-width="6" fill="none"/><path d="m64 6-12 17 6 9-15 13" stroke="#fcf6eb" stroke-width="4" fill="none"/></svg><h4>结构与特殊现象</h4><p>关注层理、裂缝等保存下来的特征；破碎会丢失原位关系，需要结合其他资料解释。</p></article>
+      </div><p class="fine-print">以上为观察维度示意。未标定倍率和比例尺的照片，不宜直接报告定量粒度或孔隙尺寸。</p></div>
+      <details class="geology-extension"><summary>认识本例三类岩性，以及它们与地质解释的关系</summary>
+        <div class="lithology-grid" id="lithology-cards"></div>
+        <article class="reservoir-board warm-board"><div class="reservoir-diagram" id="reservoir-diagram" role="img" aria-label="岩石颗粒、孔隙与流体通道的概念示意"></div><div class="reservoir-copy"><span class="mini-label">岩性结构 / 点击切换</span><div class="rock-tabs" role="group" aria-label="切换岩性概念"><button type="button" data-rock="sandstone" aria-pressed="true">细砂岩</button><button type="button" data-rock="shale" aria-pressed="false">页岩</button><button type="button" data-rock="dolomite" aria-pressed="false">灰质白云岩</button></div><h3 id="rock-concept-title">颗粒之间的空间，为什么值得关注？</h3><p id="rock-concept-copy">岩性提供地层描述线索，孔隙与连通性需要另外验证。</p><div class="rock-question"><span>后续解释需要的证据</span><strong id="rock-concept-question">结构线索需要什么资料验证？</strong></div><p class="fine-print">孔隙与通道为定性示意，不表示本例照片的实测孔渗或含油气情况。图中仅对应公开数据的三类标签。</p></div></article>
+      </details>
+      <div class="subsection-intro"><span class="mini-label">必须先解决的深度对应问题</span><h3>样品到达地面时，钻头已经继续向下。</h3></div>
+      <article class="background-grid warm-board">
+        <div class="well-visual"><div class="well-art" aria-hidden="true"><img src="../assets/m1-dioramas.webp" width="1254" height="1254" alt=""></div><svg viewBox="0 0 480 360" class="well-overlay" role="img" aria-label="钻井液携带岩屑上返与迟到深度示意"><defs><marker id="lag-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="m1 1 7 4-7 4" stroke="#e59648" stroke-width="2" fill="none"/></marker></defs><path class="lag-current" d="M155 278V107Q155 78 199 78H350" stroke="#e9a660" stroke-width="7" fill="none" marker-end="url(#lag-arrow)"/><path class="white-current" d="M155 278V107Q155 78 199 78H350"/><text x="210" y="57">岩屑随钻井液返回地面</text><line x1="301" y1="258" x2="436" y2="258" stroke="#b28e6b" stroke-dasharray="4 5"/><text x="310" y="249">钻头：3200 m</text><g id="lag-marker"><line x1="301" y1="221" x2="436" y2="221" stroke="#4e90af" stroke-width="2"/><text x="310" y="211" id="lag-source-label">样品来源示意：3194 m</text></g></svg><span class="visual-caption">机理示意 · 参数为教学设定，与公开样本井深无关</span></div>
+        <div class="context-copy"><span class="mini-label">迟到时间 / LAG TIME</span><h3>先对深度，再谈岩性变化。</h3><p>迟到时间 τ 是岩屑从井底到达地面的上返时间。若钻进连续、取 τ 为代表性上返时间，样品深度可近似对应取样时刻 t−τ 的钻头深度。现场还需结合井眼、钻具、泵排量和校验记录确定对应关系。<a class="source-ref" href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">[2]</a></p><div class="depth-relation">D<sub>样品</sub>(t) ≈ D<sub>钻头</sub>(t − τ)</div><div class="lag-controls"><label for="lag-minutes">上返迟到时间 <output id="lag-value">30 分钟</output></label><input id="lag-minutes" type="range" min="10" max="80" step="5" value="30"><label for="rop">恒定钻速（教学假设）<output id="rop-value">12 m/h</output></label><input id="rop" type="range" min="5" max="40" step="1" value="12"><div class="lag-equation">3200 − 钻速 × 迟到时间 ÷ 60 = <b id="source-depth">3194 m</b></div></div><p class="fine-print">滑杆仅解释恒定钻速下的深度偏移，不用于工程迟到计算。本案例沿用原数据井深，未用这些教学参数重新校正。</p></div>
+      </article>
+      <div class="problem-strip"><div><b>重复判断</b><p>逐份观察与录入需要持续投入，并要求不同人员使用一致的描述规则。</p></div><div><b>样品混杂</b><p>井壁坍塌碎块（cavings）并非钻头直接切削所得，混入样品会干扰钻遇岩性的判断。<a class="source-ref" href="https://glossary.slb.com/terms/c/cavings" target="_blank" rel="noopener noreferrer">[6]</a></p></div><div><b>证据不完整</b><p>照片保留了外观，却可能缺少比例尺、取样状态和验证记录；单凭一张图不能补齐全部描述。</p></div></div>
+    </section>
+
+    <section class="background-chapter" data-background-topic="intervention" aria-labelledby="bg-intervention-title">
+      <div class="chapter-heading"><span class="chapter-number">02</span><div><p class="eyebrow">INTERVENTION</p><h2 id="bg-intervention-title">AI 能做什么</h2><p>辅助重复性的图像比较，输出可以检查的岩性候选。</p></div></div>
+      <div class="professional-copy"><p>本例将任务定义为<strong>照片级、单标签的监督分类</strong>：使用带岩性标签的参考照片，预测一张待识别照片所属的候选类别。k 近邻把照片变为特征向量，比较距离，检索 k 个相似参考样本并按类别投票；这是一种可直接展示判断依据的机器学习基线。<a class="source-ref" href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">[4]</a></p></div>
+      <article class="ai-explainer"><div><span class="mini-label">明确介入环节</span><h3>先生成候选，<br>再由录井人员复核。</h3><p>计算使用颜色直方图、局部纹理、梯度方向和统计量，共 40 维。界面呈现候选、票数与相似照片，供人核对。低票结果可优先排查；高票结果也可能继承参考库的成像偏差。</p></div><div class="evidence-path" aria-label="图像分类的输入、计算与输出"><span>岩屑照片<small>单张待识别图</small></span><i aria-hidden="true">→</i><span>40 维特征<small>颜色 · 纹理</small></span><i aria-hidden="true">→</i><span>k 个近邻<small>标签 · 距离 · 票数</small></span><i aria-hidden="true">→</i><span>人工复核<small>来源与意见留痕</small></span></div></article>
+      <div class="task-scope"><div><span class="mini-label">本案例的交付</span><h3>岩性候选 + 可查证据 + 复核记录</h3><p>对细砂岩、页岩、灰质白云岩三个原始标签进行辅助分类，减少无依据的重复判断。是否提升效率与一致性，需要与相同条件下的人工基准比较。</p></div><div><span class="mini-label">完整录井还需要</span><p>混合样品各岩性含量、矿物定量、准确粒度、孔渗及油气显示等证据。本例没有相应标注和测量，也没有实现这些预测。近邻票数占比仅反映参考样本投票。</p></div></div>
+    </section>
+
+    <section class="background-chapter" data-background-topic="data" aria-labelledby="bg-data-title">
+      <div class="chapter-heading"><span class="chapter-number">03</span><div><p class="eyebrow">DATA</p><h2 id="bg-data-title">需要准备什么</h2><p>照片、统一标签、可追溯样品信息，以及独立的验证样本。</p></div></div>
+      <div class="preparation-table-wrap"><table class="preparation-table"><caption>正式应用的数据准备要求与本例实际条件</caption><thead><tr><th scope="col">准备项</th><th scope="col">现场或建模要求</th><th scope="col">本例实际提供</th></tr></thead><tbody>
+        <tr><th scope="row">图像与成像条件</th><td>统一照明、背景、倍率和干湿状态；保留比例尺与原图，记录预处理。</td><td>66 张公开 RGB 原始 JPEG；原字节与校验值保留。未获得完整的成像条件及标定信息。</td></tr>
+        <tr><th scope="row">标签与标注规则</th><td>由专业人员按统一岩性词表复核；混合样品和不确定样品单列规则。</td><td>沿用源 CSV 的三类单标签；没有新增矿物鉴定，也没有颗粒分割或含量标注。</td></tr>
+        <tr><th scope="row">样品与深度记录</th><td>井号、取样时间或井段、迟到校正状态、样品处理及异常记录可追溯。</td><td>井号、源记录井深、文件路径和逐图 SHA-256；未补造现场迟到或取样状态记录。</td></tr>
+        <tr><th scope="row">参考与评价划分</th><td>同源、相邻或同批样本成组划分；另设独立井验证泛化。</td><td>按 20 m 井段成组，17 组中留出 5 组。42 张参考、24 张测试，均来自井 2。</td></tr>
+      </tbody></table></div>
+      <article class="data-section"><div class="subsection-intro"><span class="mini-label">公开数据 / 可追溯子集</span><h3>66 张原图，按井段分组后再比较。</h3></div><div class="data-layout"><div><p>数据来自 nature9420 的公开岩屑项目，本包选取井 2 的细砂岩 24 张、页岩 18 张、灰质白云岩 24 张。源仓库声明用于学术用途；本例按该说明用于课程教学。<a class="source-ref" href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">[3]</a></p><p>同一 20 m 分组不同时进入参考库与测试集；标准化参数只由参考库计算。井号、井深、文件名与原标签不作为分类输入。分组用于降低相关样本跨集合的风险，跨井效果仍需另外验证。<a class="source-ref" href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">[5]</a></p><p class="fine-print">20 m 是本例建模分组宽度，不是对原始现场取样间距的声明；66 张仅够展示基线过程，没有通用的“达到某张数即可上线”阈值。</p></div><div><div id="split-bars" class="split-bars"></div><p class="fine-print">参考库提供近邻；留出样本用于查询与评价。每类的样本量差异需在评价时考虑。</p></div></div></article>
+    </section>
+
+    <section class="background-chapter" data-background-topic="difficulty" aria-labelledby="bg-difficulty-title">
+      <div class="chapter-heading"><span class="chapter-number">04</span><div><p class="eyebrow">DIFFICULTY</p><h2 id="bg-difficulty-title">难度与参考方向</h2><p>先排查样品与成像，再讨论特征、模型和推广效果。</p></div></div>
+      <div class="professional-copy"><p>教学基线的实现难度为中等：特征、距离和投票都可以在前端展开。现场应用难度较高：模型必须面对取样代表性、混合岩屑、标签歧义与跨井成像差异。改进应先确认误差来源，再增加模型复杂度。</p></div>
+      <div class="difficulty-grid" aria-label="从地质样品到模型推广的四类难点">
+        <details open><summary><span>01 / 样品</span><b>深度与样品代表性</b></summary><div><p>迟到对应不准会把判断放错井段；坍塌碎块与钻井液固相可能混入取样。</p><strong>参考方向</strong><p>核验迟到和取样记录，记录污染或坍塌现象。图像分类结果回到原始井段后再解释。</p></div></details>
+        <details open><summary><span>02 / 成像</span><b>外观差异可能来自拍摄</b></summary><div><p>亮度、干湿、倍率和背景变化都会改变颜色或纹理；模型可能学到拍摄条件。</p><strong>参考方向</strong><p>先标准化成像和背景，做受控扰动检查。示范中的亮度与对比度滑杆可观察敏感性。</p></div></details>
+        <details open><summary><span>03 / 标签</span><b>细粒度类别与混合样品</b></summary><div><p>外观相似的岩性不一定具有相同组成；单个标签也不能表达一盘混样的含量。</p><strong>参考方向</strong><p>统一岩性词表，复核易混类别，保留不确定状态；有颗粒级标注后再研究分割或含量估计。</p></div></details>
+        <details open><summary><span>04 / 泛化</span><b>同一口井的好分数能否推广？</b></summary><div><p>相邻井段与同批照片具有相关性。小型单井测试不能说明陌生井或新成像条件下的效果。</p><strong>参考方向</strong><p>增加独立井验证，报告逐类召回率与混淆矩阵；数据与划分固定后，再比较迁移学习等方法。</p></div></details>
+      </div>
+      <article class="acceptance-note"><span class="mini-label">如何判断这件事值得做</span><h3>分类效果、复核成本与跨井稳定性，需要同时评价。</h3><p>本例可实时检查留出样本的准确率、宏平均 F1 和混淆矩阵，并保留人工修改。正式应用还应在相同样品上与人工流程比较耗时、漏判及复核量，并设置独立井测试；本包没有这些现场实测结果。</p></article>
+    </section>
+
+    <details class="background-sources"><summary>专业背景的依据与资料来源</summary><ol>
+      <li><a href="https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis" target="_blank" rel="noopener noreferrer">AAPG · Mudlogging: drill cuttings analysis</a>：代表性取样、迟到、样品处理和岩性描述维度。</li>
+      <li><a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">SLB · The Defining Series: Mud Logging</a>：钻井液循环、样品深度对应与录井记录。</li>
+      <li><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">公开 RGB 岩屑图像仓库</a>：图像与原始标签；固定来源及逐样本记录见包内 provenance.json。</li>
+      <li><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">scikit-learn · Nearest Neighbors</a>：近邻分类的一般原理。</li>
+      <li><a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">scikit-learn · Cross-validation</a>：相关样本分组与独立验证。</li>
+      <li><a href="https://glossary.slb.com/terms/c/cavings" target="_blank" rel="noopener noreferrer">SLB Energy Glossary · Cavings</a>：井壁脱落碎块与钻头切削岩屑的区别。</li>
+    </ol><p class="fine-print">本页结构参照老师的 firstbreak-pick-case；内容围绕 M1 重新编写。插画与孔隙图为机理示意，真实照片来自公开资料。</p></details>
+    <div class="part-next"><span>明确现场任务与方法边界，再拆解每一步。</span><button type="button" data-go="workflow" class="primary-button">进入案例流程 →</button></div>

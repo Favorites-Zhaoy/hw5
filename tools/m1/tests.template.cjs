@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.1.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.2.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);

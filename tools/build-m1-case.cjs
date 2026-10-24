@@ -12,13 +12,8 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 820 250" role="img" aria-label="四步可解释岩屑分类流程，每步的输入输出与实际参数">'+[['核验与分组','66 张原图与标签','42 参考 / 24 测试','#dda366'],['图像与特征','中心 72% → 96 × 96','输出 40 维特征','#7da9b7'],['近邻与投票','参考尺度标准化','距离 → k 票 → 候选','#a18bb8'],['复核与评价','24 张留出测试图','模型与人工分别记录','#8ca47e']].map((s,i)=>{const x=8+i*205;return '<g transform="translate('+x+',15)"><rect width="188" height="185" rx="12" fill="#fff9ee" stroke="#e4d6c0"/><circle cx="31" cy="30" r="18" fill="'+s[3]+'"/><text x="31" y="35" text-anchor="middle" font-size="15" fill="white">0'+(i+1)+'</text><text x="18" y="78" font-size="17" fill="#365261">'+s[0]+'</text><text x="18" y="114" font-size="12" fill="#869084">'+s[1]+'</text><text x="18" y="145" font-size="12" fill="#869084">'+s[2]+'</text></g>'+(i<3?'<path d="M'+(x+178)+' 224q28 10 48-10m-9 0h9v9" fill="none" stroke="'+s[3]+'" stroke-width="3"/>':'');}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 125" role="img" aria-label="40维图像特征的组成"><text x="0" y="18" fill="#8d866c" font-size="12">图像 → 40 维描述 → 加权距离 → 近邻证据</text>'+[[12,'12 维颜色','#c69570'],[16,'16 维局部纹理','#95a888'],[8,'8 维梯度方向','#86a7b6'],[4,'4 个统计量','#aa9abd']].map((s,i,all)=>{const start=all.slice(0,i).reduce((n,v)=>n+v[0],0)*17;return '<rect x="'+start+'" y="37" width="'+(s[0]*17-4)+'" height="35" rx="4" fill="'+s[2]+'"/><text x="'+start+'" y="101" fill="#8a9585" font-size="11">'+s[1]+'</text>';}).join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id);return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.0.1',updated:'2026-10-24',status:'ready',tabs:{
-background:{label:'专业背景',lede:'在录井现场，钻头产生的岩屑被带回地面，供地质人员观察和记录岩性。本案例用公开真实岩屑图像，演示如何让颜色、纹理与近邻证据辅助重复性判断，并保留人工复核。',judge:[{label:'现场任务',value:'岩屑岩性',desc:'三类原始标签的辅助识别'},{label:'公开样本',value:'66 张',desc:'保留原图、井深和来源'},{label:'智能方法',value:'k 近邻',desc:'40 维特征，展示相似证据'},{label:'验证范围',value:'单井子集',desc:'不能直接代表新井效果'}],sections:[
-{en:'CONTEXT',title:'岩屑如何反映地层，为什么还要考虑迟到',html:style+'<p>钻头破碎岩石，岩屑随钻井液沿环空返回地面。观察颜色、颗粒与结构可为岩性判断提供线索。岩屑上返需要时间，地面取样时的钻头深度不能直接作为样品来源深度。</p><div class="m1c">'+well+'</div><p>下图数字是机理示意；可运行页面可调整迟到时间与钻速。本例样品使用源 CSV 的井深，不套用教学参数重新校正。</p>'},
-{en:'INTERVENTION',title:'从“反复看照片”到“展示候选与依据”',html:'<p>大量照片需要重复观察，光照、混样与相似外观会影响判断。本例用 12 维颜色、16 维局部纹理、8 维梯度方向和 4 个统计量描述图像，在带标签的参考库中找出最近的 k 张照片，再按类别计票。人与模型可以对照同一批相似证据。</p><div class="m1c">'+feature+'</div><p>这里的智能化价值是辅助筛选与证据组织。颜色或纹理无法独立确定矿物组成、孔隙度、渗透率和含油气情况。</p>'},
-{en:'OPEN DATA',title:'本例使用什么真实数据，怎样保留来源',html:'<p>数据来自 <a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">nature9420 的公开岩屑资料</a>，上游声明用于学术用途。本例从井 2 选取细砂岩 24 张、页岩 18 张、灰质白云岩 24 张，共 66 张。保留原始 JPEG、CSV 标签、井深、源路径和 SHA-256 校验值。</p><div class="m1c"><div class="m1c-grid">'+photos+'</div></div><div class="m1c">'+split+'<div class="m1c-legend"><span><i></i>参考库 42 张</span><span><i class="test"></i>测试集 24 张</span></div></div><p>按 20 米井段分组，以固定种子划分 42 张参考图与 24 张测试图，同一分组不跨两边。井深、井号、文件名与原标签均不作为分类输入。</p>'},
-{en:'LIMITS',title:'可见的分数只能回答本例的问题',html:'<p>先取中心 72% 区域，减少样品盘边框和手写编号干扰；再统一图像尺度，并只用参考库计算标准化参数。批量评价使用留出样本原始图像条件，人工修改单独保存。</p><p>本例是单井、三类、小样本基线，分组不能完全排除批次相似性。混合岩屑、污染与外观相近的不同岩性都应复核。进一步研究需增加独立井数据、规范成像条件，并可比较卷积网络迁移学习。</p><p>参考：<a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">SLB 录井背景</a>；<a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">近邻分类</a>；<a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">分组验证</a>。本包插画仅为教学情境，真实样本均来自原始数据仓库。</p>'}
-]},
+const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.2.0',updated:'2026-10-24',status:'ready',tabs:{
+background:null,
 workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的四步流程',lead:['每一步都有明确输入、可见计算与可保存的输出。第三部分实际执行同一套流程。'],stats:[['真实照片','66 张'],['参考 / 测试','42 / 24'],['类别 / 特征','3 / 40']],steps:[
 {name:'核验图像并按井段分组',role:'数据',do:'核对原图、岩性标签与源井深，选取三类共 66 张，按 20 米井段分组留出。',effect:'42 张参考图与 24 张测试图，同组不跨集合；原图 SHA-256 可追溯。',trap:'相邻照片随机拆分会高估效果；选样与分组不使用模型分数。'},
 {name:'统一图像并提取 40 维特征',role:'CV',do:'中心 72% 区域统一到 96 × 96；计算颜色、局部二值纹理、梯度方向与图像统计。',effect:'每个样本得到 40 维向量，以参考库尺度标准化。',trap:'不把边框编号、文件名、井深或原标签作为输入；中心裁切不保证完全消除背景偏差。'},
@@ -27,10 +22,6 @@ workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的
 ],metrics:{title:'把每一步的目的与输出连起来',html:style+'<div class="m1c">'+workflow+'</div><p>可运行示范会实时给出准确率、宏平均 F1 和混淆矩阵。准确率 = 与原标签一致的数量 ÷ 24；宏平均 F1 为三个类别 F1 的等权平均。当前查询的光照扰动只用于观察敏感性，批量评价保持原始图像条件。</p>'},fails:[{name:'拍摄条件替代岩性特征',why:'颜色与纹理会受光照、背景、拍摄批次影响，应检查相似样本与跨井验证。'},{name:'混样或标签不确定',why:'原标签作为本例对照依据，但不能消除现场混样与人工标注误差。'},{name:'把候选当成最终解释',why:'需要样品、取样记录与其他地质证据共同复核。'}]},
 demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'选择真实留出样品，调整 k、颜色与纹理权重，查看候选、近邻、混淆矩阵与原井深记录；人工复核与模型输出分别保存，可导出 CSV。',height:1040}
 }};
-definition.version='1.1.0';
-definition.tabs.background.page={html:'demo/index.html',view:'background',height:1040};
-definition.tabs.workflow.page={html:'demo/index.html',view:'workflow',height:1040};
-definition.tabs.demo.view='demo';
 // Retain the same teaching points in original-protocol HTML for older portals.
 const rockOverview='<svg viewBox="0 0 780 230" role="img" aria-label="三类岩性结构与孔隙通道的概念示意">'+data.classes.map((c,i)=>{
   let shapes='';if(i===0)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<ellipse cx="'+(27+x*41)+'" cy="'+(65+y*32)+'" rx="15" ry="12" fill="#d3b083" stroke="#b99565"/>';
@@ -38,7 +29,10 @@ const rockOverview='<svg viewBox="0 0 780 230" role="img" aria-label="三类岩�
   if(i===2)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<path d="m'+(13+x*44)+' '+(53+y*32)+' 23-7 13 20-23 7Z" fill="#acba97" stroke="#8c9f7b"/>';
   return '<g transform="translate('+(i*260)+',0)"><rect x="0" y="34" width="245" height="126" rx="10" fill="#e9dfcb"/>'+shapes+'<text x="8" y="20" fill="#65808b" font-size="15">'+c.name+'</text><text x="8" y="187" fill="#8b947e" font-size="12">'+['颗粒与孔隙：储集空间的线索','细粒与层理：需核验岩层作用','晶体与裂缝：需验证内部通道'][i]+'</text></g>';
 }).join('')+'<text x="7" y="220" fill="#a29477" font-size="11">概念示意，不表示样本实测孔渗。岩性识别不能直接证明油气存在。</text></svg>';
-definition.tabs.background.sections.unshift({en:'WHY LITHOLOGY',title:'录井为什么要识别岩性：从结构线索到地质问题',html:style+'<p>孔隙提供储存流体的空间，通道的连通性影响流体能否通过。岩性帮助地质人员描述钻遇岩层，并提出储层、封盖与地层对比的问题；最终解释仍需结合岩心、测井和物性分析。</p><div class="m1c">'+rockOverview+'</div><p>完整互动页面可切换三类岩性，查看结构与通道的机理示意；本图同样保留在原规范背景段落中。</p>'});
+definition.tabs.background=require('./m1/background-metadata.cjs')({style,well,feature,photos,split,rockOverview});
+definition.tabs.background.page={html:'demo/index.html',view:'background',height:1040};
+definition.tabs.workflow.page={html:'demo/index.html',view:'workflow',height:1040};
+definition.tabs.demo.view='demo';
 const grouped={};data.samples.forEach(s=>{if(!grouped[s.group])grouped[s.group]=[];grouped[s.group].push(s);});
 const groupDiagram='<svg viewBox="0 0 820 265" role="img" aria-label="本案例实际17个20米井段分组及其参考测试归属">'+Object.keys(grouped).sort((a,b)=>Number(a.split('-').pop())-Number(b.split('-').pop())).map((key,i)=>{const start=Number(key.split('-').pop()),samples=grouped[key],test=samples[0].split==='test',x=(i%6)*137,y=Math.floor(i/6)*78;return '<g transform="translate('+x+','+y+')"><rect width="126" height="65" rx="6" fill="'+(test?'#efd0a9':'#c9dadd')+'"/><text x="10" y="25" fill="#6b7e80" font-size="12">'+start+'—'+(start+19)+' m</text><text x="10" y="49" fill="#83907e" font-size="10">'+samples.length+' 张 / '+(test?'测试':'参考')+'</text></g>';}).join('')+'<text x="0" y="257" fill="#a3957a" font-size="11">整组划分：42 张参考图、24 张测试图；颜色表示集合，不是岩性。</text></svg>';
 definition.tabs.workflow.metrics.html+='<div class="m1c"><h4>第一步的真实数据：17 个井段分组，5 组留出</h4>'+groupDiagram+'</div>';
@@ -49,6 +43,7 @@ let css=fs.readFileSync(path.join(__dirname,'m1/style.template.css'),'utf8');
 css=css.replace(/(\.(?:hero-art|well-art|scene-art|art-vision|art-review|art-lab\.scene-art)) img/g,'$1 .art-sheet');
 css+='\n:root{--m1-art-sheet:url("'+artwork+'")}\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
 let html=fs.readFileSync(path.join(__dirname,'m1/index.template.html'),'utf8');
+html=html.replace('<!-- M1_BACKGROUND -->',fs.readFileSync(path.join(__dirname,'m1/background.template.html'),'utf8'));
 html=html.replace('<link rel="stylesheet" href="demo.css">','<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>');
 html=html.replace(/<img\b[^>]*\bsrc="\.\.\/assets\/m1-dioramas\.webp"[^>]*>/g,tag=>{
   const alt=/\balt="([^"]*)"/.exec(tag);
@@ -70,7 +65,7 @@ tab.unmount=function(){global.removeEventListener('message',resize);if(frame)fra
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/m1p1|m1case[12]/g,'m1case3');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261024-m1case4');
 ['case-demo-host','case-upload','shell'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261024-sections1');});
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

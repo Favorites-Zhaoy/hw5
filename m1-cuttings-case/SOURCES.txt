@@ -38,3 +38,23 @@ https://www.slb.com/resource-library/oilfield-review/defining-series/defining-pe
 SLB Energy Glossary — Seal
 https://glossary.slb.com/terms/s/seal
 是否具有封盖能力需要岩层与物性证据，不能只由一张照片决定。
+
+[8] 岩屑取样、样品准备和岩性描述的专业依据
+AAPG Development Geology Reference Manual — Mudlogging: drill cuttings analysis
+作者：Alun Whittaker, Diana Morton-Thompson
+https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis
+用于代表性取样、迟到对应、样品处理与观察维度的概述。页面未把岩屑块径当作原岩粒度，也未由未标定照片推算定量粒度。
+
+[9] 井壁坍塌碎块的定义
+SLB Energy Glossary — Cavings
+https://glossary.slb.com/terms/c/cavings
+与钻头直接切削产生的岩屑区分，说明混入样品时的解释问题。
+
+[10] 岩屑的来源与观察对象
+SLB Energy Glossary — Cuttings
+https://glossary.slb.com/terms/c/cuttings
+用于说明岩屑由钻头破岩产生，以及组成、大小、形态、颜色与纹理等观察维度。
+
+专业背景组织参考
+本项目 firstbreak-pick-case/case.json：当前做法与问题 / AI 能做什么 / 需要准备什么 / 难度与参考方向。
+只参照其讲解结构，M1 专业内容与适用范围单独编写，不沿用初至波场景的参数或效果数字。

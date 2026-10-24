@@ -101,9 +101,9 @@
   Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){renderRockLesson(button.dataset.rock);});});
   renderRockLesson('sandstone');
   var descriptions = {
-    sandstone:{text:'沉积颗粒形成的碎屑岩。粒度与颗粒形态是观察线索，但照片不能直接给出孔隙度、渗透率。',concept:'颗粒结构示意'},
-    shale:{text:'细粒沉积岩，层理或薄片状构造是常见观察要点。混样、风化和相近外观会影响图像判断。',concept:'细粒与层理示意'},
-    dolomite:{text:'含方解石组分的白云岩类原标签。外观可提供线索，准确矿物组成需结合酸反应、显微或其他分析。',concept:'碳酸盐晶体示意'}
+    sandstone:{text:'碎屑岩类原标签。观察原岩颗粒与胶结关系；未标定图像不作定量粒度测量，岩屑块径也不能代替沉积粒度。',concept:'颗粒结构示意'},
+    shale:{text:'细粒沉积岩类原标签。保存的层理与薄片状特征可供观察；钻碎和混样会削弱原岩结构，照片需结合样品复核。',concept:'细粒与层理示意'},
+    dolomite:{text:'碳酸盐岩类原标签。外观仅支持候选识别；灰质组分与白云石的确认需结合酸反应、显微或其他矿物分析。',concept:'碳酸盐晶体示意'}
   };
   $('lithology-cards').innerHTML = classes.map(function (c) {
     var sample = DATA.samples.filter(function(s){return s.classId===c.id;})[0], d=descriptions[c.id];
