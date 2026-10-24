@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.2.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.3.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -89,12 +89,15 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
   assert.ok(bodyMarkup.includes('<style data-m1-style="artwork">'));
   assert.ok(entryHTML.includes('--paper:#fcf6eb'));
   assert.ok(entryHTML.includes('--m1-art-sheet:url("data:image/webp;base64,'));
-  assert.equal((entryHTML.match(/data:image\/webp;base64,/g)||[]).length,1,'one shared illustration sheet');
+  assert.equal((entryHTML.match(/--m1-art-sheet:url\("data:image\/webp;base64,/g)||[]).length,1,'one shared illustration sheet');
   assert.equal(/<script\b[^>]*\bsrc\s*=/.test(entryHTML),false);
   assert.equal(/<link\b[^>]*\brel="stylesheet"/.test(entryHTML),false);
   assert.equal(/<img\b[^>]*\bsrc="(?!data:)/.test(markup),false);
   assert.equal(/\.\.\/assets\/m1-dioramas/.test(entryHTML),false);
   assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,6);
+  const figureSources=JSON.parse(read('m1-cuttings-case/FIGURE-SOURCES.json'));
+  assert.equal(figureSources.assets.length,5);
+  for(const figure of figureSources.assets){const bytes=fs.readFileSync(path.join(site,'tools/m1/runtime/paper-figures',figure.file));assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),figure.sha256);assert.ok(entryHTML.includes('data:image/webp;base64,'+bytes.toString('base64')));assert.ok(figureSources.papers[figure.paper].doi&&figureSources.papers[figure.paper].license==='CC BY 4.0');}
   for(const name of ['dataset','model','app'])new vm.Script(inlineCode(name));
   assert.equal(inlineCode('model').trim(),read('tools/m1/runtime/model.js').trim());
 });

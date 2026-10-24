@@ -1,7 +1,7 @@
 // Original-protocol background for portals without optional interactive lessons.
 // Keep the four topics used in the teacher's firstbreak-pick-case.
 module.exports = function backgroundMetadata(visuals) {
-  const { style, well, feature, photos, split, rockOverview } = visuals;
+  const { style, well, feature, photos, split, rockOverview, observationGallery } = visuals;
   const external = (url, label) => '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
   const aapg = external('https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis', 'AAPG 岩屑分析');
   const mudLogging = external('https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging', 'SLB 录井背景');
@@ -29,7 +29,7 @@ module.exports = function backgroundMetadata(visuals) {
       { no: 1, en: 'PROBLEM', title: '当前做法与问题', html: style +
         '<p>岩屑由钻头破岩产生，经钻井液沿环空携带到振动筛。录井人员按取样制度采集、清洗和筛分，放大观察后描述岩石类型、颜色、颗粒与结构；混合样品还需估计各组分比例。岩性记录按深度对应后用于井段对比。依据：' + aapg + '。</p>' +
         '<p><b>描述依据</b>包括颜色与表面状态、粒度和颗粒特征、组分与胶结、保存的层理或裂缝。钻碎后的岩屑块径受钻头影响，不能直接代替原岩粒度；未标定倍率和比例尺的照片不宜报告定量粒度。</p>' +
-        '<div class="m1c">' + well + '</div><p><b>迟到对应</b>：样品深度近似对应取样时刻减去上返时间后的钻头深度；上图为恒定钻速简化，现场需结合循环与校验记录。本包沿用原数据井深，不用教学滑杆重新校正。依据：' + mudLogging + '。</p>' +
+        observationGallery + '<div class="m1c">' + well + '</div><p><b>迟到对应</b>：样品深度近似对应取样时刻减去上返时间后的钻头深度；上图为恒定钻速简化，现场需结合循环与校验记录。本包沿用原数据井深，不用教学滑杆重新校正。依据：' + mudLogging + '。</p>' +
         '<p><b>现场问题</b>：重复观察需要统一描述规则；' + cavings + '并非钻头直接切削所得，混入后会干扰钻遇岩性判断；照片还可能缺少取样状态及验证记录。</p>' +
         '<div class="m1c"><div class="m1c-grid">' + photos + '</div></div><details><summary>三类岩性的结构线索与解释边界</summary><div class="m1c">' + rockOverview + '</div><p>结构图为定性示意。矿物组成、孔渗和油气显示需要额外证据。</p></details>' },
       { no: 2, en: 'INTERVENTION', title: 'AI 能做什么', html:

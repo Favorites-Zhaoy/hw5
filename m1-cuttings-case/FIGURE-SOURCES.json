@@ -1,0 +1,170 @@
+{
+  "retrieved": "2026-10-24",
+  "purpose": "Background teaching examples only; excluded from the 66 classification samples",
+  "papers": {
+    "cuttings": {
+      "authors": "Tolstaya, Shakirov, Mezghani & Safonov",
+      "year": 2023,
+      "title": "Fast Reservoir Characterization with AI-Based Lithology Prediction Using Drill Cuttings Images and Noisy Labels",
+      "journal": "Journal of Imaging",
+      "citation": "9(7), 126",
+      "doi": "10.3390/jimaging9070126",
+      "figure": "4",
+      "articleUrl": "https://www.mdpi.com/2313-433X/9/7/126",
+      "figureUrl": "https://pub.mdpi-res.com/jimaging/jimaging-09-00126/article_deploy/html/images/jimaging-09-00126-g004.png",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "grains": {
+      "authors": "Yue Zhang, Yunmeng Zhang & Jizhong Huang",
+      "year": 2022,
+      "title": "Experimental study on capillary water absorption of sandstones from different grotto heritage sites in China",
+      "journal": "Heritage Science",
+      "citation": "10, 25",
+      "doi": "10.1186/s40494-022-00656-y",
+      "figure": "4(a,b)",
+      "articleUrl": "https://www.nature.com/articles/s40494-022-00656-y",
+      "figureUrl": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs40494-022-00656-y/MediaObjects/40494_2022_656_Fig4_HTML.png",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "cement": {
+      "authors": "Gbenga Olamide Adesola, Oswald Gwavava & Kuiwu Liu",
+      "year": 2023,
+      "title": "Petrographic Analysis of the Sandstones and Mudstones in Alice, Eastern Cape Province, South Africa: Implications for Groundwater Potential",
+      "journal": "Proceedings",
+      "citation": "87(1), 39 (IECG 2022)",
+      "doi": "10.3390/iecg2022-14818",
+      "figure": "9",
+      "articleUrl": "https://www.mdpi.com/2504-3900/87/1/39",
+      "figureUrl": "https://pub.mdpi-res.com/proceedings/proceedings-87-00039/article_deploy/html/images/proceedings-87-00039-g009.png",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "structure": {
+      "authors": "Qingsong Tang, Lu Zhou, Lei Chen, Xiucheng Tan & Gaoxiang Wang",
+      "year": 2021,
+      "title": "Development Characteristics of Shale Lithofacies in the Longmaxi Formation and their Main Controlling Factors in the Changning Area, South Sichuan Basin, SW China",
+      "journal": "Frontiers in Earth Science",
+      "citation": "9, 775657",
+      "doi": "10.3389/feart.2021.775657",
+      "figure": "3(A–C)",
+      "articleUrl": "https://www.frontiersin.org/journals/earth-science/articles/10.3389/feart.2021.775657/full",
+      "figureUrl": "https://www.frontiersin.org/files/Articles/775657/xml-images/feart-09-775657-g003.webp",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "assets": [
+    {
+      "id": "color",
+      "paper": "cuttings",
+      "file": "color.webp",
+      "thumbnail": "color-thumb.webp",
+      "width": 640,
+      "height": 509,
+      "sourceSize": [
+        2027,
+        1624
+      ],
+      "sourceFilename": "cuttings-color.png",
+      "sourceSha256": "b89f4f7082e22325531a77136dbc7cc0b2fd8af16d99236fe5e202e577e07905",
+      "sha256": "14ab089c3a636ea2352b7db0bbee755b57c9af51b6419dc1bdc9cccb3d382341",
+      "thumbnailSha256": "d2a412ff5351a6320df6a8c469ad5cbedc159658f70f109e9bb8a7a9f7a459d2",
+      "cropPixels": [
+        0,
+        565,
+        660,
+        1090
+      ],
+      "processing": "Crop where stated, aspect-preserving resize, WebP encoding; no recoloring, retouching or generative reconstruction",
+      "note": "Figure 4: Dolomite tile; original label retained"
+    },
+    {
+      "id": "grain-coarse",
+      "paper": "grains",
+      "file": "grain-coarse.webp",
+      "thumbnail": "grain-coarse-thumb.webp",
+      "width": 560,
+      "height": 417,
+      "sourceSize": [
+        685,
+        1551
+      ],
+      "sourceFilename": "grain-comparison.png",
+      "sourceSha256": "f8bf3928eb3ac2955d2884820843e19195f1667d239be8e297615f5d0d67deb5",
+      "sha256": "60a224518bdee05c847317da0bc61e8739369cae8fe0959b303b78286c32746c",
+      "thumbnailSha256": "7bc1587cf1fb449e63fd7b7d4cd47e1b2ece398e4b527736a67087837e3806be",
+      "cropPixels": [
+        0,
+        0,
+        685,
+        510
+      ],
+      "processing": "Crop where stated, aspect-preserving resize, WebP encoding; no recoloring, retouching or generative reconstruction",
+      "note": "Figure 4(a), YG; 800 micrometre scale bar retained"
+    },
+    {
+      "id": "grain-fine",
+      "paper": "grains",
+      "file": "grain-fine.webp",
+      "thumbnail": "grain-fine-thumb.webp",
+      "width": 560,
+      "height": 410,
+      "sourceSize": [
+        685,
+        1551
+      ],
+      "sourceFilename": "grain-comparison.png",
+      "sourceSha256": "f8bf3928eb3ac2955d2884820843e19195f1667d239be8e297615f5d0d67deb5",
+      "sha256": "6cb899225d71f3a7f69ecb455859a9b8415a1d4766a96e9c6cac8f5b15404154",
+      "thumbnailSha256": "64fb3adbfa78f2ee0b202d32ed0cfe3a90d624e3885471d4f785f8301af76f88",
+      "cropPixels": [
+        0,
+        525,
+        685,
+        1027
+      ],
+      "processing": "Crop where stated, aspect-preserving resize, WebP encoding; no recoloring, retouching or generative reconstruction",
+      "note": "Figure 4(b), DZ; 300 micrometre scale bar retained"
+    },
+    {
+      "id": "cement",
+      "paper": "cement",
+      "file": "cement.webp",
+      "thumbnail": "cement-thumb.webp",
+      "width": 760,
+      "height": 576,
+      "sourceSize": [
+        2393,
+        1815
+      ],
+      "sourceFilename": "matrix-calcite.png",
+      "sourceSha256": "0ab808968f8e9dac4c232b0dc36c1b9aca7df9557f18d1d98896c3b70c599c20",
+      "sha256": "f6f55a04f855a4f750cba5de132ff53168e85542b7948670572f3839d1a03cd2",
+      "thumbnailSha256": "ef707cee6d80be28e8030d153ef0b30bd0840c0d1b412c80ebafcd4f692943c7",
+      "cropPixels": null,
+      "processing": "Crop where stated, aspect-preserving resize, WebP encoding; no recoloring, retouching or generative reconstruction",
+      "note": "Complete Figure 9; original yellow arrows and 2000 micrometre scale retained"
+    },
+    {
+      "id": "structure",
+      "paper": "structure",
+      "file": "structure.webp",
+      "thumbnail": "structure-thumb.webp",
+      "width": 1000,
+      "height": 334,
+      "sourceSize": [
+        1772,
+        591
+      ],
+      "sourceFilename": "shale-structures.webp",
+      "sourceSha256": "44668df9ccc5b969c03976bf820c2574f6959ed3b5e1e86dfc631db95c59652d",
+      "sha256": "c29ec883476a13b70f13a16f14cbb1427b97dd1d5caeed4fbd9cd85eaa336192",
+      "thumbnailSha256": "89afba114248aac325ff09e7b0a458202784dc4b4c19fdc9ebe6c892fd6d3388",
+      "cropPixels": null,
+      "processing": "Crop where stated, aspect-preserving resize, WebP encoding; no recoloring, retouching or generative reconstruction",
+      "note": "Complete Figure 3; A lamination, B graptolites, C quartz lamination"
+    }
+  ]
+}
