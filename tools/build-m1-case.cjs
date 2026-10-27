@@ -13,7 +13,7 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 820 250" role="img" aria-label="四步可解释岩屑分类流程，每步的输入输出与实际参数">'+[['核验与分组','66 张原图与标签','42 参考 / 24 测试','#dda366'],['图像与特征','中心 72% → 96 × 96','输出 40 维特征','#7da9b7'],['近邻与投票','参考尺度标准化','距离 → k 票 → 候选','#a18bb8'],['复核与评价','24 张留出测试图','模型与人工分别记录','#8ca47e']].map((s,i)=>{const x=8+i*205;return '<g transform="translate('+x+',15)"><rect width="188" height="185" rx="12" fill="#fff9ee" stroke="#e4d6c0"/><circle cx="31" cy="30" r="18" fill="'+s[3]+'"/><text x="31" y="35" text-anchor="middle" font-size="15" fill="white">0'+(i+1)+'</text><text x="18" y="78" font-size="17" fill="#365261">'+s[0]+'</text><text x="18" y="114" font-size="12" fill="#869084">'+s[1]+'</text><text x="18" y="145" font-size="12" fill="#869084">'+s[2]+'</text></g>'+(i<3?'<path d="M'+(x+178)+' 224q28 10 48-10m-9 0h9v9" fill="none" stroke="'+s[3]+'" stroke-width="3"/>':'');}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 125" role="img" aria-label="40维图像特征的组成"><text x="0" y="18" fill="#8d866c" font-size="12">图像 → 40 维描述 → 加权距离 → 近邻证据</text>'+[[12,'12 维颜色','#c69570'],[16,'16 维局部纹理','#95a888'],[8,'8 维梯度方向','#86a7b6'],[4,'4 个统计量','#aa9abd']].map((s,i,all)=>{const start=all.slice(0,i).reduce((n,v)=>n+v[0],0)*17;return '<rect x="'+start+'" y="37" width="'+(s[0]*17-4)+'" height="35" rx="4" fill="'+s[2]+'"/><text x="'+start+'" y="101" fill="#8a9585" font-size="11">'+s[1]+'</text>';}).join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id);return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.3.0',updated:'2026-10-24',status:'ready',tabs:{
+const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：公开图像与可解释近邻分类',methods:['cv'],version:'1.3.1',updated:'2026-10-27',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的四步流程',lead:['每一步都有明确输入、可见计算与可保存的输出。第三部分实际执行同一套流程。'],stats:[['真实照片','66 张'],['参考 / 测试','42 / 24'],['类别 / 特征','3 / 40']],steps:[
 {name:'核验图像并按井段分组',role:'数据',do:'核对原图、岩性标签与源井深，选取三类共 66 张，按 20 米井段分组留出。',effect:'42 张参考图与 24 张测试图，同组不跨集合；原图 SHA-256 可追溯。',trap:'相邻照片随机拆分会高估效果；选样与分组不使用模型分数。'},
@@ -24,12 +24,8 @@ workflow:{label:'案例流程',title:'从真实岩屑图像到可复核候选的
 demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'选择真实留出样品，调整 k、颜色与纹理权重，查看候选、近邻、混淆矩阵与原井深记录；人工复核与模型输出分别保存，可导出 CSV。',height:1040}
 }};
 // Retain the same teaching points in original-protocol HTML for older portals.
-const rockOverview='<svg viewBox="0 0 780 230" role="img" aria-label="三类岩性结构与孔隙通道的概念示意">'+data.classes.map((c,i)=>{
-  let shapes='';if(i===0)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<ellipse cx="'+(27+x*41)+'" cy="'+(65+y*32)+'" rx="15" ry="12" fill="#d3b083" stroke="#b99565"/>';
-  if(i===1)for(let y=0;y<5;y++)shapes+='<path d="M14 '+(57+y*18)+'q55-8 110 0t110 0" fill="none" stroke="#8d9fac" stroke-width="9"/>';
-  if(i===2)for(let y=0;y<3;y++)for(let x=0;x<5;x++)shapes+='<path d="m'+(13+x*44)+' '+(53+y*32)+' 23-7 13 20-23 7Z" fill="#acba97" stroke="#8c9f7b"/>';
-  return '<g transform="translate('+(i*260)+',0)"><rect x="0" y="34" width="245" height="126" rx="10" fill="#e9dfcb"/>'+shapes+'<text x="8" y="20" fill="#65808b" font-size="15">'+c.name+'</text><text x="8" y="187" fill="#8b947e" font-size="12">'+['颗粒与孔隙：储集空间的线索','细粒与层理：需核验岩层作用','晶体与裂缝：需验证内部通道'][i]+'</text></g>';
-}).join('')+'<text x="7" y="220" fill="#a29477" font-size="11">概念示意，不表示样本实测孔渗。岩性识别不能直接证明油气存在。</text></svg>';
+const rockOverview='<p><b>细砂岩</b>：对照颗粒、接触与胶结；<b>页岩</b>：对照细粒、层理与特殊组分；<b>灰质白云岩</b>：核验碳酸盐组分。上方为本例真实岩屑，论文图见“人工描述的依据”。外观不能直接证明矿物含量、孔渗或油气。</p>';
+
 definition.tabs.background=require('./m1/background-metadata.cjs')({style,well,feature,photos,split,rockOverview,observationGallery:paperFigures.legacy()});
 definition.tabs.background.page={html:'demo/index.html',view:'background',height:1040};
 definition.tabs.workflow.page={html:'demo/index.html',view:'workflow',height:1040};
@@ -70,7 +66,7 @@ tab.unmount=function(){global.removeEventListener('message',resize);if(frame)fra
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261024-m1case6');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261027-m1case7');
 ['case-demo-host','case-upload','shell'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261024-sections1');});
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

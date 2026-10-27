@@ -31,7 +31,7 @@ module.exports = function backgroundMetadata(visuals) {
         '<p><b>描述依据</b>包括颜色与表面状态、粒度和颗粒特征、组分与胶结、保存的层理或裂缝。钻碎后的岩屑块径受钻头影响，不能直接代替原岩粒度；未标定倍率和比例尺的照片不宜报告定量粒度。</p>' +
         observationGallery + '<div class="m1c">' + well + '</div><p><b>迟到对应</b>：样品深度近似对应取样时刻减去上返时间后的钻头深度；上图为恒定钻速简化，现场需结合循环与校验记录。本包沿用原数据井深，不用教学滑杆重新校正。依据：' + mudLogging + '。</p>' +
         '<p><b>现场问题</b>：重复观察需要统一描述规则；' + cavings + '并非钻头直接切削所得，混入后会干扰钻遇岩性判断；照片还可能缺少取样状态及验证记录。</p>' +
-        '<div class="m1c"><div class="m1c-grid">' + photos + '</div></div><details><summary>三类岩性的结构线索与解释边界</summary><div class="m1c">' + rockOverview + '</div><p>结构图为定性示意。矿物组成、孔渗和油气显示需要额外证据。</p></details>' },
+        '<div class="m1c"><div class="m1c-grid">' + photos + '</div></div><details open><summary>三类岩性的结构线索与解释边界</summary><div class="m1c">' + rockOverview + '</div><p>真实图像支持观察与对照；矿物组成、孔渗和油气显示需要额外证据。</p></details>' },
       { no: 2, en: 'INTERVENTION', title: 'AI 能做什么', html:
         '<p>本例是<b>照片级、单标签的监督分类</b>：用带岩性标签的参考图预测待识别照片的类别。k 近邻比较特征距离，寻找 k 个相似样本并按类别投票。它可直接展示原图、标签与距离，适合解释判断依据。原理：' + neighbors + '。</p>' +
         '<div class="m1c">' + feature + '</div><p>使用 12 维颜色、16 维局部纹理、8 维梯度方向和 4 个统计量，共 40 维。交付内容是<b>岩性候选、相似证据与人工复核记录</b>。低票结果可优先检查；高票结果也可能继承参考库偏差，票数占比不作校准概率。</p>' +

@@ -76,38 +76,32 @@
   }
   $('lag-minutes').addEventListener('input', updateLag); $('rop').addEventListener('input', updateLag); updateLag();
 
-  function rockConcept(id) {
-    var inside = '';
-    if (id === 'sandstone') for (var y=0;y<4;y++) for (var x=0;x<5;x++) inside += '<circle cx="'+(15+x*19+(y%2)*6)+'" cy="'+(15+y*19)+'" r="7" fill="#d7ad73" stroke="#be915a" stroke-width="1"/>';
-    if (id === 'shale') for (var i=0;i<6;i++) inside += '<path d="M9 '+(13+i*12)+'q24-6 46 0t48 0" stroke="#7e94a9" stroke-width="6" fill="none"/>';
-    if (id === 'dolomite') for (var j=0;j<3;j++) for(var k=0;k<4;k++) inside += '<path d="m'+(13+k*25)+' '+(12+j*25)+' 15-5 7 15-15 5Z" fill="#a1b393" stroke="#7f9774" stroke-width="1"/>';
-    return '<svg viewBox="0 0 118 90" role="img" aria-label="岩性概念示意，不表示照片中的定量矿物组成">'+inside+'</svg>';
-  }
+  var rockAnnotationsVisible = true;
   function renderRockLesson(id) {
     var lessons={
-      sandstone:{title:'颗粒之间的空间，为什么值得关注？',copy:'孔隙提供储存流体的空间，连通的通道影响流体能否通过。识别砂岩可为寻找和描述储集层提供岩性线索；但胶结、压实等作用会改变孔隙，不能把“砂岩”直接等同于“好储层”。',question:'有哪些孔隙与连通证据？还要结合岩心、测井或实验。',caption:'颗粒 → 孔隙 → 连通性问题'},
-      shale:{title:'细粒与层理，让我们提出不同的地质问题。',copy:'页岩的细粒和层理是观察线索。相对不易透流的岩层可能参与封盖；岩层在油气系统中的实际作用，还需要厚度、裂缝、物性等证据。图像分类先提供描述线索，不能代替封盖或储集评价。',question:'层理、裂缝和物性是否支持后续解释？',caption:'细粒 / 层理 → 封盖与地层对比线索'},
-      dolomite:{title:'看到晶体外观，还需要核验内部通道。',copy:'灰质白云岩属于本例的碳酸盐岩标签。晶间空间、溶蚀与裂缝可能影响储集和流动条件，外观相似的样品也可能具有不同物性。岩屑照片可辅助识别候选，矿物组成和孔渗仍需其他分析。',question:'是否存在晶间孔、溶孔或裂缝？证据来自哪里？',caption:'晶体 / 裂缝 → 进一步验证的线索'}
+      sandstone:{photo:'grain-fine',title:'从真实薄片中，辨认颗粒与接触关系。',copy:'复用上文 DZ 细粒砂岩薄片。先沿颗粒轮廓辨认接触关系，再对照原图的 Q 等矿物标注；颗粒之间的暗区不能一概当成有效孔隙。砂岩识别提供岩性线索，储集与流动能力仍需物性证据。',question:'粒度、胶结与孔隙是否支持储层解释？需要标定薄片、岩心与物性实验共同验证。',caption:'DZ 细粒砂岩 · 原图标尺 300 μm',credit:'Zhang et al., 2022 · Heritage Science · 图 4b',doi:'10.1186/s40494-022-00656-y',limit:'石窟砂岩研究中的教学图例，不是本例油井样本。保留原图标尺；显微颜色不能直接对应矿物含量或孔隙率。',marks:[{x:49,y:55,label:'原文 Q 标注',text:'对照原作者的石英（Q）标注观察颗粒，不能只按亮暗认矿物。'},{x:73,y:39,label:'颗粒边界',text:'沿颗粒轮廓比较粒形与相互接触；原图红色矿物标注保持不变。'}]},
+      shale:{photo:'structure',title:'细粒与层理，回到真实岩心和薄片中看。',copy:'复用上文龙马溪组页岩图：A 看岩心水平纹层，B 看笔石化石，C 看显微尺度的石英纹层。完整岩心保存的空间关系，在钻碎岩屑中可能不完整；这些观察线索不能单独证明封盖或储集能力。',question:'层理、裂缝和物性是否支持后续解释？需要回到相应井段核对。',caption:'龙马溪组页岩 · 岩心 A、B 与薄片 C',credit:'Tang et al., 2021 · Frontiers in Earth Science · 图 3A—C',doi:'10.3389/feart.2021.775657',limit:'A、B、C 来自 N15 井不同深度，并非同一块样品同步成像。线状特征不能一概解释为裂缝。',marks:[{x:16,y:47,label:'A · 水平纹层',text:'在完整岩心表面观察平行纹层及其延伸。'},{x:42,y:61,label:'B · 笔石',text:'与原文 Graptolite 标注对照，辨认特殊生物组分。'},{x:85,y:70,label:'C · 石英纹层',text:'与原图 Lamination / Authigenic quartz 标注对照，区分观察尺度。'}]},
+      dolomite:{photo:'color',title:'从真实岩屑外观，走向需要验证的组成。',copy:'复用上文原标签为 Dolomite 的岩屑图，观察灰褐色调、表面明暗和碎块边界。本例类别名称为“灰质白云岩”，但这张外部论文图只标注“白云岩”；两者不直接等同。仅凭外观不能确认灰质比例或白云石含量。',question:'灰质与白云石组分如何确认？需结合酸反应、显微观察或其他矿物分析。',caption:'Dolomite · 论文原标签为白云岩',credit:'Tolstaya et al., 2023 · Journal of Imaging · 图 4 子图',doi:'10.3390/jimaging9070126',limit:'该图未给出干湿状态与矿物定量；不据此标注晶间孔、溶孔、裂缝或油气。它不属于本例的分类数据。',marks:[{x:32,y:42,label:'碎块表面',text:'对照表面的灰褐色调与局部明暗；不由明暗判定干湿或含油。'},{x:66,y:64,label:'碎块边界',text:'辨认钻碎后碎块的轮廓；碎块尺寸不能代替原岩沉积粒度。'}]}
     };
-    var lesson=lessons[id]||lessons.sandstone,shapes='',flow='M44 155C90 145 95 182 139 167S210 145 259 166S321 172 380 148';
-    if(id==='sandstone')for(var y=0;y<4;y++)for(var x=0;x<8;x++){var cx=61+x*43+(y%2)*9,cy=96+y*35;shapes+='<ellipse cx="'+cx+'" cy="'+cy+'" rx="15" ry="12" fill="#d4b384" stroke="#bd9868" stroke-width="1.2"/>';}
-    if(id==='shale'){for(var n=0;n<8;n++)shapes+='<path d="M42 '+(88+n*17)+'q88-11 172 0t168 0" stroke="'+(n%2?'#a6b2ba':'#8297a7')+'" stroke-width="9" fill="none"/>';flow='M43 155C82 153 86 145 112 146';}
-    if(id==='dolomite'){for(var j=0;j<4;j++)for(var k=0;k<7;k++)shapes+='<path d="m'+(49+k*48)+' '+(87+j*34)+' 24-9 15 21-24 9Z" fill="#b5c0a0" stroke="#91a27f" stroke-width="1.2"/>';shapes+='<path d="M58 212 148 167 201 175 279 112 380 90" fill="none" stroke="#f3edda" stroke-width="9"/>';flow='M58 212 148 167 201 175 279 112 380 90';}
-    $('reservoir-diagram').innerHTML='<svg viewBox="0 0 500 335" aria-hidden="true"><path d="M40 75 100 42H445L385 75Z" fill="#f1e5cf"/><path d="M385 75 445 42V200L385 233Z" fill="#c7b797"/><path d="M40 75H385V233H40Z" fill="#e4dbc7"/><path d="M40 233H385L445 280H100Z" fill="#d6c3a2" opacity=".45"/>'+shapes+'<path class="concept-channel" d="'+flow+'"/><path class="concept-current" d="'+flow+'"/><text x="40" y="25">'+className(id)+' / 结构与通道概念图</text><text x="40" y="301">'+lesson.caption+'</text><text class="concept-note" x="40" y="324">示意结构，不对应样本实测孔渗；不表示已经发现油气。</text></svg>';
+    if(!lessons[id])id='sandstone';
+    var lesson=lessons[id], source=$('paper-source-'+lesson.photo);
+    $('reservoir-diagram').innerHTML='<figure class="rock-photo"><div class="rock-photo-stage"><img src="'+source.getAttribute('src')+'" alt="'+esc(source.getAttribute('alt'))+'">'+lesson.marks.map(function(mark,index){return '<span class="rock-photo-pin" style="left:'+mark.x+'%;top:'+mark.y+'%" title="'+esc(mark.label)+'" aria-hidden="true">'+(index+1)+'</span>';}).join('')+'</div><figcaption><b>'+esc(lesson.caption)+'</b><ol class="rock-photo-notes">'+lesson.marks.map(function(mark){return '<li><strong>'+esc(mark.label)+'</strong>'+esc(mark.text)+'</li>';}).join('')+'</ol><p class="paper-credit">'+esc(lesson.credit)+' · CC BY 4.0<br><a href="https://doi.org/'+lesson.doi+'" target="_blank" rel="noopener noreferrer">查看论文与完整原图 ↗</a></p><small>橙色编号为本页新增的观察标注，可隐藏；原图像素、文字与标尺未改动。</small></figcaption></figure>';
     $('rock-concept-title').textContent=lesson.title;$('rock-concept-copy').textContent=lesson.copy;$('rock-concept-question').textContent=lesson.question;
+    $('rock-photo-limit').textContent=lesson.limit;
     Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.setAttribute('aria-pressed',String(button.dataset.rock===id));});
     reportHeight();
   }
+  $('rock-annotation-toggle').addEventListener('click',function(){rockAnnotationsVisible=!rockAnnotationsVisible;$('reservoir-diagram').classList.toggle('annotations-hidden',!rockAnnotationsVisible);this.setAttribute('aria-pressed',String(rockAnnotationsVisible));this.textContent=rockAnnotationsVisible?'隐藏网页标注':'显示网页标注';reportHeight();});
   Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){renderRockLesson(button.dataset.rock);});});
   renderRockLesson('sandstone');
   var descriptions = {
-    sandstone:{text:'碎屑岩类原标签。观察原岩颗粒与胶结关系；未标定图像不作定量粒度测量，岩屑块径也不能代替沉积粒度。',concept:'颗粒结构示意'},
-    shale:{text:'细粒沉积岩类原标签。保存的层理与薄片状特征可供观察；钻碎和混样会削弱原岩结构，照片需结合样品复核。',concept:'细粒与层理示意'},
-    dolomite:{text:'碳酸盐岩类原标签。外观仅支持候选识别；灰质组分与白云石的确认需结合酸反应、显微或其他矿物分析。',concept:'碳酸盐晶体示意'}
+    sandstone:{text:'碎屑岩类原标签。观察原岩颗粒与胶结关系；未标定图像不作定量粒度测量，岩屑块径也不能代替沉积粒度。'},
+    shale:{text:'细粒沉积岩类原标签。保存的层理与薄片状特征可供观察；钻碎和混样会削弱原岩结构，照片需结合样品复核。'},
+    dolomite:{text:'碳酸盐岩类原标签。外观仅支持候选识别；灰质组分与白云石的确认需结合酸反应、显微或其他矿物分析。'}
   };
   $('lithology-cards').innerHTML = classes.map(function (c) {
     var sample = DATA.samples.filter(function(s){return s.classId===c.id;})[0], d=descriptions[c.id];
-    return '<article class="lithology-card" style="--lith-color:'+c.color+'"><div class="lithology-top"><h3>'+c.name+'</h3><span>'+DATA.samples.filter(function(s){return s.classId===c.id;}).length+' 张原图</span></div><div class="lithology-evidence"><img src="'+sample.image+'" alt="公开数据中标签为'+c.name+'的岩屑原图">'+rockConcept(c.id)+'</div><p>'+d.text+'</p><small>左：真实原图；右：'+d.concept+'。照片深度 '+sample.depth+' m，非矿物定量结果。</small></article>';
+    return '<article class="lithology-card" style="--lith-color:'+c.color+'"><div class="lithology-top"><h3>'+c.name+'</h3><span>'+DATA.samples.filter(function(s){return s.classId===c.id;}).length+' 张原图</span></div><div class="lithology-evidence"><img src="'+sample.image+'" alt="公开数据中标签为'+c.name+'的岩屑原图"></div><p>'+d.text+'</p><small>本例真实原图 · 深度 '+sample.depth+' m · 沿用原始数据标签，非矿物定量结果。</small></article>';
   }).join('');
   function splitMarkup() {
     return classes.map(function(c){var reference=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='reference';}).length;var test=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='test';}).length;

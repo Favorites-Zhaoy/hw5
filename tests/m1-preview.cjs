@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.3.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.3.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -106,8 +106,8 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
 // They are never shipped as samples and are not used to report real-data model performance.
 function appRuntime(embedded=false,reduced=false,portalView=null){
   const html=read('m1-cuttings-case/demo/index.html'),nodes=new Map(),buttons=[];
-  const create=tag=>{const e=new support.El(tag);e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;};e.closest=()=>e;return e;};
-  for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){nodes.set(match[3],create(match[1]));}
+  const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;};e.closest=()=>e;return e;};
+  for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
   for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock)="([^"]+)"/g))e.dataset[a[1]]=a[2];buttons.push(e);}
   const defaults={'k-select':'5','color-weight':'50','review-threshold':'70',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
@@ -153,8 +153,21 @@ test('an arbitrary browser frame keeps the background and three-part navigation 
 test('explicit portal requests open each corresponding lesson instead of always opening the demo',async()=>{
   for(const name of ['background','workflow','demo']){const rt=appRuntime(true,false,name);await settle();assert.equal(rt.body.classList.contains('embedded'),true);assert.equal(rt.nodes.get('panel-'+name).hidden,false);assert.ok(rt.messages.some(m=>m.__m1Height===1800));}
 });
-test('the rock lesson changes geology concepts and the workflow explains actual grouped samples',async()=>{
-  const rt=appRuntime();await settle();const shale=rt.buttons.find(b=>b.dataset.rock==='shale');shale.listeners.click();assert.match(rt.nodes.get('rock-concept-title').textContent,/细粒/);assert.match(rt.nodes.get('reservoir-diagram').innerHTML,/页岩/);
+test('the open rock lesson reuses authentic photographs with toggleable annotations and the workflow explains actual groups',async()=>{
+  assert.match(entryHTML,/<details class="geology-extension" open>/);
+  const rt=appRuntime();await settle();
+  for(const [rock,photo] of [['sandstone','grain-fine'],['shale','structure'],['dolomite','color']]){
+    rt.buttons.find(b=>b.dataset.rock===rock).listeners.click();
+    const content=rt.nodes.get('reservoir-diagram').innerHTML;
+    assert.ok(content.includes(rt.nodes.get('paper-source-'+photo).getAttribute('src')));
+    assert.match(content,/rock-photo-pin/);assert.match(content,/doi.org/);assert.doesNotMatch(content,/<svg|<canvas/);
+    assert.equal(rt.buttons.find(b=>b.dataset.rock===rock).getAttribute('aria-pressed'),'true');
+  }
+  assert.match(rt.nodes.get('rock-concept-copy').textContent,/两者不直接等同/);
+  rt.event('rock-annotation-toggle','click');assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),true);
+  rt.buttons.find(b=>b.dataset.rock==='shale').listeners.click();assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),true);
+  rt.event('rock-annotation-toggle','click');assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),false);
+  assert.doesNotMatch(rt.nodes.get('lithology-cards').innerHTML,/<svg/);
   const workflow=rt.buttons.find(b=>b.dataset.view==='workflow');workflow.listeners.click();assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-depth-group=/g)||[]).length,17);
   rt.event('flow-next','click');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/data-image-stage="3"/);
   const grayStage={dataset:{imageStage:'2'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-image-stage]'?grayStage:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/灰度图由当前样本实际像素计算/);assert.equal(rt.nodes.get('flow-snapshot').querySelector('.processing-figure').children[0].tagName,'canvas');
