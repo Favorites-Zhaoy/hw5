@@ -63,6 +63,17 @@
     var order = Object.keys(votes).sort(function (a, b) { return votes[b] - votes[a] || sums[a] / votes[a] - sums[b] / votes[b] || a.localeCompare(b); });
     return { classId: order[0], share: votes[order[0]] / k, votes: votes, neighbors: neighbors, k: k };
   }
+  function explainDistance(a, b, colorWeight, scaler) {
+    var color = 0, other = 0;
+    var rows = a.map(function(value, i) {
+      var delta = (value - b[i]) / scaler.scale[i];
+      var contribution = delta * delta / (i < COLOR_DIMS ? COLOR_DIMS : DIMS - COLOR_DIMS);
+      if (i < COLOR_DIMS) color += contribution; else other += contribution;
+      return {index:i,query:value,reference:b[i],scale:scaler.scale[i],delta:delta,contribution:contribution};
+    });
+    return {rows:rows,color:color,other:other,colorPart:colorWeight*color,otherPart:(1-colorWeight)*other,
+      distance:distance(a,b,colorWeight,scaler)};
+  }
   function evaluate(tests, references, classes, options, scaler) {
     var matrix = classes.map(function () { return classes.map(function () { return 0; }); });
     var predictions = [], hit = 0;
@@ -91,7 +102,7 @@
     }
     return out;
   }
-  var api = { extract: extract, fit: fit, predict: predict, evaluate: evaluate, disturb: disturb, dimensions: DIMS };
+  var api = { extract: extract, fit: fit, predict: predict, explainDistance: explainDistance, evaluate: evaluate, disturb: disturb, dimensions: DIMS };
   global.M1Model = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 }(typeof window !== 'undefined' ? window : globalThis));

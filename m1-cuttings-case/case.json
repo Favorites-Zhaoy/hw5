@@ -5,7 +5,7 @@
   "methods": [
     "cv"
   ],
-  "version": "1.3.1",
+  "version": "1.4.0",
   "updated": "2026-10-27",
   "status": "ready",
   "tabs": {
@@ -68,9 +68,9 @@
     },
     "workflow": {
       "label": "案例流程",
-      "title": "从真实岩屑图像到可复核候选的四步流程",
+      "title": "跟随一张真实岩屑照片，拆解七步技术计算",
       "lead": [
-        "每一步都有明确输入、可见计算与可保存的输出。第三部分实际执行同一套流程。"
+        "参考库准备与待识别图像采用相同的处理；颜色与灰度纹理并行计算后合成40维。每步解释输入、处理、原因、输出与限制。"
       ],
       "stats": [
         [
@@ -82,56 +82,77 @@
           "42 / 24"
         ],
         [
-          "类别 / 特征",
-          "3 / 40"
+          "步骤 / 特征",
+          "7 / 40"
         ]
       ],
       "steps": [
         {
-          "name": "核验图像并按井段分组",
+          "name": "建立参考库",
           "role": "数据",
-          "do": "核对原图、岩性标签与源井深，选取三类共 66 张，按 20 米井段分组留出。",
-          "effect": "42 张参考图与 24 张测试图，同组不跨集合；原图 SHA-256 可追溯。",
-          "trap": "相邻照片随机拆分会高估效果；选样与分组不使用模型分数。"
+          "do": "按 20 m 井段组成 17 组，固定划分为 42 张参考图与 24 张测试图。同组照片不跨集合；标签随参考照片保存，测试标签只用于评价。",
+          "effect": "一个带标签的参考库、一个留出测试集，以及可核对的分组记录。",
+          "trap": "20 m 是本例的分组宽度，不是原数据的取样间距。选样与划分不使用模型分数。"
         },
         {
-          "name": "统一图像并提取 40 维特征",
+          "name": "统一图像",
           "role": "CV",
-          "do": "中心 72% 区域统一到 96 × 96；计算颜色、局部二值纹理、梯度方向与图像统计。",
-          "effect": "每个样本得到 40 维向量，以参考库尺度标准化。",
-          "trap": "不把边框编号、文件名、井深或原标签作为输入；中心裁切不保证完全消除背景偏差。"
+          "do": "取图像中心宽、高各 72% 的区域，再缩放为 96 × 96 像素。原图保持不变，后续特征只从这个处理结果计算。",
+          "effect": "96 × 96 的 RGB 像素，共 9,216 个像素位置。",
+          "trap": "照片中的岩屑块径不等于原岩粒度；像素缩放也不提供物理比例尺。"
         },
         {
-          "name": "计算近邻距离并按类别投票",
+          "name": "提取颜色",
+          "role": "CV",
+          "do": "每个通道按 0–63、64–127、128–191、192–255 分成 4 桶，统计像素数并除以 9,216。三个通道得到 12 个比例。",
+          "effect": "12 维颜色特征；每个通道的 4 桶比例之和为 1。",
+          "trap": "RGB 颜色不能直接给出矿物组成、含油量或岩性的物理鉴定结果。"
+        },
+        {
+          "name": "提取纹理",
+          "role": "CV",
+          "do": "以每个内部像素为中心比较 8 邻域，编码后合并为 16 桶局部纹理；按梯度幅值汇总 8 个方向，再附加 4 个统计量。与颜色拼接成 40 维。",
+          "effect": "12 维颜色 + 16 维局部纹理 + 8 维梯度 + 4 个统计量 = 40 维。",
+          "trap": "本例局部纹理用 code >> 4 合并编码；梯度采用中心差分。它们不等于直接测量层理、裂缝或晶体。"
+        },
+        {
+          "name": "计算距离",
           "role": "ML",
-          "do": "计算加权欧氏距离，寻找 k 个参考近邻。多数票给出候选，票数相同时比较该类近邻平均距离。",
-          "effect": "展示候选、票数、原始相似照片和距离；参数变化触发重新计算。",
-          "trap": "投票占比不是校准概率，相似外观不能独立证明地质成因。"
+          "do": "仅从参考库计算每维标准差，差值除以 max(标准差, 0.01)。前 12 维与后 28 维分别平均平方差，再按权重加和、开方，得到加权欧氏距离。",
+          "effect": "42 个真实距离及排序；可检查每一维和两个特征组的贡献。",
+          "trap": "权重中的“纹理”组包含局部纹理、梯度与统计量。距离越近仅表示本特征空间更相似。"
         },
         {
-          "name": "留出评价、人工复核与记录导出",
-          "role": "地质",
-          "do": "对 24 张留出照片计算混淆矩阵、准确率和宏平均 F1；人工意见单独记录并导出 CSV。",
-          "effect": "模型输出与人工修改分别可查；回到源井深记录，缺失井段保持断开。",
-          "trap": "不把人工修改计入模型分数，不把单井小样本实验外推到新井。"
+          "name": "近邻投票",
+          "role": "ML",
+          "do": "取最近的 k 张，每张投 1 票。多数票类别成为候选；票数相同则比较该类近邻的平均距离，再相同按类别 ID 排序。",
+          "effect": "一个岩性候选、各类票数、近邻原图与距离。",
+          "trap": "票数占比不是校准概率。高票也可能来自参考库共同的成像偏差。"
+        },
+        {
+          "name": "验证与交付",
+          "role": "评价 / 地质",
+          "do": "批量评价统计混淆矩阵、准确率和宏平均 F1；单样品复核独立保存人工意见。最终按源井深记录输出模型候选与复核 CSV。",
+          "effect": "可查的误判、模型评价与人工记录；缺失井段不插值。",
+          "trap": "人工修改不计入模型分数。单井、小样本的留出结果不能推断新井效果。"
         }
       ],
       "metrics": {
-        "title": "把每一步的目的与输出连起来",
-        "html": "<style>.m1c{background:#faf2e4;border:1px solid #e8dbc7;border-radius:12px;padding:22px;margin:20px 0;color:#334c56}.m1c svg{display:block;width:100%;height:auto}.m1c svg text{font-family:Microsoft YaHei,system-ui,sans-serif}.m1c p{font-size:12px;line-height:1.9;color:#858b7d}.m1c-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.m1c-photo img{width:100%;max-width:155px;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block;margin:0 auto 12px}.m1c-photo b{display:block;font-size:14px;color:#6d7f7e}.m1c-photo small{display:block;font-size:10px;line-height:1.9;color:#9a9b88}.m1c-legend{display:flex;gap:20px;font-size:11px;color:#859184}.m1c-legend i{display:inline-block;width:10px;height:10px;background:#90aab3;margin-right:5px}.m1c-legend i.test{background:#d4a06a}@media(max-width:600px){.m1c{padding:14px}.m1c-grid{gap:10px}.m1c-photo b{font-size:11px}.m1c-photo small{font-size:9px}}</style><div class=\"m1c\"><svg viewBox=\"0 0 820 250\" role=\"img\" aria-label=\"四步可解释岩屑分类流程，每步的输入输出与实际参数\"><g transform=\"translate(8,15)\"><rect width=\"188\" height=\"185\" rx=\"12\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><circle cx=\"31\" cy=\"30\" r=\"18\" fill=\"#dda366\"/><text x=\"31\" y=\"35\" text-anchor=\"middle\" font-size=\"15\" fill=\"white\">01</text><text x=\"18\" y=\"78\" font-size=\"17\" fill=\"#365261\">核验与分组</text><text x=\"18\" y=\"114\" font-size=\"12\" fill=\"#869084\">66 张原图与标签</text><text x=\"18\" y=\"145\" font-size=\"12\" fill=\"#869084\">42 参考 / 24 测试</text></g><path d=\"M186 224q28 10 48-10m-9 0h9v9\" fill=\"none\" stroke=\"#dda366\" stroke-width=\"3\"/><g transform=\"translate(213,15)\"><rect width=\"188\" height=\"185\" rx=\"12\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><circle cx=\"31\" cy=\"30\" r=\"18\" fill=\"#7da9b7\"/><text x=\"31\" y=\"35\" text-anchor=\"middle\" font-size=\"15\" fill=\"white\">02</text><text x=\"18\" y=\"78\" font-size=\"17\" fill=\"#365261\">图像与特征</text><text x=\"18\" y=\"114\" font-size=\"12\" fill=\"#869084\">中心 72% → 96 × 96</text><text x=\"18\" y=\"145\" font-size=\"12\" fill=\"#869084\">输出 40 维特征</text></g><path d=\"M391 224q28 10 48-10m-9 0h9v9\" fill=\"none\" stroke=\"#7da9b7\" stroke-width=\"3\"/><g transform=\"translate(418,15)\"><rect width=\"188\" height=\"185\" rx=\"12\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><circle cx=\"31\" cy=\"30\" r=\"18\" fill=\"#a18bb8\"/><text x=\"31\" y=\"35\" text-anchor=\"middle\" font-size=\"15\" fill=\"white\">03</text><text x=\"18\" y=\"78\" font-size=\"17\" fill=\"#365261\">近邻与投票</text><text x=\"18\" y=\"114\" font-size=\"12\" fill=\"#869084\">参考尺度标准化</text><text x=\"18\" y=\"145\" font-size=\"12\" fill=\"#869084\">距离 → k 票 → 候选</text></g><path d=\"M596 224q28 10 48-10m-9 0h9v9\" fill=\"none\" stroke=\"#a18bb8\" stroke-width=\"3\"/><g transform=\"translate(623,15)\"><rect width=\"188\" height=\"185\" rx=\"12\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><circle cx=\"31\" cy=\"30\" r=\"18\" fill=\"#8ca47e\"/><text x=\"31\" y=\"35\" text-anchor=\"middle\" font-size=\"15\" fill=\"white\">04</text><text x=\"18\" y=\"78\" font-size=\"17\" fill=\"#365261\">复核与评价</text><text x=\"18\" y=\"114\" font-size=\"12\" fill=\"#869084\">24 张留出测试图</text><text x=\"18\" y=\"145\" font-size=\"12\" fill=\"#869084\">模型与人工分别记录</text></g></svg></div><p>可运行示范会实时给出准确率、宏平均 F1 和混淆矩阵。准确率 = 与原标签一致的数量 ÷ 24；宏平均 F1 为三个类别 F1 的等权平均。当前查询的光照扰动只用于观察敏感性，批量评价保持原始图像条件。</p><div class=\"m1c\"><h4>第一步的真实数据：17 个井段分组，5 组留出</h4><svg viewBox=\"0 0 820 265\" role=\"img\" aria-label=\"本案例实际17个20米井段分组及其参考测试归属\"><g transform=\"translate(0,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2080—2099 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 参考</text></g><g transform=\"translate(137,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2100—2119 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 参考</text></g><g transform=\"translate(274,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2120—2139 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">5 张 / 参考</text></g><g transform=\"translate(411,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2140—2159 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">4 张 / 参考</text></g><g transform=\"translate(548,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2160—2179 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 参考</text></g><g transform=\"translate(685,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2180—2199 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">8 张 / 测试</text></g><g transform=\"translate(0,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2200—2219 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 测试</text></g><g transform=\"translate(137,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2220—2239 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(274,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2260—2279 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(411,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2280—2299 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(548,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2480—2499 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(685,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2600—2619 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(0,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2620—2639 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">5 张 / 参考</text></g><g transform=\"translate(137,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2640—2659 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(274,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2700—2719 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">1 张 / 参考</text></g><g transform=\"translate(411,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2840—2859 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(548,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2860—2879 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><text x=\"0\" y=\"257\" fill=\"#a3957a\" font-size=\"11\">整组划分：42 张参考图、24 张测试图；颜色表示集合，不是岩性。</text></svg></div>"
+        "title": "从参考库到单图候选的七步技术链",
+        "html": "<style>.m1c{background:#faf2e4;border:1px solid #e8dbc7;border-radius:12px;padding:22px;margin:20px 0;color:#334c56}.m1c svg{display:block;width:100%;height:auto}.m1c svg text{font-family:Microsoft YaHei,system-ui,sans-serif}.m1c p{font-size:12px;line-height:1.9;color:#858b7d}.m1c-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.m1c-photo img{width:100%;max-width:155px;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block;margin:0 auto 12px}.m1c-photo b{display:block;font-size:14px;color:#6d7f7e}.m1c-photo small{display:block;font-size:10px;line-height:1.9;color:#9a9b88}.m1c-legend{display:flex;gap:20px;font-size:11px;color:#859184}.m1c-legend i{display:inline-block;width:10px;height:10px;background:#90aab3;margin-right:5px}.m1c-legend i.test{background:#d4a06a}@media(max-width:600px){.m1c{padding:14px}.m1c-grid{gap:10px}.m1c-photo b{font-size:11px}.m1c-photo small{font-size:9px}}</style><div class=\"m1c\"><svg viewBox=\"0 0 1050 220\" role=\"img\" aria-label=\"七步技术流程，颜色与灰度纹理并行合并，参考库与查询图采用相同处理\"><g transform=\"translate(0,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">01</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">建立参考库</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">42 参考 / 24 测试</text></g><g transform=\"translate(150,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">02</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">统一图像</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">中心 72% / 96×96</text></g><g transform=\"translate(300,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">03</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">提取颜色</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">RGB → 12 维</text></g><g transform=\"translate(450,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">04</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">提取纹理</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">灰度 28 + 颜色 12</text></g><g transform=\"translate(600,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">05</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">计算距离</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">42 个加权距离</text></g><g transform=\"translate(750,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">06</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">近邻投票</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">前 k 张 / 每图 1 票</text></g><g transform=\"translate(900,12)\"><rect width=\"140\" height=\"146\" rx=\"10\" fill=\"#fff9ee\" stroke=\"#e4d6c0\"/><text x=\"13\" y=\"33\" font-size=\"21\" fill=\"#c59562\">07</text><text x=\"13\" y=\"68\" font-size=\"15\" fill=\"#365261\">验证与交付</text><text x=\"13\" y=\"99\" font-size=\"10\" fill=\"#869084\">批量评价 / 人工复核</text></g><text x=\"10\" y=\"192\" font-size=\"13\" fill=\"#7c8c80\">颜色与灰度纹理为并行分支；参考图和查询图采用相同处理；尺度仅由参考库拟合。</text></svg></div><h4>01 · 建立参考库</h4><p><b>输入：</b>66 张原始照片、三类岩性标签、井号与源井深。</p><p><b>处理：</b>按 20 m 井段组成 17 组，固定划分为 42 张参考图与 24 张测试图。同组照片不跨集合；标签随参考照片保存，测试标签只用于评价。</p><p><b>原因：</b>相邻样品和拍摄批次可能相似。整组留出能减轻相邻图像泄漏，但仍不能证明跨井泛化。</p><p><b>输出：</b>一个带标签的参考库、一个留出测试集，以及可核对的分组记录。</p><h4>02 · 统一图像</h4><p><b>输入：</b>同一张待识别原图；参考照片也执行完全相同的处理。</p><p><b>处理：</b>取图像中心宽、高各 72% 的区域，再缩放为 96 × 96 像素。原图保持不变，后续特征只从这个处理结果计算。</p><p><b>原因：</b>减轻样品盘边框与编号的干扰，统一计算量与邻域大小。固定裁切也可能遗漏边缘岩屑，不能保证完全排除背景。</p><p><b>输出：</b>96 × 96 的 RGB 像素，共 9,216 个像素位置。</p><h4>03 · 提取颜色</h4><p><b>输入：</b>96 × 96 图像的 R、G、B 三个通道。</p><p><b>处理：</b>每个通道按 0–63、64–127、128–191、192–255 分成 4 桶，统计像素数并除以 9,216。三个通道得到 12 个比例。</p><p><b>原因：</b>直方图描述颜色分布，不要求每块岩屑出现在相同位置。它也会受到照明、干湿与背景的影响。</p><p><b>输出：</b>12 维颜色特征；每个通道的 4 桶比例之和为 1。</p><h4>04 · 提取纹理</h4><p><b>输入：</b>RGB 分支保留 12 维颜色；另由 0.299R + 0.587G + 0.114B 计算灰度分支。</p><p><b>处理：</b>以每个内部像素为中心比较 8 邻域，编码后合并为 16 桶局部纹理；按梯度幅值汇总 8 个方向，再附加 4 个统计量。与颜色拼接成 40 维。</p><p><b>原因：</b>局部纹理和灰度变化补充颜色描述。它们是图像外观特征，需要通过带标签样本验证分类价值。</p><p><b>输出：</b>12 维颜色 + 16 维局部纹理 + 8 维梯度 + 4 个统计量 = 40 维。</p><h4>05 · 计算距离</h4><p><b>输入：</b>待识别图的 40 维向量，以及 42 张参考图的向量。</p><p><b>处理：</b>仅从参考库计算每维标准差，差值除以 max(标准差, 0.01)。前 12 维与后 28 维分别平均平方差，再按权重加和、开方，得到加权欧氏距离。</p><p><b>原因：</b>避免数值尺度或维数较多的一组特征主导距离。尺度只来自参考库，测试图不参与拟合。</p><p><b>输出：</b>42 个真实距离及排序；可检查每一维和两个特征组的贡献。</p><h4>06 · 近邻投票</h4><p><b>输入：</b>按距离从小到大排列的参考照片，以及它们已有的岩性标签。</p><p><b>处理：</b>取最近的 k 张，每张投 1 票。多数票类别成为候选；票数相同则比较该类近邻的平均距离，再相同按类别 ID 排序。</p><p><b>原因：</b>同一张照片的候选可以追溯到具体参考图。调整 k 和特征权重，能够观察判断对参数的敏感性。</p><p><b>输出：</b>一个岩性候选、各类票数、近邻原图与距离。</p><h4>07 · 验证与交付</h4><p><b>输入：</b>24 张测试图的原标签与模型预测；当前样品的近邻证据。</p><p><b>处理：</b>批量评价统计混淆矩阵、准确率和宏平均 F1；单样品复核独立保存人工意见。最终按源井深记录输出模型候选与复核 CSV。</p><p><b>原因：</b>模型评价回答“这套方法表现怎样”，人工复核回答“这一份样品如何处理”。两类记录分别保留。</p><p><b>输出：</b>可查的误判、模型评价与人工记录；缺失井段不插值。</p><div class=\"m1c\"><h4>第一步的真实数据：17 个井段分组，5 组留出</h4><svg viewBox=\"0 0 820 265\" role=\"img\" aria-label=\"本案例实际17个20米井段分组及其参考测试归属\"><g transform=\"translate(0,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2080—2099 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 参考</text></g><g transform=\"translate(137,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2100—2119 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 参考</text></g><g transform=\"translate(274,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2120—2139 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">5 张 / 参考</text></g><g transform=\"translate(411,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2140—2159 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">4 张 / 参考</text></g><g transform=\"translate(548,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2160—2179 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 参考</text></g><g transform=\"translate(685,0)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2180—2199 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">8 张 / 测试</text></g><g transform=\"translate(0,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2200—2219 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">7 张 / 测试</text></g><g transform=\"translate(137,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2220—2239 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(274,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2260—2279 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(411,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2280—2299 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(548,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2480—2499 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(685,78)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2600—2619 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(0,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2620—2639 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">5 张 / 参考</text></g><g transform=\"translate(137,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2640—2659 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><g transform=\"translate(274,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2700—2719 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">1 张 / 参考</text></g><g transform=\"translate(411,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#efd0a9\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2840—2859 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">3 张 / 测试</text></g><g transform=\"translate(548,156)\"><rect width=\"126\" height=\"65\" rx=\"6\" fill=\"#c9dadd\"/><text x=\"10\" y=\"25\" fill=\"#6b7e80\" font-size=\"12\">2860—2879 m</text><text x=\"10\" y=\"49\" fill=\"#83907e\" font-size=\"10\">2 张 / 参考</text></g><text x=\"0\" y=\"257\" fill=\"#a3957a\" font-size=\"11\">整组划分：42 张参考图、24 张测试图；颜色表示集合，不是岩性。</text></svg></div>"
       },
       "fails": [
         {
           "name": "拍摄条件替代岩性特征",
-          "why": "颜色与纹理会受光照、背景、拍摄批次影响，应检查相似样本与跨井验证。"
+          "why": "颜色与纹理受光照、背景和拍摄批次影响，需要独立验证。"
         },
         {
-          "name": "混样或标签不确定",
-          "why": "原标签作为本例对照依据，但不能消除现场混样与人工标注误差。"
+          "name": "把距离或票数当作物理鉴定",
+          "why": "输出为图像分类候选，仍需人工与其他地质证据复核。"
         },
         {
-          "name": "把候选当成最终解释",
-          "why": "需要样品、取样记录与其他地质证据共同复核。"
+          "name": "把人工修改计入模型分数",
+          "why": "批量模型评价与逐样品人工意见分别保存。"
         }
       ],
       "page": {

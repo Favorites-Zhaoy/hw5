@@ -60,7 +60,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.3.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.4.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -94,7 +94,7 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
   assert.equal(/<link\b[^>]*\brel="stylesheet"/.test(entryHTML),false);
   assert.equal(/<img\b[^>]*\bsrc="(?!data:)/.test(markup),false);
   assert.equal(/\.\.\/assets\/m1-dioramas/.test(entryHTML),false);
-  assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,6);
+  assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,3);
   const figureSources=JSON.parse(read('m1-cuttings-case/FIGURE-SOURCES.json'));
   assert.equal(figureSources.assets.length,5);
   for(const figure of figureSources.assets){const bytes=fs.readFileSync(path.join(site,'tools/m1/runtime/paper-figures',figure.file));assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),figure.sha256);assert.ok(entryHTML.includes('data:image/webp;base64,'+bytes.toString('base64')));assert.ok(figureSources.papers[figure.paper].doi&&figureSources.papers[figure.paper].license==='CC BY 4.0');}
@@ -106,15 +106,15 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
 // They are never shipped as samples and are not used to report real-data model performance.
 function appRuntime(embedded=false,reduced=false,portalView=null){
   const html=read('m1-cuttings-case/demo/index.html'),nodes=new Map(),buttons=[];
-  const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;};e.closest=()=>e;return e;};
+  const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;if(e.listeners.click)e.listeners.click.call(e,{target:e});};e.closest=()=>e;return e;};
   for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
   for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock)="([^"]+)"/g))e.dataset[a[1]]=a[2];buttons.push(e);}
   const defaults={'k-select':'5','color-weight':'50','review-threshold':'70',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
-  const canvasContext=()=>{let rgba=pixelImage(96,96);return {drawImage(image){rgba=image.rgba;},getImageData(){return {data:rgba};},createImageData(w,h){return {data:new Uint8ClampedArray(w*h*4)};},putImageData(){}};};
-  nodes.get('processed-canvas').getContext=canvasContext;
+  const canvasContext=owner=>{let rgba=pixelImage(96,96);return {drawImage(image){rgba=image.rgba;},getImageData(){return {data:rgba};},createImageData(w,h){return {data:new Uint8ClampedArray(w*h*4)};},putImageData(pixels){owner.pixels=new Uint8ClampedArray(pixels.data);}};};
+  nodes.get('processed-canvas').getContext=()=>canvasContext(nodes.get('processed-canvas'));
   const flow=create('svg');let pauses=0,resumes=0;flow.pauseAnimations=()=>pauses++;flow.unpauseAnimations=()=>resumes++;
-  const body=create('body'),document={body,getElementById(id){assert.ok(nodes.has(id),'Missing HTML node '+id);return nodes.get(id);},querySelectorAll(selector){if(selector==='svg.flow')return [flow];const key=/\[data-(\w+)\]/.exec(selector);return key?buttons.filter(b=>b.dataset[key[1]]!==undefined):[];},createElement(tag){const e=create(tag);if(tag==='canvas')e.getContext=canvasContext;return e;}};
+  const body=create('body'),document={body,getElementById(id){assert.ok(nodes.has(id),'Missing HTML node '+id);return nodes.get(id);},querySelectorAll(selector){if(selector==='svg.flow')return [flow];const key=/\[data-(\w+)\]/.exec(selector);return key?buttons.filter(b=>b.dataset[key[1]]!==undefined):[];},createElement(tag){const e=create(tag);if(tag==='canvas')e.getContext=()=>canvasContext(e);return e;}};
   const byImage=new Map(data.samples.map(s=>[s.image,s]));
   class FixtureImage{set src(value){const s=byImage.get(value);assert.ok(s);let seed=parseInt(s.sha256.slice(0,8),16);this.naturalWidth=180;this.naturalHeight=180;this.rgba=pixelImage(96,96);for(let i=0;i<this.rgba.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;this.rgba[i]=seed>>>24;this.rgba[i+1]=seed>>>23&255;this.rgba[i+2]=seed>>>22&255;}queueMicrotask(()=>this.onload());}}
   const stats={predict:0,evaluate:0},wrapped={...model,predict(...args){stats.predict++;return model.predict(...args);},evaluate(...args){stats.evaluate++;return model.evaluate(...args);}};
@@ -124,6 +124,48 @@ function appRuntime(embedded=false,reduced=false,portalView=null){
   return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+function flowEvent(rt,selector,dataset,type='click',value){const target={dataset,value,closest:s=>s===selector?target:null};rt.nodes.get('flow-snapshot').listeners[type]({target});}
+
+test('distance explanations reconstruct the classifier distance with reference-only scales',()=>{
+  const refs=[{id:'a',classId:'sandstone',features:feature(0)},{id:'b',classId:'shale',features:feature(1)}],scaler=model.fit(refs),query=feature(.3);
+  for(const weight of [0,.5,1]){const explained=model.explainDistance(query.vector,refs[0].features.vector,weight,scaler),prediction=model.predict(query,refs,{k:2,colorWeight:weight},scaler);
+    assert.equal(explained.rows.length,40);assert.equal(explained.distance,prediction.neighbors.find(n=>n.id==='a').distance);
+    assert.ok(Math.abs(explained.distance**2-explained.colorPart-explained.otherPart)<1e-12);assert.equal(explained.rows[0].scale,.5);
+  }
+});
+
+test('seven workflow stages follow one real sample and keyboard navigation reaches both ends',async()=>{
+  const rt=appRuntime();await settle();const stages=rt.buttons.filter(b=>b.dataset.step!==undefined);assert.equal(stages.length,7);
+  const first=rt.nodes.get('flow-sample-image').src;
+  for(const button of stages){button.listeners.click();assert.ok(rt.nodes.get('flow-input').textContent);assert.ok(rt.nodes.get('flow-why').textContent);assert.equal(rt.nodes.get('flow-sample-image').src,first);}
+  stages[0].listeners.keydown({key:'End',preventDefault(){}});assert.equal(rt.nodes.get('flow-count').textContent,'7 / 7');assert.equal(stages[6].focused,true);
+  stages[6].listeners.keydown({key:'Home',preventDefault(){}});assert.equal(rt.nodes.get('flow-count').textContent,'1 / 7');
+  const other=data.samples.filter(s=>s.split==='test')[2];rt.nodes.get('flow-sample-select').value=other.id;rt.event('flow-sample-select','change');assert.equal(rt.nodes.get('flow-sample-image').src,other.image);assert.equal(rt.nodes.get('query-id').textContent,other.id);
+  const pkg=JSON.parse(read('m1-cuttings-case/case.json'));assert.equal(pkg.tabs.workflow.steps.length,7);
+});
+
+test('color bins count actual pixels and the movable neighborhood explains local image calculations',async()=>{
+  const rt=appRuntime();await settle();rt.buttons.find(b=>b.dataset.step==='2').listeners.click();
+  flowEvent(rt,'[data-color-bin]',{colorBin:'7'});
+  const canvas=rt.nodes.get('flow-snapshot').querySelector('.flow-color-canvas').children.at(-1),source=rt.nodes.get('processed-canvas').pixels;
+  let count=0;for(let i=0;i<source.length;i+=4){const selected=source[i+1]>=192;if(selected)count++;assert.ok(Math.abs(canvas.pixels[i]-source[i]*(selected?1:.13))<=.5);}
+  assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes(count+' / 9,216'));
+  rt.buttons.find(b=>b.dataset.step==='3').listeners.click();
+  flowEvent(rt,'[data-flow-pixel]',{flowPixel:'x'},'change','16');
+  assert.match(rt.nodes.get('flow-snapshot').innerHTML,/横坐标 x = 16/);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/code &gt;&gt; 4|code >> 4/);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/RGB 分支/);
+  const gray=rt.nodes.get('flow-snapshot').querySelector('.flow-gray-canvas').children.at(-1).pixels;assert.equal(gray[0],gray[1]);assert.equal(gray[1],gray[2]);
+});
+
+test('workflow ranking, parameter changes, voting and human review keep original-condition evaluation separate',async()=>{
+  const rt=appRuntime();await settle();rt.buttons.find(b=>b.dataset.step==='4').listeners.click();assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-reference-id=/g)||[]).length,42);
+  const ref=data.samples.find(s=>s.split==='reference');flowEvent(rt,'[data-reference-id]',{referenceId:ref.id});assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes(ref.image));
+  rt.buttons.find(b=>b.dataset.step==='5').listeners.click();rt.nodes.get('flow-k-select').value='3';rt.event('flow-k-select','change');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 3 票/);
+  flowEvent(rt,'[data-flow-action]',{flowAction:'vote-all'});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/计票完成/);
+  const complete=rt.nodes.get('flow-snapshot').innerHTML;rt.nodes.get('exposure').value='40';rt.event('exposure','input');assert.equal(rt.nodes.get('flow-snapshot').innerHTML,complete);
+  rt.nodes.get('flow-color-weight').value='100';rt.event('flow-color-weight','input');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 3 票/);
+  rt.buttons.find(b=>b.dataset.step==='6').listeners.click();const metrics=rt.nodes.get('evaluation-stats').innerHTML;rt.nodes.get('flow-snapshot').querySelector('[data-flow-review]').value='shale';flowEvent(rt,'[data-flow-action]',{flowAction:'review-save'});assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/人工意见：页岩/);
+  flowEvent(rt,'[data-flow-action]',{flowAction:'export'});assert.equal(rt.blobs.length,1);const csv=await rt.blobs[0].text();const row=csv.split('\r\n')[1].split(',').map(v=>v.replaceAll('"',''));assert.equal(row[11],'0');assert.equal(row[12],'1');
+});
 test('standalone case switches all three sections and runs the sample-to-prediction flow',async()=>{
   const rt=appRuntime();await settle();
   assert.equal(rt.nodes.get('panel-background').hidden,false);assert.equal(rt.nodes.get('panel-demo').hidden,true);
@@ -144,7 +186,7 @@ test('keyboard navigation, workflow changes, lag calculation and motion preferen
   rt.event('motion-toggle','click');assert.equal(rt.body.classList.contains('is-paused'),false);assert.ok(rt.motion().resumes>0);
   rt.nodes.get('lag-minutes').value='60';rt.event('lag-minutes','input');assert.equal(rt.nodes.get('source-depth').textContent,'3188 m');
   const background=rt.buttons.find(b=>b.dataset.view==='background');background.listeners.keydown({key:'ArrowRight',preventDefault(){}});assert.equal(rt.nodes.get('panel-workflow').hidden,false);
-  const old=rt.nodes.get('flow-title').textContent;rt.event('flow-next','click');assert.notEqual(rt.nodes.get('flow-title').textContent,old);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/40 维/);
+  const old=rt.nodes.get('flow-title').textContent;rt.event('flow-next','click');assert.notEqual(rt.nodes.get('flow-title').textContent,old);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/96 × 96/);
 });
 test('an arbitrary browser frame keeps the background and three-part navigation visible',async()=>{
   const rt=appRuntime(true);await settle();assert.equal(rt.body.classList.contains('embedded'),false);assert.equal(rt.nodes.get('panel-background').hidden,false);
@@ -169,9 +211,11 @@ test('the open rock lesson reuses authentic photographs with toggleable annotati
   rt.event('rock-annotation-toggle','click');assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),false);
   assert.doesNotMatch(rt.nodes.get('lithology-cards').innerHTML,/<svg/);
   const workflow=rt.buttons.find(b=>b.dataset.view==='workflow');workflow.listeners.click();assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-depth-group=/g)||[]).length,17);
-  rt.event('flow-next','click');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/data-image-stage="3"/);
-  const grayStage={dataset:{imageStage:'2'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-image-stage]'?grayStage:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/灰度图由当前样本实际像素计算/);assert.equal(rt.nodes.get('flow-snapshot').querySelector('.processing-figure').children[0].tagName,'canvas');
-  rt.event('flow-next','click');const reset={dataset:{flowAction:'vote-reset'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-flow-action]'?reset:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 5 票/);
+  rt.buttons.find(b=>b.dataset.step==='1').listeners.click();
+  const stage={dataset:{imageStage:'2'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-image-stage]'?stage:null}});
+  assert.equal(rt.nodes.get('flow-snapshot').querySelector('.processing-figure').children.at(-1).tagName,'canvas');
+  rt.buttons.find(b=>b.dataset.step==='5').listeners.click();
+  const reset={dataset:{flowAction:'vote-reset'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-flow-action]'?reset:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 5 票/);
   const next={dataset:{flowAction:'vote-next'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-flow-action]'?next:null}});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 1 \/ 5 票/);
 });
 test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{

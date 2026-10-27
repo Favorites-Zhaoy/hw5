@@ -15,12 +15,7 @@
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return { k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
   var threshold = function () { return Number($('review-threshold').value) / 100; };
-  var flowText = [
-    { kicker:'STEP 01 / 核验与分组', title:'先分组，再比较。', copy:'核对原图与 CSV 中的岩性、井号和井深，选取三个类别共 66 张照片。按井深每 20 米组成一组，以固定种子划分参考库与测试集。选样和分组不使用模型分数。', output:'42 张参考图、24 张测试图，三个类别在两边均有样本。均值与尺度只由参考库计算。', trap:'相邻或同源照片随机拆分会高估效果；即使分组留出，单井与拍摄批次偏差仍可能存在。' },
-    { kicker:'STEP 02 / 图像与特征', title:'把图像，变成可比较的数字。', copy:'从中心 72% 区域取样，再统一到 96 × 96 像素，减少样品盘边框和手写编号影响。计算 12 维颜色直方图、16 维局部二值纹理、8 维梯度方向，以及亮度、对比度、边缘与清晰度统计，共 40 维。', output:'每张照片对应一组 40 维描述。颜色与纹理权重可以在示范中调整。', trap:'不同成像条件会改变特征；中心裁切只能减轻背景干扰，不能保证完全排除非岩屑信息。' },
-    { kicker:'STEP 03 / 近邻与投票', title:'寻找相似照片，再汇总候选。', copy:'按参考库尺度标准化特征，计算加权欧氏距离，找出最近的 k 张参考照片。按类别计票，票数相同时比较该类近邻平均距离。界面同时展示每个近邻的原图、标签与距离。', output:'一个岩性候选、三类票数，以及可检查的相似样本。投票占比不作校准概率。', trap:'近邻相似性只描述本特征空间，不能直接证明矿物组成或地质成因。' },
-    { kicker:'STEP 04 / 复核与评价', title:'看见错误，才能知道方法的边界。', copy:'对 24 张分组留出图逐一分类，按原数据标签计算混淆矩阵、准确率与宏平均 F1。人工复核意见单独记录，与模型原始候选一起回到原始井深记录中。', output:'模型评价、逐样品证据与可导出的复核 CSV。缺失井段保留间隔，不插值生成连续剖面。', trap:'不要把人工修正后的结果混入模型分数，也不要把一个井上的小样本评价当作新井验证。' }
-  ];
+  var flowText = /* M1_FLOW_TEXT */ [];
 
   function reportHeight() {
     if (window.parent !== window) window.parent.postMessage({ __m1Height: Math.ceil(document.body.getBoundingClientRect().height) }, '*');
@@ -203,45 +198,7 @@
     $('depth-log').innerHTML=html+'</div>';
   }
   $('depth-log').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick);});
-  function renderWorkflow() {
-    var d=flowText[workflowStep];$('flow-kicker').textContent=d.kicker;$('flow-title').textContent=d.title;$('flow-copy').textContent=d.copy;$('flow-output').textContent=d.output;$('flow-trap').textContent=d.trap;$('flow-count').textContent=(workflowStep+1)+' / 4';
-    Array.prototype.forEach.call(document.querySelectorAll('[data-step]'),function(button){var active=Number(button.dataset.step)===workflowStep;button.classList.toggle('is-selected',active);button.setAttribute('aria-pressed',String(active));});
-    var snapshot=$('flow-snapshot');
-    if(workflowStep===0){
-      var grouped={};DATA.samples.forEach(function(s){if(!grouped[s.group])grouped[s.group]=[];grouped[s.group].push(s);});
-      var groupNames=Object.keys(grouped).sort(function(a,b){return Number(a.split('-').pop())-Number(b.split('-').pop());});
-      if(!selectedDepthGroup)selectedDepthGroup=groupNames.filter(function(name){return grouped[name][0].split==='test';})[0];
-      var selected=grouped[selectedDepthGroup],start=Number(selectedDepthGroup.split('-').pop());
-      snapshot.innerHTML='<h4>点击一个真实 20 米分组，查看它被分到哪里</h4><div class="depth-group-picker">'+groupNames.map(function(name){var samples=grouped[name],begin=Number(name.split('-').pop());return '<button type="button" data-depth-group="'+name+'" class="'+samples[0].split+'" aria-pressed="'+String(name===selectedDepthGroup)+'"><b>'+begin+'—'+(begin+19)+' m</b><small>本例 '+samples.length+' 张</small></button>';}).join('')+'</div><div class="group-readout"><b>'+start+'—'+(start+19)+' m · '+(selected[0].split==='test'?'整个分组留作测试':'整个分组进入参考库')+'</b><p>'+classes.map(function(c){return c.name+' '+selected.filter(function(s){return s.classId===c.id;}).length+' 张';}).join(' / ')+'</p></div><p class="fine-print">17 组中 5 组用于测试；同组样本不跨两边。颜色表示集合，不是岩性。蓝灰：参考；橙色：测试。</p>';return;
-    }
-    if(!ready){snapshot.innerHTML='<p>正在准备实际样本与计算结果…</p>';return;}
-    var sample=byId[currentId],f=computed[currentId].features;
-    if(workflowStep===1){
-      var labels=['原始照片','中心取样','灰度与纹理','40 维特征'];
-      snapshot.innerHTML='<h4>'+sample.id+' / 从照片到 40 维特征</h4><div class="processing-stages">'+labels.map(function(label,index){return '<button type="button" data-image-stage="'+index+'" aria-pressed="'+String(index===imageStage)+'">'+(index+1)+'. '+label+'</button>';}).join('')+'</div><div class="processing-figure">'+(imageStage<2?'<div class="processing-photo"><img src="'+sample.image+'" alt="'+labels[imageStage]+'">'+(imageStage===1?'<span class="roi-outline"></span>':'')+'</div>':imageStage===3?'<div class="snapshot-vector">'+f.vector.map(function(v){return '<i style="height:'+Math.min(100,Math.max(3,v*100))+'%"></i>';}).join('')+'</div>':'')+'</div><p class="fine-print">'+['保留原图与来源信息，分类不读取井深或文件名。','统一取中心 72% 区域，再缩放为 96 × 96，减少边框与编号干扰。','灰度图由当前样本实际像素计算，用于观察局部纹理与边缘。','12 维颜色 + 16 维局部纹理 + 8 维梯度方向 + 4 个统计量；距离计算前按参考库尺度标准化。'][imageStage]+'</p>';
-      if(imageStage===2){var canvas=document.createElement('canvas');canvas.width=cropSize;canvas.height=cropSize;canvas.className='processing-canvas';var context=canvas.getContext('2d'),pixels=context.createImageData(cropSize,cropSize);for(var g=0;g<f.gray.length;g++){pixels.data[g*4]=pixels.data[g*4+1]=pixels.data[g*4+2]=f.gray[g];pixels.data[g*4+3]=255;}context.putImageData(pixels,0,0);snapshot.querySelector('.processing-figure').appendChild(canvas);}
-    }
-    if(workflowStep===2){
-      var contextKey=currentId+'|'+JSON.stringify(config())+'|'+exposure+'|'+contrast;
-      if(contextKey!==voteContext){voteContext=contextKey;flowVoteCount=null;}
-      var count=flowVoteCount===null?currentResult.k:Math.min(flowVoteCount,currentResult.k),partial={votes:{},k:currentResult.k};
-      currentResult.neighbors.slice(0,count).forEach(function(n){partial.votes[n.classId]=(partial.votes[n.classId]||0)+1;});
-      snapshot.innerHTML='<h4>'+(count===currentResult.k?'计票完成：'+className(currentResult.classId):'已计 '+count+' / '+currentResult.k+' 票，尚未完成')+'</h4><div class="snapshot-vote-gallery">'+currentResult.neighbors.map(function(n,i){return '<figure class="'+(i<count?'is-counted':'')+'" style="--lith-color:'+byClass[n.classId].color+'"><img src="'+byId[n.id].image+'" alt="近邻 '+(i+1)+'，'+className(n.classId)+'"><figcaption>#'+(i+1)+' '+className(n.classId)+'<small>距离 '+n.distance.toFixed(3)+'</small></figcaption></figure>';}).join('')+'</div><div class="snapshot-votes">'+voteMarkup(partial)+'</div><div class="vote-controls"><button type="button" data-flow-action="vote-reset" class="quiet-button">从零计票</button><button type="button" data-flow-action="vote-next" class="quiet-button" '+(count===currentResult.k?'disabled':'')+'>计入下一张近邻 →</button></div><p class="fine-print">每张近邻投一票。票数相同，比较该类近邻平均距离。这里展示实际近邻的标签与距离。</p>';
-    }
-    if(workflowStep===3){snapshot.innerHTML='<h4>24 张留出图 / 行为原标签，列为预测</h4><div class="flow-confusion">'+evaluation.matrix.map(function(row,i){return '<div><b>'+className(classes[i].id)+'</b>'+row.map(function(n,j){return '<span class="'+(i===j?'diagonal':'')+'" title="'+className(classes[i].id)+' → '+className(classes[j].id)+'">'+n+'</span>';}).join('')+'</div>';}).join('')+'</div><p class="fine-print">列顺序：细砂岩 / 页岩 / 灰质白云岩。非对角线是误判。</p><div class="evaluation-stats"><div class="evaluation-stat"><span>准确率</span><strong>'+pct(evaluation.accuracy)+'</strong><small>'+evaluation.hit+' / '+evaluation.count+' 张</small></div><div class="evaluation-stat"><span>宏平均 F1</span><strong>'+evaluation.macroF1.toFixed(3)+'</strong><small>三个类别等权</small></div></div><button type="button" data-flow-action="inspect-errors" class="quiet-button">在示范里检查一份误判样本 →</button><p class="fine-print">人工复核单独保留，不修饰模型分数。</p>';}
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('[data-step]'),function(button){button.addEventListener('click',function(){workflowStep=Number(button.dataset.step);renderWorkflow();reportHeight();});});
-  $('flow-prev').addEventListener('click',function(){workflowStep=(workflowStep+3)%4;renderWorkflow();reportHeight();});
-  $('flow-next').addEventListener('click',function(){workflowStep=(workflowStep+1)%4;renderWorkflow();reportHeight();});
-  $('flow-snapshot').addEventListener('click',function(event){
-    var group=event.target.closest('[data-depth-group]');if(group){selectedDepthGroup=group.dataset.depthGroup;renderWorkflow();reportHeight();return;}
-    var stage=event.target.closest('[data-image-stage]');if(stage){imageStage=Number(stage.dataset.imageStage);renderWorkflow();reportHeight();return;}
-    var action=event.target.closest('[data-flow-action]');if(!action||!ready)return;
-    if(action.dataset.flowAction==='vote-reset')flowVoteCount=0;
-    if(action.dataset.flowAction==='vote-next')flowVoteCount=Math.min(currentResult.k,(flowVoteCount===null?currentResult.k:flowVoteCount)+1);
-    if(action.dataset.flowAction==='inspect-errors'){var wrong=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;})[0];$('exposure').value='0';$('contrast').value='100';exposure=0;contrast=1;$('exposure-value').textContent='0';$('contrast-value').textContent='1.0×';setView('demo',true);if(wrong){selectSample(wrong.id);renderMatrixSelection(wrong.truth,wrong.result.classId);}return;}
-    renderWorkflow();reportHeight();
-  });
+  /* M1_WORKFLOW_SCRIPT */
 
   $('sample-select').addEventListener('change',function(){selectSample(this.value);});
   $('k-select').addEventListener('change',function(){drawQuery();updateEvaluation();});
@@ -274,15 +231,17 @@
   if(embedded){document.body.classList.add('embedded');var brand=document.querySelector?document.querySelector('.wordmark'):null;if(brand){brand.removeAttribute('href');brand.setAttribute('aria-label','M1 岩屑岩性辅助识别');}}
   setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
-  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv'];
+  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight'];
   demoControls.forEach(function(id){$(id).disabled=true;});
   Promise.all(DATA.samples.map(imageFeatures)).then(function(results){
     references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);ready=true;currentId=tests[0].id;
     $('sample-select').innerHTML=tests.map(function(s){return '<option value="'+s.id+'">'+s.id+' · '+byId[s.id].depth+' m</option>';}).join('');
+    $('flow-sample-select').innerHTML=$('sample-select').innerHTML;
     demoControls.forEach(function(id){$(id).disabled=false;});
+    $('flow-status').textContent='已就绪 · 本页各步沿用同一张样品的原始成像条件；k 与权重变化会实时重算。';
     $('loading-status').textContent='已就绪 · 66 张原图完成特征计算 · 42 张参考 / 24 张测试 · 所有结果由当前浏览器实时计算';
     updateEvaluation();selectSample(currentId);renderWorkflow();reportHeight();
-  }).catch(function(error){$('loading-status').classList.add('is-error');$('loading-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整，并刷新页面。';reportHeight();});
+  }).catch(function(error){$('loading-status').classList.add('is-error');$('loading-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整，并刷新页面。';$('flow-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整并刷新。';reportHeight();});
   if(window.ResizeObserver)new window.ResizeObserver(reportHeight).observe(document.body);
   window.addEventListener('load',reportHeight);window.addEventListener('resize',reportHeight);
 }());
