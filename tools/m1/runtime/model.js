@@ -1,11 +1,34 @@
 /* An interpretable browser kNN baseline. No dependencies, remote API or embedded predictions. */
 (function (global) {
   'use strict';
-  var COLOR_DIMS = 12, DIMS = 40;
+  var COLOR_DIMS = 12, DIMS = 34;
+  // LBP riu2, P=8, R=1: circular samples, bilinear interpolation, 10 histogram bins.
+  var diagonal=Math.SQRT1_2;
+  var ring=[[-diagonal,-diagonal],[0,-1],[diagonal,-diagonal],[1,0],[diagonal,diagonal],[0,1],[-diagonal,diagonal],[-1,0]];
+  function uniformPattern(code){
+    var ones=0,transitions=0;
+    for(var i=0;i<8;i++){var bit=(code>>i)&1;ones+=bit;if(bit!==((code>>((i+1)%8))&1))transitions++;}
+    return {ones:ones,transitions:transitions,bin:transitions<=2?ones:9};
+  }
+  var uniformBins=Array.from({length:256},function(_,code){return uniformPattern(code).bin;});
+  function sampleGray(gray,width,x,y){
+    var x0=Math.floor(x),y0=Math.floor(y),tx=x-x0,ty=y-y0;
+    var a=gray[y0*width+x0],b=gray[y0*width+x0+1],c=gray[(y0+1)*width+x0],d=gray[(y0+1)*width+x0+1];
+    // Integer coordinates need no second row/column (including the last valid pixel).
+    if(!tx&&!ty)return a;
+    if(!tx)return a+(c-a)*ty;
+    if(!ty)return a+(b-a)*tx;
+    var top=a+(b-a)*tx,bottom=c+(d-c)*tx;return top+(bottom-top)*ty;
+  }
+  function localPattern(gray,width,x,y){
+    var center=gray[y*width+x],code=0;
+    var samples=ring.map(function(offset,i){var value=sampleGray(gray,width,x+offset[0],y+offset[1]);if(value>=center)code|=1<<i;return value;});
+    var info=uniformPattern(code);return {center:center,samples:samples,code:code,ones:info.ones,transitions:info.transitions,bin:info.bin};
+  }
   function extract(rgba, width, height) {
     if (!rgba || rgba.length !== width * height * 4 || width < 3 || height < 3) throw new Error('图像尺寸或像素数据无效');
     var n = width * height, gray = new Float64Array(n), color = new Array(12).fill(0);
-    var lbp = new Array(16).fill(0), gradients = new Array(8).fill(0), sum = 0, sum2 = 0;
+    var lbp = new Array(10).fill(0), gradients = new Array(8).fill(0), sum = 0, sum2 = 0;
     for (var i = 0; i < n; i++) {
       var r = rgba[i * 4], g = rgba[i * 4 + 1], b = rgba[i * 4 + 2];
       color[Math.min(3, r >> 6)]++; color[4 + Math.min(3, g >> 6)]++; color[8 + Math.min(3, b >> 6)]++;
@@ -13,11 +36,10 @@
       gray[i] = value; sum += value; sum2 += value * value;
     }
     var count = 0, edgeSum = 0, lapSum = 0, lapSum2 = 0, edgeCount = 0;
-    var offsets = [-width - 1, -width, -width + 1, 1, width + 1, width, width - 1, -1];
     for (var y = 1; y < height - 1; y++) for (var x = 1; x < width - 1; x++) {
       var at = y * width + x, code = 0;
-      offsets.forEach(function (offset, bit) { if (gray[at + offset] >= gray[at]) code |= (1 << bit); });
-      lbp[code >> 4]++;
+      for(var bit=0;bit<8;bit++)if(sampleGray(gray,width,x+ring[bit][0],y+ring[bit][1])>=gray[at])code|=1<<bit;
+      lbp[uniformBins[code]]++;
       var dx = gray[at + 1] - gray[at - 1], dy = gray[at + width] - gray[at - width];
       var magnitude = Math.sqrt(dx * dx + dy * dy);
       var direction = Math.min(7, Math.floor((Math.atan2(dy, dx) + Math.PI) / (2 * Math.PI) * 8));
@@ -74,15 +96,13 @@
     return {rows:rows,color:color,other:other,colorPart:colorWeight*color,otherPart:(1-colorWeight)*other,
       distance:distance(a,b,colorWeight,scaler)};
   }
-  function evaluate(tests, references, classes, options, scaler) {
+  function summarize(predictions,classes) {
     var matrix = classes.map(function () { return classes.map(function () { return 0; }); });
-    var predictions = [], hit = 0;
-    tests.forEach(function (sample) {
-      var result = predict(sample.features, references, options, scaler);
-      var truth = classes.indexOf(sample.classId), predicted = classes.indexOf(result.classId);
+    var hit = 0;
+    predictions.forEach(function (sample) {
+      var truth = classes.indexOf(sample.truth), predicted = classes.indexOf(sample.result.classId);
       if (truth < 0 || predicted < 0) throw new Error('类别不在评价范围内');
       matrix[truth][predicted]++; if (truth === predicted) hit++;
-      predictions.push({ id: sample.id, truth: sample.classId, result: result });
     });
     var perClass = classes.map(function (id, i) {
       var tp = matrix[i][i], actual = matrix[i].reduce(function (s, n) { return s + n; }, 0);
@@ -90,9 +110,23 @@
       var precision = proposed ? tp / proposed : 0, recall = actual ? tp / actual : 0;
       return { id: id, total: actual, recall: recall, precision: precision, f1: precision + recall ? 2 * precision * recall / (precision + recall) : 0 };
     });
-    return { count: tests.length, hit: hit, accuracy: tests.length ? hit / tests.length : 0, matrix: matrix,
+    return { count: predictions.length, hit: hit, accuracy: predictions.length ? hit / predictions.length : 0, matrix: matrix,
       macroF1: perClass.reduce(function (s, c) { return s + c.f1; }, 0) / classes.length,
       perClass: perClass, predictions: predictions };
+  }
+  function evaluate(tests,references,classes,options,scaler){
+    return summarize(tests.map(function(sample){return {id:sample.id,truth:sample.classId,result:predict(sample.features,references,options,scaler)};}),classes);
+  }
+  function crossValidate(training,classes,options){
+    var groups=Array.from(new Set(training.map(function(s){if(!s.group)throw new Error('分组交叉验证需要井段分组');return s.group;}))).sort();
+    if(groups.length<2)throw new Error('分组交叉验证至少需要两个组');
+    var predictions=[],folds=[];
+    groups.forEach(function(group){
+      var fitSamples=training.filter(function(s){return s.group!==group;}),validation=training.filter(function(s){return s.group===group;}),foldScaler=fit(fitSamples);
+      folds.push({group:group,trainingIds:fitSamples.map(function(s){return s.id;}),validationIds:validation.map(function(s){return s.id;}),scale:foldScaler.scale.slice()});
+      validation.forEach(function(sample){predictions.push({id:sample.id,truth:sample.classId,group:group,result:predict(sample.features,fitSamples,options,foldScaler)});});
+    });
+    var result=summarize(predictions,classes);result.folds=folds;result.protocol='LeaveOneGroupOut';return result;
   }
   function disturb(rgba, exposure, contrast) {
     var out = new Uint8ClampedArray(rgba.length);
@@ -102,7 +136,7 @@
     }
     return out;
   }
-  var api = { extract: extract, fit: fit, predict: predict, explainDistance: explainDistance, evaluate: evaluate, disturb: disturb, dimensions: DIMS };
+  var api = { extract: extract, localPattern:localPattern, uniformPattern:uniformPattern, fit: fit, predict: predict, explainDistance: explainDistance, evaluate: evaluate, crossValidate:crossValidate, disturb: disturb, dimensions: DIMS };
   global.M1Model = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 }(typeof window !== 'undefined' ? window : globalThis));

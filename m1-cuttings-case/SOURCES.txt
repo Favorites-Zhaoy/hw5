@@ -92,3 +92,18 @@ https://doi.org/10.3389/feart.2021.775657
 上述四篇的图像按 CC BY 4.0 引用，作者、出版出处与许可链接在页面及 FIGURE-SOURCES.json 中提供。
 原始下载图保留在作者工作区归档；展示图仅做记录在案的子图裁取、等比缩小和WebP格式转换，未改色、修补、重绘或使用生成模型重构。
 这些外部论文图不进入66张岩屑图像的参考库、测试集或模型评价。
+
+[15] Uniform LBP（本版实际实现）
+Ojala, Pietikainen & Maenpaa (2002). Multiresolution gray-scale and rotation invariant texture classification with local binary patterns. IEEE TPAMI 24(7):971–987.
+https://doi.org/10.1109/TPAMI.2002.1017623
+P=8、R=1圆周采样，双线性插值，riu2十类映射；只统计内部像素。没有复用论文图片。
+https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.local_binary_pattern
+
+[16] 数据划分、交叉验证与测试集使用
+https://scikit-learn.org/stable/modules/cross_validation.html
+https://scikit-learn.org/stable/common_pitfalls.html
+本版在训练集上Leave-One-Group-Out交叉验证，折内拟合尺度，锁定超参数后开放测试。
+
+[17] 方法定位：基于实例的k近邻监督分类
+https://scikit-learn.org/stable/modules/neighbors.html
+使用手工视觉特征与等权投票，不宣称CNN或其他深度网络训练。
