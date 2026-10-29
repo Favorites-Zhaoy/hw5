@@ -46,3 +46,12 @@
 @media(max-width:600px){.field-story{padding:17px}.story-heading,.flow-overview-heading{align-items:start;flex-direction:column;gap:6px}.story-heading h3,.flow-overview-heading h3{font-size:19px}.field-stage-nav button{font-size:10px;padding:10px 3px}.field-stage-nav button b{display:block;margin:0 0 4px}.field-diagram svg text{font-size:18px}.field-reading{grid-template-columns:98px 1fr;gap:12px}.field-reading h4{font-size:15px}.field-reading p{font-size:11px}.evidence-journey{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.evidence-journey>button:nth-child(even):after{display:none}.journey-card-visual{height:105px}.flow-overview-heading p{text-align:left}.overview-nearest img{flex-basis:50px;width:50px;height:50px}}
 @media(prefers-reduced-motion:reduce){.field-focus,.evidence-journey>button{transition:none}}
 .case-panel{scroll-margin-top:90px}body.embedded .part-next{display:flex}#flow-prev:disabled,#flow-next:disabled{cursor:not-allowed}@media(max-width:480px){body.embedded .part-next{display:block}}
+
+/* Optional background depth; the central learning path stays visible. */
+.lag-extension,.data-extension{margin:22px 0;border-top:1px dashed #dcc9aa;border-bottom:1px dashed #dcc9aa;padding:15px 0}
+.lag-extension>summary,.data-extension>summary{cursor:pointer;color:#526c70;font-size:13px;font-weight:600;line-height:1.8}
+.data-extension .preparation-table-wrap{margin-top:18px}
+.practice-guide{display:flex;flex-wrap:wrap;gap:9px 20px;margin:0 0 20px;color:#667b75;font-size:12px;line-height:1.8}
+.practice-guide span{display:flex;align-items:center;gap:8px}.practice-guide b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#efe2cf;color:#a96d3e;font-size:11px}
+.evidence-journey>button:nth-child(3):after{content:'+';font-size:16px;font-weight:600}
+.evaluation-board>p:not(.limit-note){font-size:12px;color:#697c78;line-height:1.8}

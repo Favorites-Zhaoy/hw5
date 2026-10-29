@@ -12,12 +12,12 @@
   var workflowStep = 0, view = 'background', motionPaused = false, revealed = false;
   var cropSize = 96, exposure = 0, contrast = 1, matrixFilter = null;
   var imageStage = 0, flowVoteCount = null, voteContext = '', selectedDepthGroup = null;
-  var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null;
+  var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null,pendingRock=null;
   var className = function (id) { return byClass[id] ? byClass[id].name : '尚未复核'; };
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return lockedConfig?{k:lockedConfig.k,colorWeight:lockedConfig.colorWeight}:{ k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
   var threshold = function () { return Number($('review-threshold').value) / 100; };
-  var flowText = [{"name":"数据集构建与划分","role":"Dataset","title":"先整理样本，再把调参和测试的数据分开。","input":"66张岩屑照片、已有岩性标签、井号、源井深与逐图校验值。","process":"沿用源标签并核对样本记录，按20 m井段形成17组。42张、12组作为训练集；24张、5组作为测试集。训练集内部再做留一组交叉验证，用于选择k和特征权重。","why":"井段相邻照片存在相关性。同组不跨训练与测试；交叉验证时，同一组也不跨该折拟合与验证。","output":"训练集42张、测试集24张及分组元数据。训练图在当前验证折内分为拟合样本和验证样本。","trap":"本例复用公开标签，没有新增专家标注。20 m是分组宽度；历史版本已展示测试图，本版演示规范流程，不宣称独立盲测。"},{"name":"图像预处理","role":"Preprocessing","title":"裁掉外围干扰，让图像具有相同的计算尺寸。","input":"当前查询图像；每张拟合参考图也采用相同预处理。","process":"执行固定中心ROI裁剪：宽、高各保留72%，随后Resize为96×96。RGB通道用于颜色直方图；另计算灰度图用于纹理与梯度。","why":"统一像素尺寸和计算量，减轻边框编号干扰。固定中心ROI不属于岩屑分割，也不保证完全去掉背景。","output":"96×96 RGB像素及对应灰度图；保留未修改的原始JPEG。","trap":"Resize属于尺寸调整，不是像素归一化。裁切与缩放不提供物理比例尺，也不能测量原岩粒度。"},{"name":"颜色特征提取","role":"RGB histogram","title":"用颜色直方图描述图像中各种色调的比例。","input":"预处理后图像的R、G、B通道，各有9,216个像素值。","process":"每通道使用4个直方图区间（bin）：0–63、64–127、128–191、192–255。以区间计数除以像素总数完成直方图归一化，得到12维向量。","why":"描述颜色分布，减弱岩屑位置变化的影响；光照、干湿和背景仍会改变分布。","output":"12维RGB直方图特征，每通道4个比例之和为1。","trap":"这里的归一化把计数变为频率，不等于后续按训练数据标准差进行特征缩放。"},{"name":"纹理特征与特征拼接","role":"Uniform LBP / Gradient","title":"描述局部明暗变化，再与颜色特征组合。","input":"灰度图与已得到的12维RGB特征。","process":"采用Uniform LBP（LBP riu2，P=8，R=1）：圆周采样、双线性插值、循环跳变数不超过2时映射为1的数量，否则映射到非均匀模式9，形成10维直方图。另取8维全图梯度方向直方图和4维统计量，最终拼接成34维。","why":"使用有明确定义的纹理描述子，保留全部8个采样点的模式信息；补充颜色难以描述的局部图像结构。","output":"12维RGB + 10维Uniform LBP + 8维梯度方向 + 4维统计量 = 34维。","trap":"LBP模式映射具备旋转不变性；整个34维向量还含有方向特征，不宣称整体旋转不变。8维全图梯度统计不称为完整HOG。"},{"name":"特征缩放与距离度量","role":"Feature scaling / Distance","title":"让不同特征用相同的尺度参与比较。","input":"查询图像与当前拟合参考样本的34维特征。","process":"仅用该折拟合样本估计每维标准差；差值除以max(标准差,0.01)。颜色12维与其余22维分别平均平方差，再以颜色权重w合成加权欧氏距离。测试阶段使用完整42张训练图拟合尺度。","why":"控制不同数值尺度与组内维数的影响，避免验证或测试数据参与尺度拟合。","output":"当前可用拟合样本的距离排序及逐维数值；交叉验证时排除查询图整个井段组。","trap":"条形图展示对平方距离的数值贡献，不是类别特征重要性、SHAP值或矿物学解释。权重是人工超参数，没有进行度量学习。"},{"name":"kNN分类推理","role":"k-nearest neighbors","title":"检索最近的样本，用它们的标签形成预测。","input":"按加权距离排序的拟合样本、已有标签及超参数k。","process":"取前k个近邻，执行等权多数表决。平票时比较各类近邻平均距离；仍相同时按类别ID排序。k和颜色权重只在训练集交叉验证阶段调整，测试阶段固定。","why":"传统监督学习基线可直接追溯到近邻样本与距离；不涉及CNN训练、反向传播或深度特征学习。","output":"预测类别（供地质人员复核的岩性候选）、各类票数和近邻证据。","trap":"投票占比不是校准置信概率。图像相似不直接证明矿物组成、孔渗或地质成因。"},{"name":"模型评估与人工复核","role":"Evaluation / Human review","title":"先用训练数据选参数，再固定参数查看测试结果。","input":"训练集分组交叉验证的折外预测；锁定参数后生成的测试预测；独立人工意见。","process":"阶段1在42张训练图上执行12折Leave-One-Group-Out交叉验证。阶段2锁定k与权重，在全部训练图上拟合尺度与参考集，随后评价24张测试图。混淆矩阵、准确率和宏平均F1随评估阶段明确标注。人工意见单列导出。","why":"把超参数探索、留出测试和业务复核分开，避免依据测试分数反复选择配置。","output":"分组交叉验证记录、锁定配置的测试结果、带协议与描述子版本的CSV。","trap":"测试后不再开放本页参数调整。刷新后再挑参数属于继续探索，不能视作新的独立测试。小样本单井结果不代表跨井泛化。"}];
+  var flowText = [{"name":"先把照片分组","role":"照片与井段","title":"让同一井段的照片留在同一组。","input":"66张岩屑照片、已有岩性标签、井号、源井深与逐图校验值。","process":"将 66 张照片按 20 m 井段分为 17 组：42 张用于训练集内的分组验证，24 张留作测试。点击右侧井段，看每组去了哪里。","why":"井段相邻照片存在相关性。同组不跨训练与测试；交叉验证时，同一组也不跨该折拟合与验证。","output":"训练集42张、测试集24张及分组元数据。训练图在当前验证折内分为拟合样本和验证样本。","trap":"本例复用公开标签，没有新增专家标注。20 m是分组宽度；历史版本已展示测试图，本版演示规范流程，不宣称独立盲测。"},{"name":"裁出统一的画面","role":"图像预处理","title":"减少外围干扰，让照片便于比较。","input":"当前查询图像；每张拟合参考图也采用相同预处理。","process":"每张图都保留中心 72% 的区域，缩放到 96 × 96 像素。右侧可以依次查看原图、裁切范围和处理结果。","why":"统一像素尺寸和计算量，减轻边框编号干扰。固定中心ROI不属于岩屑分割，也不保证完全去掉背景。","output":"96×96 RGB像素及对应灰度图；保留未修改的原始JPEG。","trap":"Resize属于尺寸调整，不是像素归一化。裁切与缩放不提供物理比例尺，也不能测量原岩粒度。"},{"name":"看看颜色怎么分布","role":"RGB 直方图","title":"统计不同强度区间的像素比例。","input":"预处理后图像的R、G、B通道，各有9,216个像素值。","process":"红、绿、蓝三个通道分别分成 4 个区间，统计每个区间的像素比例，共得到 12 个数。点击右侧柱子，看它数到了哪些像素。","why":"描述颜色分布，减弱岩屑位置变化的影响；光照、干湿和背景仍会改变分布。","output":"12维RGB直方图特征，每通道4个比例之和为1。","trap":"这里的归一化把计数变为频率，不等于后续按训练数据标准差进行特征缩放。"},{"name":"纹理与颜色合在一起","role":"LBP 与特征拼接","title":"颜色之外，还可以描述局部明暗变化。","input":"灰度图与已得到的12维RGB特征。","process":"纹理从同一张裁切后的图像另行计算：比较每个位置周围的明暗，汇总为 LBP 特征，再加上梯度和统计量。它们与颜色特征合成 34 个数。右侧可移动位置查看计算。","why":"使用有明确定义的纹理描述子，保留全部8个采样点的模式信息；补充颜色难以描述的局部图像结构。","output":"12维RGB + 10维Uniform LBP + 8维梯度方向 + 4维统计量 = 34维。","trap":"LBP模式映射具备旋转不变性；整个34维向量还含有方向特征，不宣称整体旋转不变。8维全图梯度统计不称为完整HOG。"},{"name":"找出相近的参考图","role":"特征缩放与距离","title":"把这张图与可用参考照片逐一比较。","input":"查询图像与当前拟合参考样本的34维特征。","process":"先按当前拟合参考样本的尺度调整差异，再根据颜色权重合成距离。距离越小，表示本方法下的特征越相近。点击右侧参考图可查看计算。","why":"控制不同数值尺度与组内维数的影响，避免验证或测试数据参与尺度拟合。","output":"当前可用拟合样本的距离排序及逐维数值；交叉验证时排除查询图整个井段组。","trap":"条形图展示对平方距离的数值贡献，不是类别特征重要性、SHAP值或矿物学解释。权重是人工超参数，没有进行度量学习。"},{"name":"让近邻投票","role":"k 近邻分类","title":"检索最近的样本，用它们的标签形成预测。","input":"按加权距离排序的拟合样本、已有标签及超参数k。","process":"取距离最近的 k 张参考图，每张按原标签投一票，得票最多的类别成为候选。可以在右侧逐张计票，观察候选如何产生。","why":"传统监督学习基线可直接追溯到近邻样本与距离；不涉及CNN训练、反向传播或深度特征学习。","output":"预测类别（供地质人员复核的岩性候选）、各类票数和近邻证据。","trap":"投票占比不是校准置信概率。图像相似不直接证明矿物组成、孔渗或地质成因。"},{"name":"检查一次判断与整组表现","role":"评价与复核","title":"单张候选和整组指标回答的是不同问题。","input":"训练集分组交叉验证的折外预测；锁定参数后生成的测试预测；独立人工意见。","process":"一张照片可以检查近邻与投票；要了解方法在一组照片上的表现，还需要把预测与已有标签逐一比较。进入示范后，可以继续复核，并查看分组验证与测试结果。","why":"把超参数探索、留出测试和业务复核分开，避免依据测试分数反复选择配置。","output":"分组交叉验证记录、锁定配置的测试结果、带协议与描述子版本的CSV。","trap":"测试后不再开放本页参数调整。刷新后再挑参数属于继续探索，不能视作新的独立测试。小样本单井结果不代表跨井泛化。"}];
 
   function reportHeight() {
     if (window.parent !== window) window.parent.postMessage({ __m1Height: Math.ceil(document.body.getBoundingClientRect().height) }, '*');
@@ -34,7 +34,7 @@
     if (next === 'workflow') renderWorkflow();
     if (ready && next === 'demo') drawQuery();
     try { window.history.replaceState(null, '', '#' + next); } catch (e) { /* file and sandbox history are optional */ }
-    if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:motionPaused?'auto':'smooth'});
+    if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:'instant'});
     reportHeight();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (button, index, buttons) {
@@ -79,21 +79,26 @@
   }
   $('lag-minutes').addEventListener('input', updateLag); $('rop').addEventListener('input', updateLag); updateLag();
 
-  function renderRockLesson(id) {
+  function renderRockLesson(id, selectedSample) {
     var lessons={
       sandstone:{title:'细砂岩：从已有标签开始观察。',copy:'这张照片沿用公开数据中的细砂岩标签。先观察整体颜色与碎块表面，再与其他照片比较；未标定的图像不能给出原岩颗粒的定量尺度。',question:'原岩粒度与矿物组成如何确认？需要比例尺、薄片或其他实验资料。'},
       shale:{title:'页岩：碎块不一定保留完整层理。',copy:'这张照片沿用公开数据中的页岩标签。岩屑是破碎后的样品，完整岩心中可以观察的层理，在岩屑照片里可能不再完整。',question:'照片中的表面特征是否有地层意义？需要回到取样记录和其他地质资料。'},
       dolomite:{title:'灰质白云岩：外观提供候选线索。',copy:'这张照片沿用公开数据中的灰质白云岩标签。图像可以用于外观比较，但不能单独确认灰质与白云石的含量。',question:'碳酸盐组分如何确认？需要结合酸反应、显微观察或其他矿物分析。'}
     };
     if(!lessons[id])id='sandstone';
-    var lesson=lessons[id],sample=DATA.samples.filter(function(s){return s.classId===id&&s.split==='reference';})[0];
+    var lesson=lessons[id],split=evaluationStage==='test'?'test':'reference';
+    var sample=selectedSample||DATA.samples.filter(function(s){return s.classId===id&&s.split===split;})[0];
     $('reservoir-diagram').innerHTML='<figure class="rock-photo"><div class="rock-photo-stage"><img src="'+sample.image+'" alt="本例公开岩屑照片，原数据标签为'+esc(className(id))+'"></div><figcaption><b>原标签：'+esc(className(id))+' · '+esc(sample.id)+' · 源井深 '+sample.depth+' m</b><p class="paper-credit">本案例公开数据原图 · 井 '+esc(sample.well)+'<br><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">查看原始数据来源 ↗</a></p><small>保留源数据标签；外观不等于矿物定量结果。</small></figcaption></figure>';
     $('rock-concept-title').textContent=lesson.title;$('rock-concept-copy').textContent=lesson.copy;$('rock-concept-question').textContent=lesson.question;
     $('rock-photo-limit').textContent='这些是本案例的真实照片；岩性名称沿用源标签，不把外部论文图当作本井样品。';
     Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.setAttribute('aria-pressed',String(button.dataset.rock===id));});
     reportHeight();
   }
-  Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){renderRockLesson(button.dataset.rock);});});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){
+    var id=button.dataset.rock;pendingRock=id;
+    var sample=DATA.samples.filter(function(s){return s.classId===id&&s.split===(evaluationStage==='test'?'test':'reference');})[0];
+    if(ready&&sample)selectSample(sample.id);else renderRockLesson(id);
+  });});
   renderRockLesson('sandstone');
   function splitMarkup() {
     return classes.map(function(c){var reference=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='reference';}).length;var test=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='test';}).length;
@@ -156,7 +161,7 @@
     if (!ready || !byId[id] || !activeSamples().some(function(s){return s.id===id;})) return;
     currentId=id;revealed=false;$('sample-select').value=id;$('original-label').hidden=true;
     $('reveal-label').textContent='显示原数据标签';
-    var image=byId[id]; showFieldSample(image); $('query-image').src=image.image;
+    var image=byId[id]; selectedDepthGroup=image.group; showFieldSample(image); renderRockLesson(image.classId,image); $('query-image').src=image.image;
     $('query-id').textContent=image.id; $('query-depth').textContent='源记录井深 '+image.depth+' m · 井 '+image.well;
     drawQuery(); renderFeatureMap(); renderDepth();
   }
@@ -234,10 +239,11 @@
     $('flow-sample-select').innerHTML=$('sample-select').innerHTML;
   }
   function syncEvaluationControls(){
-    var frozen=evaluationStage==='test',description=frozen?'阶段 2 · 锁定测试：k='+lockedConfig.k+'，颜色权重='+lockedConfig.colorWeight.toFixed(1)+'；24 张测试图仅按此配置评价。':'阶段 1 · 参数探索：仅在42张训练图的12个井段组内部执行 Leave-One-Group-Out 交叉验证；24张测试图暂不开放。';
-    ['evaluation-status','flow-evaluation-status'].forEach(function(id){$(id).textContent=description;});
-    $('flow-status').textContent=frozen?'当前阶段：参数已锁定，展示测试样品；图中始终使用原始成像条件。':'当前阶段：在训练集分组验证中探索参数；锁定后开放测试图。';
-    ['k-select','color-weight','flow-k-select','flow-color-weight','reset-parameters','finalize-test','flow-finalize-test'].forEach(function(id){$(id).disabled=!ready||frozen;});
+    var frozen=evaluationStage==='test',description=frozen?'阶段 2 · 已锁定 k='+lockedConfig.k+'、颜色权重='+lockedConfig.colorWeight.toFixed(1)+'，正在查看 24 张测试图。':'阶段 1 · 用 42 张训练图做分组交叉验证；每次排除待检照片所在的整个井段组。24 张测试图暂不开放。';
+    $('evaluation-status').textContent=description;
+    $('loading-status').textContent=frozen?'当前为测试集，k 和颜色权重已锁定。':'已就绪 · 先从一张训练集照片开始；参数锁定后可查看测试照片。';
+    $('flow-status').textContent=frozen?'当前为锁定测试阶段，展示测试样品的原始照片。':'当前在训练集内探索；可在示范页锁定参数并查看测试图。';
+    ['k-select','color-weight','flow-k-select','flow-color-weight','reset-parameters','finalize-test'].forEach(function(id){$(id).disabled=!ready||frozen;});
     $('evaluation-sample-badge').textContent=frozen?'测试集 / 参数已锁定':'训练集 / 折外查询';
     $('evaluation-title').textContent=frozen?'锁定参数测试与误差分析':'分组交叉验证与参数敏感性分析';
     $('evaluation-subtitle').textContent=frozen?'查看固定配置在24张测试图上的表现。':'在42张训练图内部检验参数，每个样品的同组图均从该折参考集排除。';
@@ -250,7 +256,6 @@
     currentId=tests[0].id;populateSampleChoices();syncEvaluationControls();updateEvaluation();selectSample(currentId);renderWorkflow();reportHeight();
   }
   $('finalize-test').addEventListener('click',finalizeTest);
-  $('flow-finalize-test').addEventListener('click',finalizeTest);
 
     // All illustrations below use the same selected sample's original pixels and computed features.
   var flowColorBin=0, flowPixelX=48, flowPixelY=48, flowReferenceId=null;
@@ -337,8 +342,8 @@
       snapshot.innerHTML='<h4>'+(count===result.k?'计票完成：'+className(result.classId):'已计 '+count+' / '+result.k+' 票，尚未完成')+'</h4><div class="snapshot-vote-gallery">'+result.neighbors.map(function(n,i){return '<figure class="'+(i<count?'is-counted':'')+'" style="--lith-color:'+byClass[n.classId].color+'"><img src="'+byId[n.id].image+'" alt="近邻 '+(i+1)+'，'+className(n.classId)+'"><figcaption>#'+(i+1)+' '+className(n.classId)+'<small>'+n.id+'<br>距离 '+n.distance.toFixed(4)+'</small></figcaption></figure>';}).join('')+'</div><div class="snapshot-votes">'+voteMarkup(partial)+'</div><div class="vote-controls"><button type="button" data-flow-action="vote-reset" class="quiet-button">从零计票</button><button type="button" data-flow-action="vote-next" class="quiet-button" '+(count===result.k?'disabled':'')+'>计入下一张 →</button><button type="button" data-flow-action="vote-all" class="quiet-button">查看完整投票</button></div><div class="technical-readout">'+(count===result.k?'最高票 '+result.votes[result.classId]+' / '+result.k+'，占比 '+pct(result.share)+'。这一比例不作校准概率。':'按距离顺序逐张计入原标签，完成全部 '+result.k+' 票后才输出候选。')+'</div><p class="fine-print">每张图一票。平票时比较该类近邻平均距离；仍相同时按类别 ID 排序。上方 k 与权重改变时，重新开始计票。</p>';
     }
     if(workflowStep===6){
-      var reviewed=reviews[currentId];
-      snapshot.innerHTML='<h4>两个出口：评价方法 / 复核样品</h4><div class="technical-exits"><section><h5>A · '+(evaluationStage==='test'?'锁定参数测试 / 24张':'训练集分组交叉验证 / 42张')+'</h5><table class="matrix" aria-label="当前评估阶段的混淆矩阵，行是已有标签，列是折外或锁定测试预测"><thead><tr><th>原标签 ↓<br>预测 →</th>'+classes.map(function(c){return '<th>'+c.name+'</th>';}).join('')+'</tr></thead><tbody>'+evaluation.matrix.map(function(row,i){return '<tr><th>'+classes[i].name+'</th>'+row.map(function(n,j){return '<td style="background:'+(i===j?'#d7e3dc':'#f1dfcb')+'">'+n+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table><div class="evaluation-stats"><div class="evaluation-stat"><span>准确率</span><strong>'+pct(evaluation.accuracy)+'</strong><small>'+evaluation.hit+' / '+evaluation.count+'</small></div><div class="evaluation-stat"><span>宏平均 F1</span><strong>'+evaluation.macroF1.toFixed(3)+'</strong><small>三个类别等权</small></div></div><p>对角线为与原标签一致，非对角线为误判。单井留出实验不能代表跨井表现。</p><details><summary>准确率与宏平均 F1 怎样算？</summary><p>准确率 = 对角线之和 / '+evaluation.count+'。逐类精确率 P = TP / 预测该类数量；召回率 R = TP / 原标签该类数量；F1 = 2PR / (P + R)，分母为零时取 0。宏平均 F1 为三类 F1 的平均。</p></details><button type="button" data-flow-action="inspect-errors" class="quiet-button">跟踪一份误判 → 回到距离计算</button></section><section><h5>B · 单样品复核 / '+sample.id+'</h5><div class="technical-record">模型候选：'+className(result.classId)+'<br>最高票：'+result.votes[result.classId]+' / '+result.k+'<br>人工意见：'+(reviewed?className(reviewed.classId):'待复核')+'<br>源井深：'+sample.depth+' m</div><p>回看第 5、6 步的真实近邻与距离，再确认或修改。保存人工意见不改变模型原始输出和左侧分数。</p><label class="mini-label">人工复核岩性<select data-flow-review aria-label="当前样品的人工复核岩性">'+classes.map(function(c){return '<option value="'+c.id+'" '+((reviewed?reviewed.classId:result.classId)===c.id?'selected':'')+'>'+c.name+'</option>';}).join('')+'</select></label><button type="button" data-flow-action="review-save" class="primary-button">保存本次复核</button><p role="status">'+(reviewed?'已保存本次会话意见。请导出 CSV 留存。':'意见保存在本次页面会话中。')+'</p><button type="button" data-flow-action="export" class="quiet-button">导出预测与复核 CSV ↓</button><p>CSV 分别保存原标签、原始成像条件下的候选、人工意见及源井深。缺失井段不补造连续地层。</p></section></div>';
+      var phase=evaluationStage==='test'?'锁定参数后的测试集':'训练集分组交叉验证';
+      snapshot.innerHTML='<h4>一张图与一组图，回答不同问题。</h4><div class="technical-exits"><section><h5>这张照片</h5><div class="technical-record">样品：'+esc(sample.id)+'<br>候选：'+esc(className(result.classId))+'<br>最高票：'+result.votes[result.classId]+' / '+result.k+'</div><p>回看近邻及其标签，判断这次候选是否有充分依据。</p></section><section><h5>'+phase+'</h5><div class="technical-record">与原标签一致：'+evaluation.hit+' / '+evaluation.count+' 张<br>准确率：'+pct(evaluation.accuracy)+'</div><p>整组表现可以发现单张照片看不到的错误；它不能证明新井也有相同效果。</p></section></div><p>下一页可检查近邻、复核样品，并查看各类别的预测结果。人工意见不改变模型分数。</p>';
     }
   }
   function changeWorkflowStep(next,focus){workflowStep=(next+flowText.length)%flowText.length;renderWorkflow();if(focus){var buttons=document.querySelectorAll('[data-step]');if(buttons[workflowStep])buttons[workflowStep].focus();}reportHeight();}
@@ -359,9 +364,6 @@
     if(action.dataset.flowAction==='vote-reset')flowVoteCount=0;
     if(action.dataset.flowAction==='vote-next')flowVoteCount=Math.min(result.k,flowVoteCount+1);
     if(action.dataset.flowAction==='vote-all')flowVoteCount=result.k;
-    if(action.dataset.flowAction==='review-save'){var value=$('flow-snapshot').querySelector('[data-flow-review]').value;if(ids.indexOf(value)>=0){reviews[currentId]={classId:value,time:new Date().toISOString(),modelAtReview:result.classId,k:config().k,colorWeight:config().colorWeight,exposure:0,contrast:1};renderDepth();publishLessonState();}}
-    if(action.dataset.flowAction==='export')$('export-csv').click();
-    if(action.dataset.flowAction==='inspect-errors'){var wrong=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;})[0];if(wrong){selectSample(wrong.id);flowReferenceId=null;changeWorkflowStep(4,false);}else{$('flow-status').textContent='当前参数下没有与已有标签不一致的评估样本。';}return;}
     renderWorkflow();reportHeight();
   });
 
@@ -410,6 +412,7 @@
   }
   window.addEventListener('message',function(event){
     if(event.source!==window.parent||!event.data)return;
+    if(embedded&&event.data.__m1ScrollToTop)window.scrollTo(0,0);
     if(event.data.__m1NavigationAck&&event.data.__m1NavigationAck===navigationPending)navigationPending=null;
     if(Object.prototype.hasOwnProperty.call(event.data,'__m1SharedState')){
       sharingReady=true;sharedPending=event.data.__m1SharedState;
@@ -419,14 +422,13 @@
   if(embedded)window.parent.postMessage({__m1StateRequest:true},'*');
   setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
-  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test','flow-finalize-test'];
+  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test'];
   demoControls.forEach(function(id){$(id).disabled=true;});
   Promise.all(DATA.samples.map(imageFeatures)).then(function(results){
-    references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=references[0].id;
+    references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=((pendingRock&&references.filter(function(s){return s.classId===pendingRock;})[0])||references[0]).id;
     populateSampleChoices();
     demoControls.forEach(function(id){$(id).disabled=false;});
     $('flow-status').textContent='已就绪 · 当前阶段在训练集上探索超参数；锁定后开放测试图，始终使用原始成像条件讲解。';
-    $('loading-status').textContent='已就绪 · 34维手工视觉特征 + kNN · 训练集42张 / 测试集24张 · 先训练集分组交叉验证，锁定参数后测试';
     updateEvaluation();selectSample(currentId);renderWorkflow();shareInitialized=true;if(sharedPending)applyLessonState(sharedPending);else publishLessonState();reportHeight();
   }).catch(function(error){$('loading-status').classList.add('is-error');$('loading-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整，并刷新页面。';$('flow-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整并刷新。';reportHeight();});
   if(window.ResizeObserver)new window.ResizeObserver(reportHeight).observe(document.body);

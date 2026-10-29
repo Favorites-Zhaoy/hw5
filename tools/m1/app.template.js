@@ -12,7 +12,7 @@
   var workflowStep = 0, view = 'background', motionPaused = false, revealed = false;
   var cropSize = 96, exposure = 0, contrast = 1, matrixFilter = null;
   var imageStage = 0, flowVoteCount = null, voteContext = '', selectedDepthGroup = null;
-  var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null;
+  var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null,pendingRock=null;
   var className = function (id) { return byClass[id] ? byClass[id].name : '尚未复核'; };
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return lockedConfig?{k:lockedConfig.k,colorWeight:lockedConfig.colorWeight}:{ k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
@@ -34,7 +34,7 @@
     if (next === 'workflow') renderWorkflow();
     if (ready && next === 'demo') drawQuery();
     try { window.history.replaceState(null, '', '#' + next); } catch (e) { /* file and sandbox history are optional */ }
-    if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:motionPaused?'auto':'smooth'});
+    if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:'instant'});
     reportHeight();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (button, index, buttons) {
@@ -79,21 +79,26 @@
   }
   $('lag-minutes').addEventListener('input', updateLag); $('rop').addEventListener('input', updateLag); updateLag();
 
-  function renderRockLesson(id) {
+  function renderRockLesson(id, selectedSample) {
     var lessons={
       sandstone:{title:'细砂岩：从已有标签开始观察。',copy:'这张照片沿用公开数据中的细砂岩标签。先观察整体颜色与碎块表面，再与其他照片比较；未标定的图像不能给出原岩颗粒的定量尺度。',question:'原岩粒度与矿物组成如何确认？需要比例尺、薄片或其他实验资料。'},
       shale:{title:'页岩：碎块不一定保留完整层理。',copy:'这张照片沿用公开数据中的页岩标签。岩屑是破碎后的样品，完整岩心中可以观察的层理，在岩屑照片里可能不再完整。',question:'照片中的表面特征是否有地层意义？需要回到取样记录和其他地质资料。'},
       dolomite:{title:'灰质白云岩：外观提供候选线索。',copy:'这张照片沿用公开数据中的灰质白云岩标签。图像可以用于外观比较，但不能单独确认灰质与白云石的含量。',question:'碳酸盐组分如何确认？需要结合酸反应、显微观察或其他矿物分析。'}
     };
     if(!lessons[id])id='sandstone';
-    var lesson=lessons[id],sample=DATA.samples.filter(function(s){return s.classId===id&&s.split==='reference';})[0];
+    var lesson=lessons[id],split=evaluationStage==='test'?'test':'reference';
+    var sample=selectedSample||DATA.samples.filter(function(s){return s.classId===id&&s.split===split;})[0];
     $('reservoir-diagram').innerHTML='<figure class="rock-photo"><div class="rock-photo-stage"><img src="'+sample.image+'" alt="本例公开岩屑照片，原数据标签为'+esc(className(id))+'"></div><figcaption><b>原标签：'+esc(className(id))+' · '+esc(sample.id)+' · 源井深 '+sample.depth+' m</b><p class="paper-credit">本案例公开数据原图 · 井 '+esc(sample.well)+'<br><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">查看原始数据来源 ↗</a></p><small>保留源数据标签；外观不等于矿物定量结果。</small></figcaption></figure>';
     $('rock-concept-title').textContent=lesson.title;$('rock-concept-copy').textContent=lesson.copy;$('rock-concept-question').textContent=lesson.question;
     $('rock-photo-limit').textContent='这些是本案例的真实照片；岩性名称沿用源标签，不把外部论文图当作本井样品。';
     Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.setAttribute('aria-pressed',String(button.dataset.rock===id));});
     reportHeight();
   }
-  Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){renderRockLesson(button.dataset.rock);});});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rock]'),function(button){button.addEventListener('click',function(){
+    var id=button.dataset.rock;pendingRock=id;
+    var sample=DATA.samples.filter(function(s){return s.classId===id&&s.split===(evaluationStage==='test'?'test':'reference');})[0];
+    if(ready&&sample)selectSample(sample.id);else renderRockLesson(id);
+  });});
   renderRockLesson('sandstone');
   function splitMarkup() {
     return classes.map(function(c){var reference=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='reference';}).length;var test=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='test';}).length;
@@ -156,7 +161,7 @@
     if (!ready || !byId[id] || !activeSamples().some(function(s){return s.id===id;})) return;
     currentId=id;revealed=false;$('sample-select').value=id;$('original-label').hidden=true;
     $('reveal-label').textContent='显示原数据标签';
-    var image=byId[id]; showFieldSample(image); $('query-image').src=image.image;
+    var image=byId[id]; selectedDepthGroup=image.group; showFieldSample(image); renderRockLesson(image.classId,image); $('query-image').src=image.image;
     $('query-id').textContent=image.id; $('query-depth').textContent='源记录井深 '+image.depth+' m · 井 '+image.well;
     drawQuery(); renderFeatureMap(); renderDepth();
   }
@@ -270,6 +275,7 @@
   }
   window.addEventListener('message',function(event){
     if(event.source!==window.parent||!event.data)return;
+    if(embedded&&event.data.__m1ScrollToTop)window.scrollTo(0,0);
     if(event.data.__m1NavigationAck&&event.data.__m1NavigationAck===navigationPending)navigationPending=null;
     if(Object.prototype.hasOwnProperty.call(event.data,'__m1SharedState')){
       sharingReady=true;sharedPending=event.data.__m1SharedState;
@@ -279,14 +285,13 @@
   if(embedded)window.parent.postMessage({__m1StateRequest:true},'*');
   setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
-  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test','flow-finalize-test'];
+  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test'];
   demoControls.forEach(function(id){$(id).disabled=true;});
   Promise.all(DATA.samples.map(imageFeatures)).then(function(results){
-    references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=references[0].id;
+    references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=((pendingRock&&references.filter(function(s){return s.classId===pendingRock;})[0])||references[0]).id;
     populateSampleChoices();
     demoControls.forEach(function(id){$(id).disabled=false;});
     $('flow-status').textContent='已就绪 · 当前阶段在训练集上探索超参数；锁定后开放测试图，始终使用原始成像条件讲解。';
-    $('loading-status').textContent='已就绪 · 34维手工视觉特征 + kNN · 训练集42张 / 测试集24张 · 先训练集分组交叉验证，锁定参数后测试';
     updateEvaluation();selectSample(currentId);renderWorkflow();shareInitialized=true;if(sharedPending)applyLessonState(sharedPending);else publishLessonState();reportHeight();
   }).catch(function(error){$('loading-status').classList.add('is-error');$('loading-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整，并刷新页面。';$('flow-status').textContent='样本初始化失败：'+error.message+'。请确认案例包完整并刷新。';reportHeight();});
   if(window.ResizeObserver)new window.ResizeObserver(reportHeight).observe(document.body);

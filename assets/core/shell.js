@@ -342,6 +342,7 @@
     var allCases = Cases.bySceneAll(sc.id);
     /* 当前展示哪个案例：?case= 指定，默认第一个 */
     var c = allCases.filter(function (x) { return x.id === q.case; })[0] || allCases[0] || null;
+    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn');
 
     var caseSwitch = '';
     if (allCases.length > 1) {
@@ -372,7 +373,7 @@
       if (c.tabs.demo) panels += '<div class="panel" data-panel="demo">' + renderDemoShell(sc, c) + '</div>';
     }
 
-    var cBadge = allCases.length
+    var cBadge = isM1Lesson ? '<span class="badge-ready">交互案例</span>' : allCases.length
       ? '<span class="badge-ready">案例 ' + esc(c.id) + ' · v' + esc(c.version || '—') + '</span>' +
         (allCases.length > 1 ? '<span class="tag">共 ' + allCases.length + ' 个案例</span>' : '')
       : '<span class="badge-wip">未接入案例</span>';
@@ -388,18 +389,18 @@
       '</div>' +
       '<h1 class="dh-title">' + esc(sc.name) + '</h1>' +
       '<p class="dh-sub">' + esc(sc.intro) + '</p>' +
-      '<div class="dh-tags">' + K.dtag(sc.diff) +
+      (isM1Lesson ? '' : '<div class="dh-tags">' + K.dtag(sc.diff) +
       (sc.status === 'ext' ? '<span class="badge-wip">待扩展</span>' : '') +
       '<span class="tag"><span class="dot" style="color:var(--ink-4)"></span>' + esc(sc.id.toUpperCase()) + '</span>' +
-      '</div></div>';
+      '</div>') + '</div>';
 
     var body = c
-      ? caseSwitch + '<div class="tabs" id="tabs">' + tabBtns + '</div>' + panels
+      ? caseSwitch + '<div id="case-tab-start" aria-hidden="true"></div><div class="tabs" id="tabs">' + tabBtns + '</div>' + panels
       : pendingHTML(sc);
 
     return '<main class="wrap">' +
       crumb([['#/', '总览'], ['#/chain', '作业链'], ['#/stage/' + st.id, st.name], ['#/scene/' + sc.id, sc.name]]) +
-      head + body + relatedHTML(sc) + '</main>';
+      head + body + (isM1Lesson ? '' : relatedHTML(sc)) + '</main>';
   }
 
   /* ---- 有案例：三块内容由案例提供，这里只套版式 ---- */
@@ -525,10 +526,17 @@
       [].forEach.call(document.querySelectorAll('.panel'), function (p) {
         p.classList.toggle('on', p.dataset.panel === key);
       });
-        mountCaseSection(sc, c, key);
+      mountCaseSection(sc, c, key);
       if (scroll) {
-        var y = tabsEl.getBoundingClientRect().top + window.scrollY - 62;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+        // The tabs are sticky; their screen position no longer represents their
+        // original document position after a long read. Use a stationary anchor.
+        var anchor = document.getElementById('case-tab-start');
+        var inset = parseFloat(global.getComputedStyle(tabsEl).top) || 0;
+        var y = anchor.getBoundingClientRect().top + window.scrollY - inset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+        var root = document.getElementById('case-' + key + '-root');
+        var frame = root && root.querySelector('iframe');
+        if (frame && frame.contentWindow) frame.contentWindow.postMessage({ __m1ScrollToTop: true }, '*');
       }
     }
 

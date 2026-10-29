@@ -77,7 +77,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.6.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.6.2');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -137,7 +137,7 @@ function appRuntime(embedded=false,reduced=false,portalView=null){
   class FixtureImage{set src(value){const s=byImage.get(value);assert.ok(s);let seed=parseInt(s.sha256.slice(0,8),16);this.naturalWidth=180;this.naturalHeight=180;this.rgba=pixelImage(96,96);for(let i=0;i<this.rgba.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;this.rgba[i]=seed>>>24;this.rgba[i+1]=seed>>>23&255;this.rgba[i+2]=seed>>>22&255;}queueMicrotask(()=>this.onload());}}
   const stats={predict:0,evaluate:0},wrapped={...model,predict(...args){stats.predict++;return model.predict(...args);},evaluate(...args){stats.evaluate++;return model.evaluate(...args);}};
   const blobs=[],messages=[],windowEvents={},media={matches:reduced,addEventListener(){}};
-  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URLSearchParams,__CASE_DEMO_VIEW__:portalView,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:'',search:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(type,fn){(windowEvents[type]||=([])).push(fn);},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
+  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URLSearchParams,__CASE_DEMO_VIEW__:portalView,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:'',search:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,scrollTo(){},addEventListener(type,fn){(windowEvents[type]||=([])).push(fn);},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
   ctx.window=ctx;ctx.parent=embedded?{postMessage:message=>messages.push(message)}:ctx;vm.createContext(ctx);vm.runInContext(inlineCode('app'),ctx);
   return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),message(event){(windowEvents.message||[]).forEach(fn=>fn(event));},event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
 }
@@ -148,10 +148,10 @@ test('training-only exploration hides test samples and freezes parameters before
   const rt=appRuntime();await settle();assert.equal(rt.stats.evaluate,0);assert.match(rt.nodes.get('evaluation-status').textContent,/阶段 1/);
   for(const s of data.samples.filter(s=>s.split==='test'))assert.ok(!rt.nodes.get('sample-select').innerHTML.includes(s.id));
   const current=rt.nodes.get('query-id').textContent;rt.nodes.get('sample-select').value=data.samples.find(s=>s.split==='test').id;rt.event('sample-select','change');assert.equal(rt.nodes.get('query-id').textContent,current);
-  rt.nodes.get('k-select').value='3';rt.event('k-select','change');rt.event('finalize-test','click');assert.equal(rt.stats.evaluate,1);assert.match(rt.nodes.get('evaluation-status').textContent,/阶段 2/);assert.equal(rt.nodes.get('k-select').disabled,true);assert.equal(rt.nodes.get('flow-color-weight').disabled,true);
+  rt.nodes.get('k-select').value='3';rt.event('k-select','change');rt.event('finalize-test','click');assert.equal(rt.stats.evaluate,1);assert.match(rt.nodes.get('evaluation-status').textContent,/阶段 2/);assert.match(rt.nodes.get('loading-status').textContent,/当前为测试集/);assert.equal(rt.nodes.get('k-select').disabled,true);assert.equal(rt.nodes.get('flow-color-weight').disabled,true);
   assert.equal(data.samples.find(s=>s.id===rt.nodes.get('query-id').textContent).split,'test');
   const metrics=rt.nodes.get('evaluation-stats').innerHTML;rt.nodes.get('k-select').value='7';rt.event('k-select','change');assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);assert.match(rt.nodes.get('vote-summary').textContent,/\/ 3/);
-  rt.event('flow-finalize-test','click');assert.equal(rt.stats.evaluate,1);
+  rt.event('finalize-test','click');assert.equal(rt.stats.evaluate,1);
   rt.event('export-csv','click');const csv=await rt.blobs[0].text();assert.equal(csv.trim().split('\r\n').length,25);assert.match(csv,/fixed-parameter-holdout/);assert.match(csv,/LBPriu2-P8-R1-10/);
 });
 
@@ -165,8 +165,10 @@ test('distance explanations reconstruct the classifier distance with reference-o
 
 test('field stages and the visual overview connect real images with the current model output',async()=>{
   const rt=appRuntime();await settle();
-  assert.match(rt.nodes.get('flow-snapshot').innerHTML,/该组标签留到参数锁定后再查看/);
   const first=data.samples.find(s=>s.split==='reference');
+  assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes('data-depth-group="'+first.group+'" class="reference" aria-pressed="true"'));
+  flowEvent(rt,'[data-depth-group]',{depthGroup:data.samples.find(s=>s.split==='test').group});
+  assert.match(rt.nodes.get('flow-snapshot').innerHTML,/该组标签留到参数锁定后再查看/);
   assert.equal(rt.nodes.get('field-sample-image').src,first.image);
   assert.match(rt.nodes.get('field-sample-credit').textContent,new RegExp(first.id));
   const field=rt.buttons.find(b=>b.dataset.fieldStep==='2');field.listeners.click();
@@ -206,15 +208,17 @@ test('color bins count actual pixels and the movable neighborhood explains local
   const gray=rt.nodes.get('flow-snapshot').querySelector('.flow-gray-canvas').children.at(-1).pixels;assert.equal(gray[0],gray[1]);assert.equal(gray[1],gray[2]);
 });
 
-test('workflow ranking, parameter changes, voting and human review keep original-condition evaluation separate',async()=>{
+test('workflow ranking, parameter changes and voting lead into the demo without duplicating review',async()=>{
   const rt=appRuntime();await settle();rt.buttons.find(b=>b.dataset.step==='4').listeners.click();const current=data.samples.find(s=>s.id===rt.nodes.get('query-id').textContent);const eligible=data.samples.filter(s=>s.split==='reference'&&s.group!==current.group);assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-reference-id=/g)||[]).length,eligible.length);for(const sample of data.samples.filter(s=>s.group===current.group))assert.ok(!rt.nodes.get('flow-snapshot').innerHTML.includes('data-reference-id="'+sample.id+'"'));
   const ref=eligible[0];flowEvent(rt,'[data-reference-id]',{referenceId:ref.id});assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes(ref.image));
   rt.buttons.find(b=>b.dataset.step==='5').listeners.click();rt.nodes.get('flow-k-select').value='3';rt.event('flow-k-select','change');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 3 票/);
   flowEvent(rt,'[data-flow-action]',{flowAction:'vote-all'});assert.match(rt.nodes.get('flow-snapshot').innerHTML,/计票完成/);
   const complete=rt.nodes.get('flow-snapshot').innerHTML;rt.nodes.get('exposure').value='40';rt.event('exposure','input');assert.equal(rt.nodes.get('flow-snapshot').innerHTML,complete);
   rt.nodes.get('flow-color-weight').value='100';rt.event('flow-color-weight','input');assert.match(rt.nodes.get('flow-snapshot').innerHTML,/已计 0 \/ 3 票/);
-  rt.buttons.find(b=>b.dataset.step==='6').listeners.click();const metrics=rt.nodes.get('evaluation-stats').innerHTML;rt.nodes.get('flow-snapshot').querySelector('[data-flow-review]').value='shale';flowEvent(rt,'[data-flow-action]',{flowAction:'review-save'});assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);assert.match(rt.nodes.get('flow-snapshot').innerHTML,/人工意见：页岩/);
-  flowEvent(rt,'[data-flow-action]',{flowAction:'export'});assert.equal(rt.blobs.length,1);const csv=await rt.blobs[0].text();const row=csv.split('\r\n')[1].split(',').map(v=>v.replaceAll('"',''));assert.equal(row[11],'0');assert.equal(row[12],'1');
+  rt.buttons.find(b=>b.dataset.step==='6').listeners.click();
+  assert.match(rt.nodes.get('flow-snapshot').innerHTML,/一张图与一组图/);
+  assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes(current.id));
+  assert.doesNotMatch(rt.nodes.get('flow-snapshot').innerHTML,/data-flow-review|data-flow-action="review-save"/);
 });
 test('standalone case switches all three sections and runs the sample-to-prediction flow',async()=>{
   const rt=appRuntime();await settle();
@@ -259,8 +263,31 @@ test('embedded lessons accept shared samples and locked parameters only from the
   rt.message({source:rt.ctx.parent,data:{__m1SharedState:{...state,sampleId:holdout.id,stage:'test'}}});
   assert.equal(rt.nodes.get('query-id').textContent,holdout.id);
   assert.equal(rt.nodes.get('flow-k-select').disabled,true);
-  assert.match(rt.nodes.get('flow-status').textContent,/参数已锁定/);
+  assert.match(rt.nodes.get('flow-status').textContent,/锁定测试/);
   assert.match(rt.nodes.get('flow-viz-6').innerHTML,/锁定测试/);
+});
+test('a sample chosen in the background follows the student through each section',async()=>{
+  const rt=appRuntime(true,false,'background');await settle();
+  rt.message({source:rt.ctx.parent,data:{__m1SharedState:null}});
+  rt.buttons.find(b=>b.dataset.rock==='shale').listeners.click();
+  const selected=data.samples.find(s=>s.classId==='shale'&&s.split==='reference');
+  assert.equal(rt.nodes.get('field-sample-image').src,selected.image);
+  assert.equal(rt.nodes.get('query-id').textContent,selected.id);
+  assert.ok(rt.messages.some(m=>m.__m1StateUpdate&&m.__m1StateUpdate.sampleId===selected.id));
+  rt.buttons.find(b=>b.dataset.view==='workflow').listeners.click();
+  assert.ok(rt.nodes.get('flow-snapshot').innerHTML.includes('data-depth-group="'+selected.group+'" class="reference" aria-pressed="true"'));
+  rt.event('finalize-test','click');
+  rt.buttons.find(b=>b.dataset.rock==='dolomite').listeners.click();
+  const after=data.samples.find(s=>s.id===rt.nodes.get('query-id').textContent);
+  assert.equal(after.classId,'dolomite');assert.equal(after.split,'test');
+});
+test('standalone and embedded lessons return to the beginning when asked by their owner',async()=>{
+  const local=appRuntime();await settle();
+  local.buttons.find(b=>b.dataset.view==='workflow').listeners.click();
+  assert.equal(local.nodes.get('panel-workflow').scrollOptions.block,'start');
+  const embedded=appRuntime(true,false,'demo');await settle();let calls=0;embedded.ctx.scrollTo=()=>{calls++;};
+  embedded.message({source:{},data:{__m1ScrollToTop:true}});assert.equal(calls,0);
+  embedded.message({source:embedded.ctx.parent,data:{__m1ScrollToTop:true}});assert.equal(calls,1);
 });
 test('the rock lesson shows the case data rather than unrelated paper samples',async()=>{
   assert.match(entryHTML,/<details class="geology-extension" open>/);
@@ -286,12 +313,22 @@ test('the rock lesson shows the case data rather than unrelated paper samples',a
 test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
   const tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
-  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.endsWith('section=background'));
+  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.6.2&'));assert.ok(bg.src.endsWith('section=background'));
   const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});
   click('flow');const flow=rt.document.getElementById('case-flow-root').children[0];assert.ok(flow.src.endsWith('section=workflow'));
   click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.endsWith('section=demo'));
   click('bg');click('demo');assert.equal(demo.removed,undefined);assert.equal(rt.document.getElementById('case-demo-root').children.length,1);
   rt.ctx.__shellTest.unmountCurrent();assert.equal(bg.removed,true);assert.equal(flow.removed,true);assert.equal(demo.removed,true);
+});
+test('portal tab switches use the stationary section anchor rather than the stuck tab position',()=>{
+  const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
+  const tabs=rt.document.getElementById('tabs'),anchor=rt.document.getElementById('case-tab-start');
+  for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
+  tabs.getBoundingClientRect=()=>({top:68});anchor.getBoundingClientRect=()=>({top:-4700});
+  rt.ctx.getComputedStyle=()=>({top:'68px'});rt.ctx.scrollY=5000;const positions=[];rt.ctx.scrollTo=options=>positions.push(options.top);
+  rt.ctx.__shellTest.bindTabs(sc,c);
+  for(const button of tabs.children){tabs.listeners.click({target:{closest:()=>button}});assert.equal(positions.at(-1),232);}
+  assert.match(rt.ctx.__shellTest.sceneHTML(sc,{case:c.id}),/id="case-tab-start"/);
 });
 test('optional page lessons import with their view while legacy packages keep static rendering',()=>{
   const rt=support.makeRuntime(),pkg=JSON.parse(read('m1-cuttings-case/case.json')),files=packFiles();
