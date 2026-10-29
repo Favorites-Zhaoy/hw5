@@ -1,11 +1,12 @@
     <div class="background-intro">
       <p class="eyebrow">01 / PROFESSIONAL BACKGROUND · 岩屑录井</p>
-      <h2>岩屑从哪里来？为什么要识别它？</h2>
-      <p>钻头打碎岩层后，岩屑随钻井液回到地面。录井人员观察样品、对应井深，以此认识钻遇地层。这一课聚焦其中一件事：<strong>能否借助照片，为岩性判断提供一个可检查的候选？</strong></p>
+      <h2>从现场样品，认识岩性辅助识别。</h2>
+      <p>先了解岩屑录井的真实工作，再看图像识别研究解决了什么、还缺什么。随后认识本课的样品与实现条件，为下一页的案例流程做准备。</p>
     </div>
 
     <section class="background-chapter" data-background-topic="problem" aria-labelledby="bg-problem-title">
-      <div class="chapter-heading"><span class="chapter-number">01</span><div><p class="eyebrow">现场 / 从井底到地面</p><h2 id="bg-problem-title">先认识手中的样品</h2><p>从破岩到记录，岩屑要经过哪些步骤？</p></div></div>
+      <div class="chapter-heading"><div class="chapter-index"><span class="chapter-number">01</span><span class="chapter-en">CONTEXT</span></div><div><h2 id="bg-problem-title">真实背景</h2><p>录井人员怎样从岩屑认识钻遇地层？</p></div></div>
+      <div class="chapter-body">
       <div class="professional-copy"><p>地面取得的岩屑需要清洗、筛分，再观察颜色、颗粒和结构。样品可能混有多种岩性，描述还要对应正确井深，才能与其他井段比较。<a class="source-ref" href="https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis" target="_blank" rel="noopener noreferrer">[1]</a></p></div>
       <section class="field-story" id="field-story" data-field-stage="0" aria-labelledby="field-story-title">
         <div class="story-heading"><div><span class="mini-label">从井底到记录 / 现场过程示意</span><h3 id="field-story-title">一份岩屑，经历了什么？</h3><p>点击四个环节，看看样品在哪儿产生、哪些信息被保留，又有哪些需要人工核对。</p></div><span class="story-hint">选择环节 ↓</span></div>
@@ -24,10 +25,6 @@
         </div>
         <p class="story-footnote">右侧为公开数据中的真实岩屑照片，与左侧示意井无现场对应关系；照片沿用源数据标签，不作为矿物定量鉴定。</p>
       </section>
-      <details class="geology-extension" open><summary>看看本案例中的三类真实样品</summary>
-        <article class="reservoir-board warm-board"><div class="reservoir-diagram" id="reservoir-diagram" aria-live="polite"></div><div class="reservoir-copy"><span class="mini-label">本案例的公开照片 / 原始标签</span><p>选一种岩性，观察一张真实照片。这张照片会带到下一页，跟着它看机器如何比较。</p><div class="rock-tabs" role="group" aria-label="选择要继续观察的真实岩屑样品"><button type="button" data-rock="sandstone" aria-pressed="true">细砂岩</button><button type="button" data-rock="shale" aria-pressed="false">页岩</button><button type="button" data-rock="dolomite" aria-pressed="false">灰质白云岩</button></div><h3 id="rock-concept-title">先看照片，再核对标签。</h3><p id="rock-concept-copy">切换本例三类带原始标签的岩屑照片，观察颜色和表面外观。</p><div class="rock-question"><span>还需要什么证据</span><strong id="rock-concept-question">照片之外需要什么资料验证？</strong></div><p class="fine-print" id="rock-photo-limit">沿用源数据标签；照片外观不能单独确认矿物含量或物性。</p></div></article>
-      </details>
-<!-- M1_OBSERVATIONS -->
       <details class="lag-extension"><summary>想了解更多：岩屑怎样对应到井深？</summary>
       <div class="subsection-intro"><span class="mini-label">深度对应 / 现场记录的一步</span><h3>样品到达地面时，钻头已经继续向下。</h3></div>
       <article class="background-grid warm-board">
@@ -35,33 +32,48 @@
         <div class="context-copy"><span class="mini-label">迟到时间 / LAG TIME</span><h3>先对深度，再谈岩性变化。</h3><p>迟到时间 τ 是岩屑从井底到达地面的上返时间。若钻进连续、取 τ 为代表性上返时间，样品深度可近似对应取样时刻 t−τ 的钻头深度。现场还需结合井眼、钻具、泵排量和校验记录确定对应关系。<a class="source-ref" href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">[2]</a></p><div class="depth-relation">D<sub>样品</sub>(t) ≈ D<sub>钻头</sub>(t − τ)</div><div class="lag-controls"><label for="lag-minutes">上返迟到时间 <output id="lag-value">30 分钟</output></label><input id="lag-minutes" type="range" min="10" max="80" step="5" value="30"><label for="rop">恒定钻速（教学假设）<output id="rop-value">12 m/h</output></label><input id="rop" type="range" min="5" max="40" step="1" value="12"><div class="lag-equation">3200 − 钻速 × 迟到时间 ÷ 60 = <b id="source-depth">3194 m</b></div></div><p class="fine-print">滑杆仅解释恒定钻速下的深度偏移，不用于工程迟到计算。本案例沿用原数据井深，未用这些教学参数重新校正。</p></div>
       </article>
       </details>
-      <div class="professional-copy"><p>这些照片保留了岩屑的外观，却没有完整的成像和现场记录。接下来，我们只用可见的颜色和纹理做比较，不把结果当作完整的岩性描述。</p></div>
+      <p class="chapter-bridge">重复观察照片，是机器可以参与的一步；样品是否有代表性、井深是否对应，仍要回到现场记录核对。</p>
+      </div>
     </section>
 
     <section class="background-chapter" data-background-topic="intervention" aria-labelledby="bg-intervention-title">
-      <div class="chapter-heading"><span class="chapter-number">02</span><div><p class="eyebrow">方法 / 从观察到比较</p><h2 id="bg-intervention-title">机器能帮上什么忙？</h2><p>把照片与已知样品比较，提出一个值得复核的候选。</p></div></div>
-      <article class="ai-explainer"><div><h3>找相似照片，再看它们的标签。</h3><p>本例先把照片的颜色、纹理等外观信息转成特征，再用 k 近邻（kNN）找出相似的参考照片，由它们投票产生候选。你可以查看每张近邻及其距离，再自己判断。<a class="source-ref" href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">[4]</a></p></div><div class="evidence-path" aria-label="图像分类的输入、计算与输出"><span>岩屑照片<small>待识别样品</small></span><i aria-hidden="true">→</i><span>外观特征<small>颜色 · 纹理等</small></span><i aria-hidden="true">→</i><span>相似参考图<small>近邻与投票</small></span><i aria-hidden="true">→</i><span>人工复核<small>检查候选依据</small></span></div></article>
-      <div class="task-scope"><div><h3>这里的结果是什么？</h3><p>一个三类岩性的候选，以及支持它的相似照片和票数。是否能提高现场效率，还需要与人工流程比较。</p></div><div><h3>还缺什么？</h3><p>照片不能单独确认矿物含量、原岩粒度或混样比例，也不能代替油气显示等资料。票数占比只是投票结果，不是可靠概率。</p></div></div>
+      <div class="chapter-heading"><div class="chapter-index"><span class="chapter-number">02</span><span class="chapter-en">RESEARCH</span></div><div><h2 id="bg-intervention-title">技术前沿</h2><p>从整张照片的分类，走向质量控制和单颗粒识别。</p></div></div>
+      <div class="chapter-body">
+      <div class="research-directions" aria-label="岩屑图像识别的三项相关研究">
+        <article class="research-study"><div class="research-date"><b>2023</b><span>期刊研究</span></div><div><h3>先让训练图像和标签更可靠</h3><p>Tolstaya 等用 CNN 识别岩屑照片，先排查低质量图像，再通过交叉验证和特征聚类检查可疑标签。它回应的是：相似外观为什么会被标成不同岩性？</p><div class="research-route" aria-label="该研究的方法示意"><span>照片与标签</span><i aria-hidden="true">→</i><span>质量检查</span><i aria-hidden="true">→</i><span>CNN 分类</span></div><a class="research-source" href="https://doi.org/10.3390/jimaging9070126" target="_blank" rel="noopener noreferrer">Tolstaya et al. · Journal of Imaging ↗</a></div></article>
+        <article class="research-study"><div class="research-date"><b>2025</b><span>期刊研究</span></div><div><h3>把采样、成像和识别接到一起</h3><p>Li 等把取样、输送和图像采集接入钻机流程，再用集成学习识别岩性。研究在煤矿井下开展试验，说明成像条件与采样流程也是系统的一部分。</p><div class="research-route" aria-label="该研究的方法示意"><span>规范取样</span><i aria-hidden="true">→</i><span>统一成像</span><i aria-hidden="true">→</i><span>集成识别</span></div><a class="research-source" href="https://doi.org/10.1002/dug2.70047" target="_blank" rel="noopener noreferrer">Li et al. · Deep Underground Science and Engineering ↗</a></div></article>
+        <article class="research-study"><div class="research-date"><b>2026</b><span>会议摘要</span></div><div><h3>混合样品里，逐颗看见不同岩屑</h3><p>Zeghdoud 等在 SPWLA 摘要中提出单颗粒分割与分类，并比较统计特征和视觉 Transformer 表征。目标是避免整图标签掩盖少量岩性；这里作为研究方向介绍。</p><div class="research-route" aria-label="该研究的方法示意"><span>整盘照片</span><i aria-hidden="true">→</i><span>颗粒分割</span><i aria-hidden="true">→</i><span>逐颗分类</span></div><a class="research-source" href="https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf" target="_blank" rel="noopener noreferrer">Zeghdoud et al. · SPWLA 2026 摘要集 ↗</a></div></article>
+      </div>
+<!-- M1_OBSERVATIONS -->
+      <article class="lesson-method"><span class="mini-label">回到本课 / 看清一次判断的依据</span><h3>从能逐张核对的 kNN 基线开始。</h3><p>本课把照片的颜色、纹理等外观信息转成特征，用 k 近邻找出相似的参考照片，再由它们投票产生候选。选择这条方法，是为了让你能查看每张近邻、距离和票数，理解判断从何而来。<a class="source-ref" href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">[4]</a></p><div class="evidence-path" aria-label="本课采用的图像分类方法"><span>岩屑照片<small>待识别样品</small></span><i aria-hidden="true">→</i><span>外观特征<small>颜色 · 纹理等</small></span><i aria-hidden="true">→</i><span>近邻投票<small>相似照片与距离</small></span><i aria-hidden="true">→</i><span>人工复核<small>检查候选依据</small></span></div><p class="fine-print">这是照片级、单标签分类；本课未实现上述研究中的 CNN、集成模型或颗粒分割。下面先认识这条基线实际使用的数据。</p></article>
+      </div>
     </section>
 
     <section class="background-chapter" data-background-topic="data" aria-labelledby="bg-data-title">
-      <div class="chapter-heading"><span class="chapter-number">03</span><div><p class="eyebrow">数据 / 我们手里有什么</p><h2 id="bg-data-title">用哪些照片来比较？</h2><p>先认识这批数据，再看它们怎样分工。</p></div></div>
-      <article class="data-section"><div class="data-layout"><div><p>本例使用公开数据中同一口井的 66 张岩屑照片，沿用细砂岩、页岩和灰质白云岩三类原标签。<a class="source-ref" href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">[3]</a></p><p>42 张用于训练集内的分组验证与参考比较；另外 24 张留到参数锁定后测试。相邻照片按 20 m 井段分组，避免同一组同时出现在训练集和测试集。下一页会展示具体怎么分。</p><p class="fine-print">井深用于分组和记录，不作为分类特征。20 m 是建模分组宽度；单井数据不能证明跨井效果。<a class="source-ref" href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">[5]</a></p></div><div><div id="split-bars" class="split-bars"></div><p class="fine-print">颜色区分训练集与测试集；每类样本数量不同。</p></div></div></article>
+      <div class="chapter-heading"><div class="chapter-index"><span class="chapter-number">03</span><span class="chapter-en">DATA</span></div><div><h2 id="bg-data-title">示例数据</h2><p>同一口井，66 张真实照片，三类原始标签。</p></div></div>
+      <div class="chapter-body">
+      <section class="sample-explorer geology-extension" aria-labelledby="sample-explorer-title"><h3 id="sample-explorer-title">选一张照片，带着它继续学习。</h3>
+        <article class="reservoir-board warm-board"><div class="reservoir-diagram" id="reservoir-diagram" aria-live="polite"></div><div class="reservoir-copy"><span class="mini-label">本案例的公开原图 / 可切换查看</span><p>选一种岩性，观察照片与源井深。案例流程和可视化示范会接着使用你选中的样品。</p><div class="rock-tabs" role="group" aria-label="选择要继续观察的真实岩屑样品"><button type="button" data-rock="sandstone" aria-pressed="true">细砂岩</button><button type="button" data-rock="shale" aria-pressed="false">页岩</button><button type="button" data-rock="dolomite" aria-pressed="false">灰质白云岩</button></div><h3 id="rock-concept-title">先看照片，再核对标签。</h3><p id="rock-concept-copy">切换本例三类带原始标签的岩屑照片，观察颜色和表面外观。</p><div class="rock-question"><span>还需要什么证据</span><strong id="rock-concept-question">照片之外需要什么资料验证？</strong></div><p class="fine-print" id="rock-photo-limit">沿用源数据标签；照片外观不能单独确认矿物含量或物性。</p></div></article>
+      </section>
+      <article class="data-section"><div class="data-layout"><div><p>图像取自公开岩屑数据仓库的井 2，保留源照片、井深和标签；没有新增矿物鉴定或颗粒含量标注。<a class="source-ref" href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">[3]</a></p><p>42 张用于训练集内的分组验证与参考比较；另外 24 张留到参数锁定后测试。相邻照片按 20 m 井段分组，避免同一组同时出现在训练集和测试集。下一页会展示具体怎么分。</p><p class="fine-print">井深用于分组和记录，不作为分类特征。20 m 是建模分组宽度；单井数据不能证明跨井效果。<a class="source-ref" href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">[5]</a></p></div><div><div id="split-bars" class="split-bars"></div><p class="fine-print">颜色区分训练集与测试集；每类样本数量不同。</p></div></div></article>
       <details class="data-extension"><summary>查看现场应用还需要准备的数据</summary><div class="preparation-table-wrap"><table class="preparation-table"><caption>正式应用的数据准备要求与本例实际条件</caption><thead><tr><th scope="col">准备项</th><th scope="col">现场或建模要求</th><th scope="col">本例实际提供</th></tr></thead><tbody>
         <tr><th scope="row">图像与成像条件</th><td>统一照明、背景、倍率和干湿状态；保留比例尺与原图，记录预处理。</td><td>66 张公开 RGB 原始 JPEG；原字节与校验值保留。未获得完整的成像条件及标定信息。</td></tr>
         <tr><th scope="row">标签与标注规则</th><td>由专业人员按统一岩性词表复核；混合样品和不确定样品单列规则。</td><td>沿用源 CSV 的三类单标签；没有新增矿物鉴定，也没有颗粒分割或含量标注。</td></tr>
         <tr><th scope="row">样品与深度记录</th><td>井号、取样时间或井段、迟到校正状态、样品处理及异常记录可追溯。</td><td>井号、源记录井深、文件路径和逐图 SHA-256；未补造现场迟到或取样状态记录。</td></tr>
         <tr><th scope="row">训练、验证与测试划分</th><td>同源、相邻或同批样本成组划分；另设独立井验证泛化。</td><td>按20 m井段成组：42张训练图分12组，24张测试图分5组。训练集内部留一组交叉验证，锁定超参数后测试，均来自井2。</td></tr>
       </tbody></table></div></details>
+      </div>
     </section>
 
     <section class="background-chapter" data-background-topic="difficulty" aria-labelledby="bg-difficulty-title">
-      <div class="chapter-heading"><span class="chapter-number">04</span><div><p class="eyebrow">边界 / 带着问题往下看</p><h2 id="bg-difficulty-title">看到结果时，还要追问什么？</h2><p>观察样品、成像和数据来源，才能知道候选是否值得相信。</p></div></div>
-      <div class="difficulty-grid" aria-label="从地质样品到模型推广的四类难点">
-        <details><summary><span>01 / 样品</span><b>这一盘岩屑来自哪里？</b></summary><div><p>迟到对应不准会放错井段；井壁坍落碎块也可能混入。现场需要核对取样与深度记录。</p></div></details>
-        <details><summary><span>02 / 成像</span><b>外观变化来自岩性，还是拍摄？</b></summary><div><p>光照和干湿状态会改变照片。本例示范可以调整亮度和对比度，观察候选是否变化。</p></div></details>
-        <details><summary><span>03 / 标签</span><b>一个标签能描述整盘混样吗？</b></summary><div><p>本例每张照片只有一个原标签，无法给出混合岩屑的组分比例；现场需要更多证据。</p></div></details>
-        <details><summary><span>04 / 推广</span><b>一口井上的表现能用于新井吗？</b></summary><div><p>本例只有一口井。即使分组测试表现好，也需要独立井数据检验。</p></div></details>
+      <div class="chapter-heading"><div class="chapter-index"><span class="chapter-number">04</span><span class="chapter-en">DIFFICULTY</span></div><div><h2 id="bg-difficulty-title">技术难度与参考方向</h2></div></div>
+      <div class="chapter-body">
+        <div class="difficulty-summary"><span class="difficulty-badge"><i aria-hidden="true"></i>难度 <b>中</b></span><p>公开照片易获取，分类任务边界清晰；难点在标签核对、井段分组，以及让识别依据便于复核。</p></div>
+        <div class="difficulty-meter" role="img" aria-label="课程实现难度为中，低中高三档中的第二档"><span class="is-filled"></span><span class="is-filled"></span><span></span></div>
+        <p class="difficulty-scale">按课程实现条件分三档：<strong>低</strong> = 数据和标签可直接使用、任务边界清晰；<strong>中</strong> = 需要整理标签、设计分组验证并完成复核交互；<strong>高</strong> = 缺少可靠标注，或需解决混样定量与跨井应用。</p>
+        <p class="difficulty-context">本课按“中”组织。走向现场应用，还需要规范采样成像、专业人员复核，以及独立井验证。</p>
+        <div class="method-references"><h3>可借鉴的通用技术</h3><div class="method-links"><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">kNN 相似检索 <span aria-hidden="true">↗</span></a><a href="https://doi.org/10.3390/jimaging9070126" target="_blank" rel="noopener noreferrer">CNN 图像分类 <span aria-hidden="true">↗</span></a><a href="https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf" target="_blank" rel="noopener noreferrer">颗粒分割 <span aria-hidden="true">↗</span></a><a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">分组验证 <span aria-hidden="true">↗</span></a></div><p class="fine-print">本课使用 kNN 与分组验证。CNN 可用于学习图像特征；研究混样组分时，还需准备颗粒级标注并验证分割与分类结果。</p></div>
+        <p class="related-disciplines">交叉环节：<strong>钻井</strong><span>取样与井深</span><i aria-hidden="true">·</i><strong>录井</strong><span>观察与描述</span><i aria-hidden="true">·</i><strong>测井</strong><span>综合核对</span></p>
       </div>
     </section>
 
@@ -72,5 +84,8 @@
       <li><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">scikit-learn · Nearest Neighbors</a>：近邻分类的一般原理。</li>
       <li><a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">scikit-learn · Cross-validation</a>：相关样本分组与独立验证。</li>
       <li><a href="https://glossary.slb.com/terms/c/cavings" target="_blank" rel="noopener noreferrer">SLB Energy Glossary · Cavings</a>：井壁脱落碎块与钻头切削岩屑的区别。</li>
+      <li><a href="https://doi.org/10.3390/jimaging9070126" target="_blank" rel="noopener noreferrer">Tolstaya et al. (2023) · Fast Reservoir Characterization…</a>：CNN、图像质量检查与噪声标签处理。</li>
+      <li><a href="https://doi.org/10.1002/dug2.70047" target="_blank" rel="noopener noreferrer">Li et al. (2025) · Real-time lithology identification…</a>：取样成像流程与集成学习；煤矿井下试验，应用场景与本课油气井照片不同。</li>
+      <li><a href="https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf" target="_blank" rel="noopener noreferrer">Zeghdoud et al. · SPWLA 2026 摘要集 · Automated Lithology Recognition in Drill Cuttings…</a>：单颗粒分割、分类与视觉 Transformer；依据为会议摘要。</li>
     </ol><p class="fine-print">现场过程图与迟到图为机理示意；本例样品来自公开数据，文献图例来自独立研究，作者、图号与许可分别标注。</p></details>
-    <div class="part-next"><span>接下来，跟着刚才选中的照片，看看候选是怎样产生的。</span><button type="button" data-go="workflow" class="primary-button">跟随样品进入案例流程 →</button></div>
+    <div class="part-next"><span>带着“示例数据”中选中的照片，进入特征提取、近邻比较和投票的过程。</span><button type="button" data-go="workflow" class="primary-button">跟随样品进入案例流程 →</button></div>

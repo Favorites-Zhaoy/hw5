@@ -1,4 +1,4 @@
-背景资料核验：2026-10-24；论文图例复核与更新：2026-10-28
+背景资料核验：2026-10-24；论文图例复核与更新：2026-10-28；技术前沿与四部分背景核验：2026-10-30
 
 [1] 真实 RGB 岩屑图像、岩性与井深标签
 nature9420/-ResNet-HMM-Lithology
@@ -56,8 +56,7 @@ https://glossary.slb.com/terms/c/cuttings
 用于说明岩屑由钻头破岩产生，以及组成、大小、形态、颜色与纹理等观察维度。
 
 专业背景组织参考
-本项目 firstbreak-pick-case/case.json：当前做法与问题 / AI 能做什么 / 需要准备什么 / 难度与参考方向。
-只参照其讲解结构，M1 专业内容与适用范围单独编写，不沿用初至波场景的参数或效果数字。
+本版按用户要求改为：真实背景 / 技术前沿 / 示例数据 / 技术难度与参考方向。第四部分参照用户所给截图呈现分档、难度条、参考技术与交叉环节；评级仅指课程实现条件，不套用截图中其他主题的方法或工期。
 
 [11] 不同岩屑、同类差异与污染：真实岩屑图像
 Tolstaya E, Shakirov A, Mezghani M, Safonov S (2023).
@@ -92,3 +91,19 @@ https://scikit-learn.org/stable/common_pitfalls.html
 [17] 方法定位：基于实例的k近邻监督分类
 https://scikit-learn.org/stable/modules/neighbors.html
 使用手工视觉特征与等权投票，不宣称CNN或其他深度网络训练。
+
+
+[18] 规范采样成像与集成识别
+Li K, Ren T, Yao N, et al. (2025).
+Real-time lithology identification while drilling based on drill cuttings image analysis with ensemble learning.
+Deep Underground Science and Engineering. First published 17 July 2025.
+https://doi.org/10.1002/dug2.70047
+依据出版方摘要，研究整合采样、输送、成像和集成识别，并在煤矿井下试验。该场景、样本和结果与本课油气井RGB数据不同；本课没有实现或复现实验系统，不套用论文性能数字。
+
+[19] 单颗岩屑分割、分类及视觉Transformer表征（会议摘要）
+Zeghdoud R, Figliuzzi B, Peyret A-P (2026).
+Automated Lithology Recognition in Drill Cuttings: From Global Context to Instance-Level Classification Using Vision Transformers.
+SPWLA 67th Annual Logging Symposium, paper SPWLA-2026-0085.
+摘要集：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf
+最终议程：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/Technical%20Program/Final-2026-SPWLA-Technical-Program-with-Times-and-Session-Names.pdf
+作为前沿方向介绍，明确依据为会议摘要。没有采用摘要的性能数字或数据，本课没有颗粒级标注，不宣称已实现颗粒含量估计。

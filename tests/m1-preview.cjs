@@ -79,7 +79,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.7.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.8.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -315,7 +315,15 @@ test('standalone and embedded lessons return to the beginning when asked by thei
   embedded.message({source:embedded.ctx.parent,data:{__m1ScrollToTop:true}});assert.equal(calls,1);
 });
 test('the rock lesson shows the case data rather than unrelated paper samples',async()=>{
-  assert.match(entryHTML,/<details class="geology-extension" open>/);
+  const background=entryHTML.split('id="panel-background"')[1].split('id="panel-workflow"')[0];
+  const chapters=background.split('<section class="background-chapter"').slice(1);
+  assert.equal(chapters.length,4);
+  assert.deepEqual(chapters.map(chapter=>/<h2[^>]*>([^<]+)<\/h2>/.exec(chapter)[1]),['真实背景','技术前沿','示例数据','技术难度与参考方向']);
+  assert.ok(chapters[2].includes('id="reservoir-diagram"'));
+  assert.equal(chapters[0].includes('id="reservoir-diagram"'),false);
+  assert.match(chapters[3],/aria-label="课程实现难度为中/);
+  const pkg=JSON.parse(read('m1-cuttings-case/case.json'));
+  assert.deepEqual(pkg.tabs.background.sections.map(s=>s.title),['真实背景','技术前沿','示例数据','技术难度与参考方向']);
   const rt=appRuntime();await settle();
   for(const rock of ['sandstone','shale','dolomite']){
     rt.buttons.find(b=>b.dataset.rock===rock).listeners.click();
@@ -338,7 +346,7 @@ test('the rock lesson shows the case data rather than unrelated paper samples',a
 test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
   const tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
-  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.7.0&'));assert.ok(bg.src.endsWith('section=background'));
+  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.8.0&'));assert.ok(bg.src.endsWith('section=background'));
   const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});
   click('flow');const flow=rt.document.getElementById('case-flow-root').children[0];assert.ok(flow.src.endsWith('section=workflow'));
   click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.endsWith('section=demo'));
