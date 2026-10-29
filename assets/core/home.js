@@ -24,15 +24,19 @@
       '<div class="atlas-cover-shade"></div><div class="atlas-cover-grid" aria-hidden="true"></div>' +
       '<div class="atlas-cover-content atlas-width"><div class="atlas-cover-kicker"><span class="atlas-live-dot"></span> PETRO × AI ATLAS <span class="atlas-kicker-line"></span> 从现场出发</div>' +
       '<h1 id="cover-title">石油勘探开发的<br><span>智能化可能性地图</span></h1>' +
-      '<p class="atlas-cover-desc">让专业知识与智能方法相遇。<br>沿着一条作业链，发现问题、理解方法，亲手运行一个案例。</p>' +
-      '<div class="atlas-cover-actions"><button class="atlas-btn atlas-btn-red" data-home-jump="stage-map">探索场景地图 ' + arrow + '</button>' +
-      '<a class="atlas-cover-secondary" href="#/cases">打开案例库 <span>↗</span></a></div>' +
+      '<p class="atlas-cover-desc">从石油现场的问题出发，理解专业背景与数据。<br>跟着案例看方法，再动手检查结果。</p>' +
+      '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">从岩屑案例开始 ' + arrow + '</a>' +
+      '<button class="atlas-cover-secondary atlas-cover-map" data-home-jump="stage-map">浏览场景地图 <span>↓</span></button></div>' +
       '<div class="atlas-cover-index"><span>EXPLORATION</span><i></i><span>INTELLIGENCE</span></div></div>' +
       '<div class="atlas-cover-bottom atlas-width"><span>从地质勘察，一直走到加工。</span><button data-home-jump="stage-map" aria-label="向下浏览场景地图">向下探索 <span>↓</span></button></div></section>' +
       '<div class="atlas-stats atlas-width" aria-label="网站收录概况">' +
       [[A.stages.length, '作业环节', 'CONNECTED STAGES'], [A.allScenes.length, '候选场景', 'POSSIBILITIES'], [Object.keys(A.methods).length, '智能方法类别', 'AI APPROACHES'], [countReady(), '可运行案例', 'HANDS-ON CASES']].map(function (it) {
         return '<div class="atlas-stat"><strong>' + it[0] + '</strong><div><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>';
       }).join('') + '</div>';
+  }
+  function firstLesson() {
+    return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，先理解它从哪里来，再看照片怎样变成候选，最后检查机器判断的依据。</p><a href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
+      '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>跟随样品</b><small>照片如何参与计算？</small></li><li><span>03</span><b>亲手复核</b><small>候选有怎样的依据？</small></li></ol></section>';
   }
   function sceneLeaf(sc, st) {
     var ready = C.bySceneAll(sc.id).length;
@@ -48,7 +52,7 @@
         '<a class="atlas-stage-junction" href="#/stage/' + esc(st.id) + '" data-river-node="' + esc(st.id) + '" aria-label="探索第 ' + st.idx + ' 阶段：' + esc(st.name) + '"><span class="atlas-node-orbit" aria-hidden="true"></span><b>' + pad(st.idx) + '</b></a></div>';
     }).join('');
     return '<section class="atlas-section atlas-map-section" id="stage-map"><div class="atlas-width">' +
-      sectionHead('01', 'BY STAGE · FOLLOW THE CURRENT', '让智能，<em>沿作业链流动。</em>', '顺流探索 ' + A.stages.length + ' 个作业环节。主河道连接专业现场，每一条支流，通向一个可以被智能方法改进的具体问题。') +
+      sectionHead('01', 'BY STAGE · FOLLOW THE CURRENT', '从作业链，<em>找到具体问题。</em>', '沿着 ' + A.stages.length + ' 个作业环节浏览场景；标有“有案例”的节点可以继续学习和操作。') +
       '<div class="atlas-map-toolbar"><div class="atlas-segment" role="group" aria-label="地图场景范围"><button class="is-active" data-home-scope="all" aria-pressed="true">全部场景 <span>' + A.allScenes.length + '</span></button><button data-home-scope="ready" aria-pressed="false">已有案例 <span>' + C.stats().coveredScenes + '</span></button></div>' +
       '<label class="atlas-search"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6"/></svg><input id="atlas-map-search" type="search" placeholder="搜索环节、场景或方法" aria-label="搜索场景地图"></label></div>' +
       '<div class="atlas-map-caption"><span><i></i> THE CURRENT / 石油勘探开发</span><span id="atlas-map-count" role="status">' + A.allScenes.length + ' 个场景</span></div>' +
@@ -101,8 +105,9 @@
   }
   function matrixNote() { return matrixMode === 'coverage' ? '数字为已覆盖场景 / 候选场景；颜色越深，覆盖比例越高。点击格子进入筛选结果。' : '数字为关联场景数量；一个场景可对应多种方法。点击格子进入筛选结果。'; }
   function learning() {
-    var demo = C.list().filter(function (c) { return c.tabs && c.tabs.demo && typeof c.tabs.demo.mount === 'function' && A.index.byScene[c.sceneId]; })[0];
-    var target = demo ? '#/scene/' + demo.sceneId + '?case=' + encodeURIComponent(demo.id) + '&tab=demo' : '#/cases';
+    var available = C.list().filter(function (c) { return c.tabs && c.tabs.demo && typeof c.tabs.demo.mount === 'function' && A.index.byScene[c.sceneId]; });
+    var demo = available.filter(function (c) { return c.id === 'm1-cuttings-preview-local'; })[0] || available[0];
+    var target = demo ? '#/scene/' + demo.sceneId + '?case=' + encodeURIComponent(demo.id) + '&tab=bg' : '#/cases';
     return '<section class="atlas-section atlas-learning-section" id="start-learning"><div class="atlas-width">' +
       '<div class="atlas-learning-top"><div>' + sectionHead('04', 'FROM KNOWING TO DOING', '不止看懂，<br><em>还要亲手试一试。</em>', '每个完整案例，都沿着同一条学习路径展开。') + '<a class="atlas-btn atlas-btn-dark" href="' + target + '">' + (demo ? '运行一个案例' : '浏览案例库') + ' ' + arrow + '</a></div>' +
       '<div class="atlas-learning-path"><div><span>01 / UNDERSTAND</span><h3>读懂专业背景</h3><p>先认识现场的对象、机理与难题。让图解把陌生的石油概念变得具体。</p><svg viewBox="0 0 240 60" fill="none" aria-hidden="true"><path d="M0 20c40-20 70 20 110 0s80 15 130-5M0 36c40-20 70 20 110 0s80 15 130-5M0 52c40-20 70 20 110 0s80 15 130-5" stroke="currentColor" stroke-width="1.5"/></svg></div>' +
@@ -115,7 +120,7 @@
   }
   function render(ctx) {
     A = ctx.atlas; C = ctx.cases; K = ctx.K;
-    return '<main class="atlas-home">' + cover() + stageMap() + methods() + matrix() + learning() + '</main>';
+    return '<main class="atlas-home">' + cover() + firstLesson() + stageMap() + methods() + matrix() + learning() + '</main>';
   }
   function bind(root) {
     var scope = 'all';

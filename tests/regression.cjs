@@ -302,6 +302,8 @@ test('homepage contains all stage branches, valid scene links, and local cover a
   for(const match of html.matchAll(/href="#\/scene\/([^"?]+)(?:[^"]*)"/g)) assert.ok(rt.ctx.ATLAS.index.byScene[match[1]],match[1]);
   assert.match(html, /data-home-matrix="coverage"/);
   assert.match(html, /data-home-scope="ready"/);
+  assert.ok(html.indexOf('id="first-lesson-title"') < html.indexOf('id="stage-map"'));
+  assert.match(html, /href="#\/scene\/m1\?case=m1-cuttings-preview-local&amp;tab=bg"/);
   assert.doesNotMatch(html, /DATA LAYER|SHELL|atlas@example.com/);
 });
 

@@ -1,4 +1,4 @@
-核验日期：2026-10-24
+背景资料核验：2026-10-24；论文图例复核与更新：2026-10-28
 
 [1] 真实 RGB 岩屑图像、岩性与井深标签
 nature9420/-ResNet-HMM-Lithology
@@ -59,39 +59,24 @@ https://glossary.slb.com/terms/c/cuttings
 本项目 firstbreak-pick-case/case.json：当前做法与问题 / AI 能做什么 / 需要准备什么 / 难度与参考方向。
 只参照其讲解结构，M1 专业内容与适用范围单独编写，不沿用初至波场景的参数或效果数字。
 
-[11] 颜色与表面状态：真实岩屑照片
+[11] 不同岩屑、同类差异与污染：真实岩屑图像
 Tolstaya E, Shakirov A, Mezghani M, Safonov S (2023).
 Fast Reservoir Characterization with AI-Based Lithology Prediction Using Drill Cuttings Images and Noisy Labels.
 Journal of Imaging 9(7):126. DOI: 10.3390/jimaging9070126
 https://doi.org/10.3390/jimaging9070126
-使用原图4的 Dolomite 子图；原标签保留，不推断该图未说明的干湿状态。
+图4显示不同岩屑类型；图6显示不同深度和地层的粉砂岩岩屑外观差异；图8显示泥浆污染照片。Sand和Dolomite不直接等同本例细砂岩和灰质白云岩，图8不是清洗前后配对。
+原研究使用CNN，本案例使用手工特征与kNN，两者数据和结果不可混同。
 
-[12] 粒度与颗粒特征：真实粗粒/细粒砂岩薄片对比
-Zhang Y, Zhang Y, Huang J (2022).
-Experimental study on capillary water absorption of sandstones from different grotto heritage sites in China.
-Heritage Science 10:25. DOI: 10.1186/s40494-022-00656-y
-https://doi.org/10.1186/s40494-022-00656-y
-使用图4a的YG粗粒砂岩与图4b的DZ细粒砂岩。原标尺分别为800与300微米；未改成相同标尺或相同倍率。
-此文研究石窟砂岩，在本页仅解释颗粒尺度，不将其当作本井样品。
-
-[13] 组分、基质与胶结：真实砂岩显微照片
-Adesola GO, Gwavava O, Liu K (2023).
-Petrographic Analysis of the Sandstones and Mudstones in Alice, Eastern Cape Province, South Africa: Implications for Groundwater Potential.
-Proceedings 87(1):39 (IECG 2022). DOI: 10.3390/iecg2022-14818
-https://doi.org/10.3390/iecg2022-14818
-使用完整图9，保留作者黄色箭头及2000微米标尺。按原图注说明方解石胶结与交代石英颗粒、黏土基质，不自行按明暗重标矿物。
-
-[14] 结构与特殊现象：真实岩心与薄片
-Tang Q, Zhou L, Chen L, Tan X, Wang G (2021).
-Development Characteristics of Shale Lithofacies in the Longmaxi Formation and their Main Controlling Factors in the Changning Area, South Sichuan Basin, SW China.
-Frontiers in Earth Science 9:775657. DOI: 10.3389/feart.2021.775657
-https://doi.org/10.3389/feart.2021.775657
-使用完整图3：A水平纹层，B笔石，C石英纹层。来自同一井不同深度，未说成同一岩块的同步成像；未将纹层或化石统称为裂缝。
+[12] 岩屑碎块尺度：真实油气井岩屑薄片扫描
+Caja MÁ, Castillo JN, Santos CA, et al. (2023).
+Digital Rock Physics in Cuttings Using High-Resolution Thin Section Scan Images.
+Minerals 13(9):1140. DOI: 10.3390/min13091140
+https://doi.org/10.3390/min13091140
+使用完整图9的A、B两幅真实油气井岩屑薄片扫描，保留12 mm标尺；论文说明制片前未筛分。不能将岩屑碎块大小直接当作原岩沉积粒度。该薄片与本案例RGB照片成像方式不同。
 
 文献实例图的使用与处理
-上述四篇的图像按 CC BY 4.0 引用，作者、出版出处与许可链接在页面及 FIGURE-SOURCES.json 中提供。
-原始下载图保留在作者工作区归档；展示图仅做记录在案的子图裁取、等比缩小和WebP格式转换，未改色、修补、重绘或使用生成模型重构。
-这些外部论文图不进入66张岩屑图像的参考库、测试集或模型评价。
+以上两篇论文图像均按 CC BY 4.0 引用，作者、图号、DOI、许可及文件校验值记录于 FIGURE-SOURCES.json。完整图像等比缩小并转为WebP，保留原图文字与标尺；外部论文图不进入本例66张图像的训练、验证或测试。
+原先的石窟砂岩、地下水露头薄片和页岩岩心图与岩屑识别的任务距离较远，已从课程图例中移出；核对与取舍记录见项目 docs/论文图例相关性核查.md。旧素材文件未删除。
 
 [15] Uniform LBP（本版实际实现）
 Ojala, Pietikainen & Maenpaa (2002). Multiresolution gray-scale and rotation invariant texture classification with local binary patterns. IEEE TPAMI 24(7):971–987.

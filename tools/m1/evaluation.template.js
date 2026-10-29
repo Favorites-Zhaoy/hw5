@@ -11,6 +11,7 @@
   function syncEvaluationControls(){
     var frozen=evaluationStage==='test',description=frozen?'阶段 2 · 锁定测试：k='+lockedConfig.k+'，颜色权重='+lockedConfig.colorWeight.toFixed(1)+'；24 张测试图仅按此配置评价。':'阶段 1 · 参数探索：仅在42张训练图的12个井段组内部执行 Leave-One-Group-Out 交叉验证；24张测试图暂不开放。';
     ['evaluation-status','flow-evaluation-status'].forEach(function(id){$(id).textContent=description;});
+    $('flow-status').textContent=frozen?'当前阶段：参数已锁定，展示测试样品；图中始终使用原始成像条件。':'当前阶段：在训练集分组验证中探索参数；锁定后开放测试图。';
     ['k-select','color-weight','flow-k-select','flow-color-weight','reset-parameters','finalize-test','flow-finalize-test'].forEach(function(id){$(id).disabled=!ready||frozen;});
     $('evaluation-sample-badge').textContent=frozen?'测试集 / 参数已锁定':'训练集 / 折外查询';
     $('evaluation-title').textContent=frozen?'锁定参数测试与误差分析':'分组交叉验证与参数敏感性分析';

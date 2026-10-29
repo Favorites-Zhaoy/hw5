@@ -77,7 +77,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.5.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.6.1');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -111,9 +111,10 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
   assert.equal(/<link\b[^>]*\brel="stylesheet"/.test(entryHTML),false);
   assert.equal(/<img\b[^>]*\bsrc="(?!data:)/.test(markup),false);
   assert.equal(/\.\.\/assets\/m1-dioramas/.test(entryHTML),false);
-  assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,3);
+  assert.equal((entryHTML.match(/class="art-sheet"/g)||[]).length,2);
   const figureSources=JSON.parse(read('m1-cuttings-case/FIGURE-SOURCES.json'));
-  assert.equal(figureSources.assets.length,5);
+  assert.equal(figureSources.assets.length,4);
+  assert.deepEqual(figureSources.assets.map(f=>[f.paper,f.figure]),[['tolstaya','4'],['tolstaya','6'],['tolstaya','8'],['caja','9']]);
   for(const figure of figureSources.assets){const bytes=fs.readFileSync(path.join(site,'tools/m1/runtime/paper-figures',figure.file));assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),figure.sha256);assert.ok(entryHTML.includes('data:image/webp;base64,'+bytes.toString('base64')));assert.ok(figureSources.papers[figure.paper].doi&&figureSources.papers[figure.paper].license==='CC BY 4.0');}
   for(const name of ['dataset','model','app'])new vm.Script(inlineCode(name));
   assert.equal(inlineCode('model').trim(),read('tools/m1/runtime/model.js').trim());
@@ -125,20 +126,20 @@ function appRuntime(embedded=false,reduced=false,portalView=null){
   const html=read('m1-cuttings-case/demo/index.html'),nodes=new Map(),buttons=[];
   const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;if(e.listeners.click)e.listeners.click.call(e,{target:e});};e.closest=()=>e;return e;};
   for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
-  for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock)="([^"]+)"/g))e.dataset[a[1]]=a[2];buttons.push(e);}
+  for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock|field-step)="([^"]+)"/g))e.dataset[a[1].replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=a[2];buttons.push(e);}
   const defaults={'k-select':'5','color-weight':'50','review-threshold':'70',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
   const canvasContext=owner=>{let rgba=pixelImage(96,96);return {drawImage(image){rgba=image.rgba;},getImageData(){return {data:rgba};},createImageData(w,h){return {data:new Uint8ClampedArray(w*h*4)};},putImageData(pixels){owner.pixels=new Uint8ClampedArray(pixels.data);}};};
   nodes.get('processed-canvas').getContext=()=>canvasContext(nodes.get('processed-canvas'));
   const flow=create('svg');let pauses=0,resumes=0;flow.pauseAnimations=()=>pauses++;flow.unpauseAnimations=()=>resumes++;
-  const body=create('body'),document={body,getElementById(id){assert.ok(nodes.has(id),'Missing HTML node '+id);return nodes.get(id);},querySelectorAll(selector){if(selector==='svg.flow')return [flow];const key=/\[data-(\w+)\]/.exec(selector);return key?buttons.filter(b=>b.dataset[key[1]]!==undefined):[];},createElement(tag){const e=create(tag);if(tag==='canvas')e.getContext=()=>canvasContext(e);return e;}};
+  const body=create('body'),document={body,getElementById(id){assert.ok(nodes.has(id),'Missing HTML node '+id);return nodes.get(id);},querySelectorAll(selector){if(selector==='svg.flow')return [flow];const key=/\[data-([\w-]+)\]/.exec(selector);return key?buttons.filter(b=>b.dataset[key[1].replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]!==undefined):[];},createElement(tag){const e=create(tag);if(tag==='canvas')e.getContext=()=>canvasContext(e);return e;}};
   const byImage=new Map(data.samples.map(s=>[s.image,s]));
   class FixtureImage{set src(value){const s=byImage.get(value);assert.ok(s);let seed=parseInt(s.sha256.slice(0,8),16);this.naturalWidth=180;this.naturalHeight=180;this.rgba=pixelImage(96,96);for(let i=0;i<this.rgba.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;this.rgba[i]=seed>>>24;this.rgba[i+1]=seed>>>23&255;this.rgba[i+2]=seed>>>22&255;}queueMicrotask(()=>this.onload());}}
   const stats={predict:0,evaluate:0},wrapped={...model,predict(...args){stats.predict++;return model.predict(...args);},evaluate(...args){stats.evaluate++;return model.evaluate(...args);}};
-  const blobs=[],messages=[],media={matches:reduced,addEventListener(){}};
-  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URLSearchParams,__CASE_DEMO_VIEW__:portalView,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:'',search:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(){},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
+  const blobs=[],messages=[],windowEvents={},media={matches:reduced,addEventListener(){}};
+  const ctx={document,console,M1_DATA:data,M1Model:wrapped,Image:FixtureImage,Blob,URLSearchParams,__CASE_DEMO_VIEW__:portalView,URL:{createObjectURL(blob){blobs.push(blob);return 'blob:fixture';},revokeObjectURL(){}},location:{hash:'',search:''},history:{replaceState(a,b,hash){ctx.location.hash=hash;}},matchMedia:()=>media,addEventListener(type,fn){(windowEvents[type]||=([])).push(fn);},setTimeout(fn){fn();},ResizeObserver:class{observe(){}}};
   ctx.window=ctx;ctx.parent=embedded?{postMessage:message=>messages.push(message)}:ctx;vm.createContext(ctx);vm.runInContext(inlineCode('app'),ctx);
-  return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
+  return {ctx,nodes,buttons,stats,blobs,messages,body,motion:()=>({pauses,resumes}),message(event){(windowEvents.message||[]).forEach(fn=>fn(event));},event(id,type){nodes.get(id).listeners[type].call(nodes.get(id),{target:nodes.get(id)});}};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function flowEvent(rt,selector,dataset,type='click',value){const target={dataset,value,closest:s=>s===selector?target:null};rt.nodes.get('flow-snapshot').listeners[type]({target});}
@@ -160,6 +161,27 @@ test('distance explanations reconstruct the classifier distance with reference-o
     assert.equal(explained.rows.length,34);assert.equal(explained.distance,prediction.neighbors.find(n=>n.id==='a').distance);
     assert.ok(Math.abs(explained.distance**2-explained.colorPart-explained.otherPart)<1e-12);assert.equal(explained.rows[0].scale,.5);
   }
+});
+
+test('field stages and the visual overview connect real images with the current model output',async()=>{
+  const rt=appRuntime();await settle();
+  assert.match(rt.nodes.get('flow-snapshot').innerHTML,/该组标签留到参数锁定后再查看/);
+  const first=data.samples.find(s=>s.split==='reference');
+  assert.equal(rt.nodes.get('field-sample-image').src,first.image);
+  assert.match(rt.nodes.get('field-sample-credit').textContent,new RegExp(first.id));
+  const field=rt.buttons.find(b=>b.dataset.fieldStep==='2');field.listeners.click();
+  assert.equal(rt.nodes.get('field-story').dataset.fieldStage,'2');
+  assert.equal(field.getAttribute('aria-pressed'),'true');
+  assert.match(rt.nodes.get('field-reading-title').textContent,/观察/);
+  assert.ok(rt.nodes.get('flow-viz-1').innerHTML.includes(first.image));
+  assert.match(rt.nodes.get('flow-viz-5').innerHTML,new RegExp(rt.nodes.get('prediction').textContent));
+  rt.nodes.get('flow-k-select').value='3';rt.event('flow-k-select','change');
+  assert.match(rt.nodes.get('flow-viz-5').innerHTML,/\/3 票/);
+  const other=data.samples.filter(s=>s.split==='reference')[2];
+  rt.nodes.get('flow-sample-select').value=other.id;rt.event('flow-sample-select','change');
+  assert.ok(rt.nodes.get('flow-viz-1').innerHTML.includes(other.image));
+  assert.equal(rt.nodes.get('field-sample-image').src,other.image);
+  assert.equal(rt.nodes.get('query-id').textContent,other.id);
 });
 
 test('seven workflow stages follow one real sample and keyboard navigation reaches both ends',async()=>{
@@ -223,21 +245,36 @@ test('an arbitrary browser frame keeps the background and three-part navigation 
 test('explicit portal requests open each corresponding lesson instead of always opening the demo',async()=>{
   for(const name of ['background','workflow','demo']){const rt=appRuntime(true,false,name);await settle();assert.equal(rt.body.classList.contains('embedded'),true);assert.equal(rt.nodes.get('panel-'+name).hidden,false);assert.ok(rt.messages.some(m=>m.__m1Height===1800));}
 });
-test('the open rock lesson reuses authentic photographs with toggleable annotations and the workflow explains actual groups',async()=>{
+test('embedded lessons accept shared samples and locked parameters only from their parent',async()=>{
+  const rt=appRuntime(true,false,'workflow');await settle();
+  const validation=data.samples.filter(s=>s.split==='reference')[4];
+  const state={sampleId:validation.id,k:3,colorWeight:.7,stage:'validation',reviews:{}};
+  rt.message({source:{},data:{__m1SharedState:state}});
+  assert.notEqual(rt.nodes.get('query-id').textContent,validation.id);
+  rt.message({source:rt.ctx.parent,data:{__m1SharedState:state}});
+  assert.equal(rt.nodes.get('query-id').textContent,validation.id);
+  assert.equal(rt.nodes.get('flow-k-select').value,'3');
+  assert.equal(rt.nodes.get('flow-color-weight').value,'70');
+  const holdout=data.samples.find(s=>s.split==='test');
+  rt.message({source:rt.ctx.parent,data:{__m1SharedState:{...state,sampleId:holdout.id,stage:'test'}}});
+  assert.equal(rt.nodes.get('query-id').textContent,holdout.id);
+  assert.equal(rt.nodes.get('flow-k-select').disabled,true);
+  assert.match(rt.nodes.get('flow-status').textContent,/参数已锁定/);
+  assert.match(rt.nodes.get('flow-viz-6').innerHTML,/锁定测试/);
+});
+test('the rock lesson shows the case data rather than unrelated paper samples',async()=>{
   assert.match(entryHTML,/<details class="geology-extension" open>/);
   const rt=appRuntime();await settle();
-  for(const [rock,photo] of [['sandstone','grain-fine'],['shale','structure'],['dolomite','color']]){
+  for(const rock of ['sandstone','shale','dolomite']){
     rt.buttons.find(b=>b.dataset.rock===rock).listeners.click();
     const content=rt.nodes.get('reservoir-diagram').innerHTML;
-    assert.ok(content.includes(rt.nodes.get('paper-source-'+photo).getAttribute('src')));
-    assert.match(content,/rock-photo-pin/);assert.match(content,/doi.org/);assert.doesNotMatch(content,/<svg|<canvas/);
+    const sample=data.samples.find(s=>s.classId===rock&&s.split==='reference');
+    assert.ok(content.includes(sample.image));assert.ok(content.includes(sample.id));
+    assert.match(content,/原标签/);assert.match(content,/nature9420/);assert.doesNotMatch(content,/<svg|<canvas|rock-photo-pin/);
     assert.equal(rt.buttons.find(b=>b.dataset.rock===rock).getAttribute('aria-pressed'),'true');
   }
-  assert.match(rt.nodes.get('rock-concept-copy').textContent,/两者不直接等同/);
-  rt.event('rock-annotation-toggle','click');assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),true);
-  rt.buttons.find(b=>b.dataset.rock==='shale').listeners.click();assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),true);
-  rt.event('rock-annotation-toggle','click');assert.equal(rt.nodes.get('reservoir-diagram').classList.contains('annotations-hidden'),false);
-  assert.doesNotMatch(rt.nodes.get('lithology-cards').innerHTML,/<svg/);
+  assert.match(rt.nodes.get('rock-concept-copy').textContent,/不能单独确认/);
+  assert.match(entryHTML,/不是同一样品的清洗前后对照/);
   const workflow=rt.buttons.find(b=>b.dataset.view==='workflow');workflow.listeners.click();assert.equal((rt.nodes.get('flow-snapshot').innerHTML.match(/data-depth-group=/g)||[]).length,17);
   rt.buttons.find(b=>b.dataset.step==='1').listeners.click();
   const stage={dataset:{imageStage:'2'}};rt.nodes.get('flow-snapshot').listeners.click({target:{closest:selector=>selector==='[data-image-stage]'?stage:null}});

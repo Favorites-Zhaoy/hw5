@@ -1,18 +1,33 @@
     <div class="background-intro">
       <p class="eyebrow">01 / PROFESSIONAL BACKGROUND · 岩屑录井</p>
-      <h2>把岩屑照片放回录井现场，明确机器要辅助的任务。</h2>
-      <p>岩屑录井利用随钻井液返回地面的岩石碎屑，描述钻遇岩层的岩性与变化，为地层对比和后续解释提供实物线索。M1 聚焦其中的<strong>岩屑图像岩性辅助分类</strong>：依据已有标签给照片生成候选，供录井人员检查和复核。</p>
+      <h2>一盘岩屑，为什么值得仔细看？</h2>
+      <p>岩屑是钻头破岩后带回地面的碎块。录井人员观察它们，并把描述对应到井深，才能为认识钻遇地层提供线索。这个案例只聚焦其中一步：<strong>给岩屑照片提供可复核的岩性候选</strong>。</p>
       <div class="background-judges" aria-label="任务条件概览"><div><span>数据形态</span><b>RGB 岩屑照片</b><small>附井号、井深与原始标签</small></div><div><span>标注成本</span><b>需专业复核</b><small>统一命名与混合样品处理规则</small></div><div><span>可见收益</span><b>候选与依据可查</b><small>实际节时效果需要现场验证</small></div><div><span>技术难度</span><b>演示中 / 应用高</b><small>主要难在样品质量与跨井泛化</small></div></div>
     </div>
 
     <section class="background-chapter" data-background-topic="problem" aria-labelledby="bg-problem-title">
       <div class="chapter-heading"><span class="chapter-number">01</span><div><p class="eyebrow">PROBLEM</p><h2 id="bg-problem-title">当前做法与问题</h2><p>现场人员观察什么，为什么一张照片不足以完成整份岩性描述？</p></div></div>
       <div class="professional-copy"><p>岩屑由钻头破岩产生，经钻井液沿环空携带到振动筛。录井人员按取样制度采集、清洗和筛分，并在放大观察下识别岩石类型，记录颜色、颗粒、结构等特征；实际样品可能含多种岩性，还需估计各组分比例。岩性记录与深度对应后，才能用于井段对比。<a class="source-ref" href="https://wiki.aapg.org/index.php?title=Mudlogging%3A_drill_cuttings_analysis" target="_blank" rel="noopener noreferrer">[1]</a></p></div>
-      <div class="field-chain" aria-label="岩屑录井的现场工作链"><div><b>井底破岩</b><small>生成钻遇岩层碎屑</small></div><i aria-hidden="true">→</i><div><b>上返与取样</b><small>迟到校正 · 样品代表性</small></div><i aria-hidden="true">→</i><div class="is-focus"><b>观察与描述</b><small>M1 辅助岩性分类</small></div><i aria-hidden="true">→</i><div><b>记录与对比</b><small>按深度核对岩性变化</small></div></div>
+      <section class="field-story" id="field-story" data-field-stage="0" aria-labelledby="field-story-title">
+        <div class="story-heading"><div><span class="mini-label">从井底到记录 / 现场过程示意</span><h3 id="field-story-title">一份岩屑，经历了什么？</h3><p>点击四个环节，看看样品在哪儿产生、哪些信息被保留，又有哪些需要人工核对。</p></div><span class="story-hint">选择环节 ↓</span></div>
+        <nav class="field-stage-nav" aria-label="选择岩屑录井环节"><button type="button" data-field-step="0" aria-pressed="true"><b>01</b>井底破岩</button><button type="button" data-field-step="1" aria-pressed="false"><b>02</b>上返取样</button><button type="button" data-field-step="2" aria-pressed="false"><b>03</b>观察描述</button><button type="button" data-field-step="3" aria-pressed="false"><b>04</b>记录对比</button></nav>
+        <div class="field-story-layout">
+          <figure class="field-diagram"><svg viewBox="0 0 640 350" role="img" aria-label="井底岩屑随钻井液上返，经取样、观察后对应井深记录的概念示意">
+            <defs><marker id="field-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#ca7e43" stroke-width="1.8"/></marker></defs>
+            <rect x="0" y="103" width="640" height="247" fill="#e9dac1"/><path d="M0 145 Q150 130 300 146 T640 142 V190 Q480 206 320 189 T0 195Z" fill="#d9c2a0"/><path d="M0 222 Q160 204 320 220 T640 217 V267 Q450 281 300 260 T0 273Z" fill="#c8c3aa"/><path d="M0 310 Q180 285 360 305 T640 294 V350 H0Z" fill="#d4b591"/><path d="M0 103 H640" stroke="#9e9c80" stroke-width="2"/>
+            <g class="field-focus" data-diagram-step="0"><rect x="119" y="79" width="49" height="236" rx="18" fill="#a7b8b3"/><rect x="137" y="45" width="13" height="269" fill="#596e72"/><path d="M126 309 L161 309 L144 331Z" fill="#526b6e"/><circle cx="115" cy="325" r="4" fill="#c77840"/><circle cx="174" cy="321" r="4" fill="#c77840"/><circle cx="99" cy="310" r="3" fill="#c77840"/></g>
+            <g class="field-focus" data-diagram-step="1"><path d="M159 290 V132 Q159 88 214 88 H270" fill="none" stroke="#ca7e43" stroke-width="5" stroke-linecap="round" marker-end="url(#field-arrow)"/><path d="M274 72 L317 72 L307 96 L284 96Z" fill="#748b88"/><path d="M286 97 Q293 113 307 97" fill="none" stroke="#748b88" stroke-width="4"/></g>
+            <g class="field-focus" data-diagram-step="2"><rect x="339" y="59" width="92" height="40" rx="5" fill="#f8f0e3" stroke="#879b92" stroke-width="2"/><circle cx="366" cy="80" r="5" fill="#ad8265"/><circle cx="382" cy="76" r="4" fill="#cbb89e"/><circle cx="394" cy="86" r="6" fill="#948578"/><circle cx="412" cy="79" r="5" fill="#b6a184"/><path d="M322 88 H337" stroke="#ca7e43" stroke-width="3" marker-end="url(#field-arrow)"/></g>
+            <g class="field-focus" data-diagram-step="3"><path d="M435 88 H470" stroke="#ca7e43" stroke-width="3" marker-end="url(#field-arrow)"/><rect x="478" y="33" width="112" height="70" rx="5" fill="#fff9f0" stroke="#8b9d99" stroke-width="2"/><path d="M491 50 H560 M491 64 H576 M491 78 H553" stroke="#a8b4a4" stroke-width="3"/><rect x="558" y="73" width="17" height="11" fill="#d2a16b"/></g>
+            <text x="24" y="30">地面</text><text x="24" y="142">井下</text><text x="200" y="257">钻井液携岩屑上返</text><text x="340" y="124">岩屑样品</text><text x="479" y="124">井深与描述记录</text>
+          </svg><figcaption>过程为教学示意；图中地层与井眼不代表真实井况。</figcaption></figure>
+          <div class="field-reading"><div class="field-photo"><img id="field-sample-image" alt="公开数据中一张真实岩屑照片"><span>公开原图</span></div><div><span class="mini-label" id="field-reading-kicker">01 / 井底破岩</span><h4 id="field-reading-title">钻头接触的岩层，变成碎块。</h4><p id="field-reading-copy">岩屑来自钻遇岩层，破碎后不再保留完整岩心的空间关系。</p><div class="field-question"><b>读图时要记住</b><span id="field-reading-note">碎块大小不能直接当作原岩颗粒大小。</span></div><p class="field-photo-credit" id="field-sample-credit">正在载入公开样品信息…</p></div></div>
+        </div>
+        <p class="story-footnote">右侧为公开数据中的真实岩屑照片，与左侧示意井无现场对应关系；照片沿用源数据标签，不作为矿物定量鉴定。</p>
+      </section>
 <!-- M1_OBSERVATIONS -->
-      <details class="geology-extension" open><summary>认识本例三类岩性，以及它们与地质解释的关系</summary>
-        <div class="lithology-grid" id="lithology-cards"></div>
-        <article class="reservoir-board warm-board"><div class="reservoir-diagram" id="reservoir-diagram" aria-live="polite"></div><div class="reservoir-copy"><span class="mini-label">岩性结构 / 真实图像切换</span><div class="rock-tabs" role="group" aria-label="切换岩性真实图例"><button type="button" data-rock="sandstone" aria-pressed="true">细砂岩</button><button type="button" data-rock="shale" aria-pressed="false">页岩</button><button type="button" data-rock="dolomite" aria-pressed="false">灰质白云岩</button></div><h3 id="rock-concept-title">从真实薄片中，辨认颗粒与接触关系。</h3><p id="rock-concept-copy">复用上文论文图，对照真实图像中的观察线索。</p><button type="button" class="quiet-button rock-annotation-toggle" id="rock-annotation-toggle" aria-pressed="true">隐藏网页标注</button><div class="rock-question"><span>后续解释需要的证据</span><strong id="rock-concept-question">结构线索需要什么资料验证？</strong></div><p class="fine-print" id="rock-photo-limit">论文图用于解释观察方法，与本例公开数据的三个标签对应学习；不加入分类样本。</p></div></article>
+      <details class="geology-extension" open><summary>看看本案例中的三类真实样品</summary>
+        <article class="reservoir-board warm-board"><div class="reservoir-diagram" id="reservoir-diagram" aria-live="polite"></div><div class="reservoir-copy"><span class="mini-label">本案例的公开照片 / 原始标签</span><div class="rock-tabs" role="group" aria-label="切换本例岩屑真实样品"><button type="button" data-rock="sandstone" aria-pressed="true">细砂岩</button><button type="button" data-rock="shale" aria-pressed="false">页岩</button><button type="button" data-rock="dolomite" aria-pressed="false">灰质白云岩</button></div><h3 id="rock-concept-title">先看照片，再核对标签。</h3><p id="rock-concept-copy">切换本例三类带原始标签的岩屑照片，观察颜色和表面外观。</p><div class="rock-question"><span>还需要什么证据</span><strong id="rock-concept-question">照片之外需要什么资料验证？</strong></div><p class="fine-print" id="rock-photo-limit">沿用源数据标签；照片外观不能单独确认矿物含量或物性。</p></div></article>
       </details>
       <div class="subsection-intro"><span class="mini-label">必须先解决的深度对应问题</span><h3>样品到达地面时，钻头已经继续向下。</h3></div>
       <article class="background-grid warm-board">
@@ -59,5 +74,5 @@
       <li><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">scikit-learn · Nearest Neighbors</a>：近邻分类的一般原理。</li>
       <li><a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener noreferrer">scikit-learn · Cross-validation</a>：相关样本分组与独立验证。</li>
       <li><a href="https://glossary.slb.com/terms/c/cavings" target="_blank" rel="noopener noreferrer">SLB Energy Glossary · Cavings</a>：井壁脱落碎块与钻头切削岩屑的区别。</li>
-    </ol><p class="fine-print">本页结构参照老师的 firstbreak-pick-case；内容围绕 M1 重新编写。现场设备插画与迟到图为机理示意；岩性图例来自公开数据及已发表论文，网页编号为新增观察标注。</p></details>
+    </ol><p class="fine-print">现场过程图与迟到图为机理示意；本例样品来自公开数据，文献图例来自独立研究，作者、图号与许可分别标注。</p></details>
     <div class="part-next"><span>明确现场任务与方法边界，再拆解每一步。</span><button type="button" data-go="workflow" class="primary-button">进入案例流程 →</button></div>

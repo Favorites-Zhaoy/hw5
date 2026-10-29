@@ -19,11 +19,25 @@
   function flowFeatureName(i) {
     return i<12?['R','G','B'][Math.floor(i/4)]+' 桶 '+(i%4):i<22?'Uniform LBP bin '+(i-12):i<30?'梯度方向 '+(i-22):['平均亮度','灰度对比度','边缘比例','清晰度'][i-30];
   }
+  function renderFlowOverview(){
+    $('flow-viz-0').innerHTML='<span class="overview-pools"><span><b>42</b>训练</span><span><b>24</b>测试</span></span><em>17 个井段组</em>';
+    if(!ready||!currentId)return;
+    var sample=byId[currentId],features=computed[currentId].features,query=queryContext();
+    var result=MODEL.predict(features,query.samples,config(),query.scaler),nearest=result.neighbors[0];
+    $('flow-viz-1').innerHTML='<span class="overview-crop"><img src="'+sample.image+'" alt=""><i></i></span><em>中心 72% → 96×96</em>';
+    $('flow-viz-2').innerHTML='<span class="overview-bars">'+features.vector.slice(0,12).map(function(v,i){return '<i style="height:'+Math.max(3,v*100)+'%;background:'+['#bf7769','#83a17d','#7d9fb6'][Math.floor(i/4)]+'" title="'+flowFeatureName(i)+'：'+pct(v)+'"></i>';}).join('')+'</span><em>RGB · 12 维</em>';
+    $('flow-viz-3').innerHTML='<span class="overview-bars texture-bars">'+features.vector.slice(12,22).map(function(v,i){return '<i style="height:'+Math.max(3,v*100)+'%" title="LBP '+i+'：'+pct(v)+'"></i>';}).join('')+'</span><em>LBP 10 + 其他 12</em>';
+    $('flow-viz-4').innerHTML='<span class="overview-nearest"><img src="'+byId[nearest.id].image+'" alt=""><span><b>最近参考图</b><br>'+esc(nearest.id)+'<br>距离 '+nearest.distance.toFixed(3)+'</span></span><em>'+esc(className(nearest.classId))+' · 原标签</em>';
+    $('flow-viz-5').innerHTML='<span class="overview-votes">'+classes.map(function(c){var count=result.votes[c.id]||0;return '<span><b>'+esc(c.name)+'</b><i><i style="width:'+(count/result.k*100)+'%;background:'+c.color+'"></i></i><small>'+count+'</small></span>';}).join('')+'</span><em>候选：'+esc(className(result.classId))+' · '+result.votes[result.classId]+'/'+result.k+' 票</em>';
+    $('flow-viz-6').innerHTML='<span class="overview-score"><b>'+(evaluation?pct(evaluation.accuracy):'—')+'</b><small>与原标签一致</small></span><em>'+(evaluationStage==='test'?'锁定测试':'训练集交叉验证')+'</em>';
+  }
   function renderWorkflow() {
     var d=flowText[workflowStep];$('flow-kicker').textContent='STEP 0'+(workflowStep+1)+' / '+d.role;
     $('flow-title').textContent=d.name;$('flow-subtitle').textContent=d.title;$('flow-input').textContent=d.input;$('flow-copy').textContent=d.process;
     $('flow-why').textContent=d.why;$('flow-output').textContent=d.output;$('flow-trap').textContent=d.trap;$('flow-count').textContent=(workflowStep+1)+' / '+flowText.length;
+    $('flow-prev').disabled=workflowStep===0;$('flow-next').disabled=workflowStep===flowText.length-1;
     Array.prototype.forEach.call(document.querySelectorAll('[data-step]'),function(button){var n=Number(button.dataset.step),active=n===workflowStep;button.classList.toggle('is-selected',active);button.classList.toggle('is-complete',n<workflowStep);button.setAttribute('aria-pressed',String(active));button.setAttribute('aria-current',active?'step':'false');});
+    renderFlowOverview();
     var snapshot=$('flow-snapshot');
     if(ready){
       var activeSample=byId[currentId];$('flow-sample-image').src=activeSample.image;$('flow-sample-select').value=currentId;
@@ -35,7 +49,7 @@
       var groupNames=Object.keys(grouped).sort(function(a,b){return Number(a.split('-').pop())-Number(b.split('-').pop());});
       if(!selectedDepthGroup)selectedDepthGroup=groupNames.filter(function(name){return grouped[name][0].split==='test';})[0];
       var selected=grouped[selectedDepthGroup],start=Number(selectedDepthGroup.split('-').pop());
-      snapshot.innerHTML='<h4>标签留在训练参考集，测试标签留待评价。</h4><div class="technical-pools"><div><b>42 张</b><span>训练集：照片 + 已有标签<br>12个组内部交叉验证与尺度拟合</span></div><div><b>24 张</b><span>测试集：5个组留出<br>锁定参数后才开放查询与评价</span></div></div><h5>点击真实井段，检查分组去向</h5><div class="depth-group-picker">'+groupNames.map(function(name){var samples=grouped[name],begin=Number(name.split('-').pop());return '<button type="button" data-depth-group="'+name+'" class="'+samples[0].split+'" aria-pressed="'+String(name===selectedDepthGroup)+'"><b>'+begin+'—'+(begin+19)+' m</b><small>'+samples.length+' 张 / '+(samples[0].split==='test'?'测试':'训练')+'</small></button>';}).join('')+'</div><div class="group-readout"><b>'+start+'—'+(start+19)+' m · '+(selected[0].split==='test'?'整组留作测试':'整组进入训练参考集')+'</b><p>'+classes.map(function(c){return c.name+' '+selected.filter(function(s){return s.classId===c.id;}).length+' 张';}).join(' / ')+'</p></div><p class="fine-print">17 组中 5 组用于测试。同组不跨集合；蓝灰表示训练，橙色表示测试，不表示岩性。</p>';return;
+      snapshot.innerHTML='<h4>标签留在训练参考集，测试标签留待评价。</h4><div class="technical-pools"><div><b>42 张</b><span>训练集：照片 + 已有标签<br>12个组内部交叉验证与尺度拟合</span></div><div><b>24 张</b><span>测试集：5个组留出<br>锁定参数后才开放查询与评价</span></div></div><h5>点击真实井段，检查分组去向</h5><div class="depth-group-picker">'+groupNames.map(function(name){var samples=grouped[name],begin=Number(name.split('-').pop());return '<button type="button" data-depth-group="'+name+'" class="'+samples[0].split+'" aria-pressed="'+String(name===selectedDepthGroup)+'"><b>'+begin+'—'+(begin+19)+' m</b><small>'+samples.length+' 张 / '+(samples[0].split==='test'?'测试':'训练')+'</small></button>';}).join('')+'</div><div class="group-readout"><b>'+start+'—'+(start+19)+' m · '+(selected[0].split==='test'?'整组留作测试':'整组进入训练参考集')+'</b><p>'+(selected[0].split==='test'&&evaluationStage!=='test'?'该组标签留到参数锁定后再查看。':classes.map(function(c){return c.name+' '+selected.filter(function(s){return s.classId===c.id;}).length+' 张';}).join(' / '))+'</p></div><p class="fine-print">17 组中 5 组用于测试。同组不跨集合；蓝灰表示训练，橙色表示测试，不表示岩性。</p>';return;
     }
     if(!ready){snapshot.innerHTML='<p>正在准备实际样本与计算结果，请稍候…</p>';return;}
     var sample=byId[currentId],f=computed[currentId].features;
@@ -91,7 +105,7 @@
     if(action.dataset.flowAction==='vote-reset')flowVoteCount=0;
     if(action.dataset.flowAction==='vote-next')flowVoteCount=Math.min(result.k,flowVoteCount+1);
     if(action.dataset.flowAction==='vote-all')flowVoteCount=result.k;
-    if(action.dataset.flowAction==='review-save'){var value=$('flow-snapshot').querySelector('[data-flow-review]').value;if(ids.indexOf(value)>=0){reviews[currentId]={classId:value,time:new Date().toISOString(),modelAtReview:result.classId,k:config().k,colorWeight:config().colorWeight,exposure:0,contrast:1};renderDepth();}}
+    if(action.dataset.flowAction==='review-save'){var value=$('flow-snapshot').querySelector('[data-flow-review]').value;if(ids.indexOf(value)>=0){reviews[currentId]={classId:value,time:new Date().toISOString(),modelAtReview:result.classId,k:config().k,colorWeight:config().colorWeight,exposure:0,contrast:1};renderDepth();publishLessonState();}}
     if(action.dataset.flowAction==='export')$('export-csv').click();
     if(action.dataset.flowAction==='inspect-errors'){var wrong=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;})[0];if(wrong){selectSample(wrong.id);flowReferenceId=null;changeWorkflowStep(4,false);}else{$('flow-status').textContent='当前参数下没有与已有标签不一致的评估样本。';}return;}
     renderWorkflow();reportHeight();

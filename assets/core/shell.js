@@ -15,6 +15,7 @@
 
   var view = document.getElementById('view');
   var sectionMounts = Object.create(null); // Keep lesson state when switching tabs; clean up on route changes.
+  var lessonMessageHandler = null;
   var homeHandle = null;
   var stageHandle = null;
 
@@ -494,6 +495,29 @@
     var tabsEl = document.getElementById('tabs');
     if (!tabsEl) return;
 
+    // M1's three isolated lesson frames share one current sample and locked
+    // evaluation state. Accept messages only from frames mounted in this case.
+    if (sc.id === 'm1' && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn')) {
+      var sharedLessonState = null;
+      var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
+      function lessonFrames() {
+        return lessonRoots.map(function (id) { var root = document.getElementById(id); return root && root.querySelector('iframe'); }).filter(Boolean);
+      }
+      lessonMessageHandler = function (event) {
+        var frames = lessonFrames(), sourceFrame = frames.filter(function (frame) { return frame.contentWindow === event.source; })[0];
+        if (!sourceFrame || !event.data || typeof event.data !== 'object') return;
+        if (event.data.__m1StateRequest) event.source.postMessage({ __m1SharedState: sharedLessonState }, '*');
+        if (event.data.__m1StateUpdate && typeof event.data.__m1StateUpdate === 'object') {
+          sharedLessonState = event.data.__m1StateUpdate;
+          frames.forEach(function (frame) { if (frame !== sourceFrame) frame.contentWindow.postMessage({ __m1SharedState: sharedLessonState }, '*'); });
+        }
+        var target = { background: 'bg', workflow: 'flow', demo: 'demo' }[event.data.__m1Navigate];
+        var button = target && tabsEl.querySelector('[data-tab="' + target + '"]');
+        if (button) { event.source.postMessage({ __m1NavigationAck: event.data.token }, '*'); button.click(); }
+      };
+      global.addEventListener('message', lessonMessageHandler);
+    }
+
     function activate(key, scroll) {
       [].forEach.call(tabsEl.children, function (b) {
         b.classList.toggle('on', b.dataset.tab === key);
@@ -917,6 +941,7 @@
      十、调度
      ========================================================= */
   function unmountCurrent() {
+    if (lessonMessageHandler) { global.removeEventListener('message', lessonMessageHandler); lessonMessageHandler = null; }
     if (homeHandle) { homeHandle.destroy(); homeHandle = null; }
     if (stageHandle) { stageHandle.destroy(); stageHandle = null; }
     Object.keys(sectionMounts).forEach(function (key) {
