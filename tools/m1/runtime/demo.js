@@ -9,14 +9,13 @@
   DATA.samples.forEach(function (s) { byId[s.id] = s; });
   var references = [], tests = [], scaler, evaluation, ready = false, currentId, currentResult, currentFeatures;
   var evaluationStage='validation',lockedConfig=null,foldContexts=Object.create(null),validationCache=Object.create(null);
-  var workflowStep = 0, view = 'background', motionPaused = false, revealed = false;
+  var workflowStep = 0, view = 'background', motionPaused = false;
   var cropSize = 96, exposure = 0, contrast = 1, matrixFilter = null;
   var imageStage = 0, flowVoteCount = null, voteContext = '', selectedDepthGroup = null;
   var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null,pendingRock=null;
   var className = function (id) { return byClass[id] ? byClass[id].name : '尚未复核'; };
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return lockedConfig?{k:lockedConfig.k,colorWeight:lockedConfig.colorWeight}:{ k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
-  var threshold = function () { return Number($('review-threshold').value) / 100; };
   var flowText = [{"name":"先把照片分组","role":"照片与井段","title":"让同一井段的照片留在同一组。","input":"66张岩屑照片、已有岩性标签、井号、源井深与逐图校验值。","process":"将 66 张照片按 20 m 井段分为 17 组：42 张用于训练集内的分组验证，24 张留作测试。点击右侧井段，看每组去了哪里。","why":"井段相邻照片存在相关性。同组不跨训练与测试；交叉验证时，同一组也不跨该折拟合与验证。","output":"训练集42张、测试集24张及分组元数据。训练图在当前验证折内分为拟合样本和验证样本。","trap":"本例复用公开标签，没有新增专家标注。20 m是分组宽度；历史版本已展示测试图，本版演示规范流程，不宣称独立盲测。"},{"name":"裁出统一的画面","role":"图像预处理","title":"减少外围干扰，让照片便于比较。","input":"当前查询图像；每张拟合参考图也采用相同预处理。","process":"每张图都保留中心 72% 的区域，缩放到 96 × 96 像素。右侧可以依次查看原图、裁切范围和处理结果。","why":"统一像素尺寸和计算量，减轻边框编号干扰。固定中心ROI不属于岩屑分割，也不保证完全去掉背景。","output":"96×96 RGB像素及对应灰度图；保留未修改的原始JPEG。","trap":"Resize属于尺寸调整，不是像素归一化。裁切与缩放不提供物理比例尺，也不能测量原岩粒度。"},{"name":"看看颜色怎么分布","role":"RGB 直方图","title":"统计不同强度区间的像素比例。","input":"预处理后图像的R、G、B通道，各有9,216个像素值。","process":"红、绿、蓝三个通道分别分成 4 个区间，统计每个区间的像素比例，共得到 12 个数。点击右侧柱子，看它数到了哪些像素。","why":"描述颜色分布，减弱岩屑位置变化的影响；光照、干湿和背景仍会改变分布。","output":"12维RGB直方图特征，每通道4个比例之和为1。","trap":"这里的归一化把计数变为频率，不等于后续按训练数据标准差进行特征缩放。"},{"name":"纹理与颜色合在一起","role":"LBP 与特征拼接","title":"颜色之外，还可以描述局部明暗变化。","input":"灰度图与已得到的12维RGB特征。","process":"纹理从同一张裁切后的图像另行计算：比较每个位置周围的明暗，汇总为 LBP 特征，再加上梯度和统计量。它们与颜色特征合成 34 个数。右侧可移动位置查看计算。","why":"使用有明确定义的纹理描述子，保留全部8个采样点的模式信息；补充颜色难以描述的局部图像结构。","output":"12维RGB + 10维Uniform LBP + 8维梯度方向 + 4维统计量 = 34维。","trap":"LBP模式映射具备旋转不变性；整个34维向量还含有方向特征，不宣称整体旋转不变。8维全图梯度统计不称为完整HOG。"},{"name":"找出相近的参考图","role":"特征缩放与距离","title":"把这张图与可用参考照片逐一比较。","input":"查询图像与当前拟合参考样本的34维特征。","process":"先按当前拟合参考样本的尺度调整差异，再根据颜色权重合成距离。距离越小，表示本方法下的特征越相近。点击右侧参考图可查看计算。","why":"控制不同数值尺度与组内维数的影响，避免验证或测试数据参与尺度拟合。","output":"当前可用拟合样本的距离排序及逐维数值；交叉验证时排除查询图整个井段组。","trap":"条形图展示对平方距离的数值贡献，不是类别特征重要性、SHAP值或矿物学解释。权重是人工超参数，没有进行度量学习。"},{"name":"让近邻投票","role":"k 近邻分类","title":"检索最近的样本，用它们的标签形成预测。","input":"按加权距离排序的拟合样本、已有标签及超参数k。","process":"取距离最近的 k 张参考图，每张按原标签投一票，得票最多的类别成为候选。可以在右侧逐张计票，观察候选如何产生。","why":"传统监督学习基线可直接追溯到近邻样本与距离；不涉及CNN训练、反向传播或深度特征学习。","output":"预测类别（供地质人员复核的岩性候选）、各类票数和近邻证据。","trap":"投票占比不是校准置信概率。图像相似不直接证明矿物组成、孔渗或地质成因。"},{"name":"检查一次判断与整组表现","role":"评价与复核","title":"单张候选和整组指标回答的是不同问题。","input":"训练集分组交叉验证的折外预测；锁定参数后生成的测试预测；独立人工意见。","process":"一张照片可以检查近邻与投票；要了解方法在一组照片上的表现，还需要把预测与已有标签逐一比较。进入示范后，可以继续复核，并查看分组验证与测试结果。","why":"把超参数探索、留出测试和业务复核分开，避免依据测试分数反复选择配置。","output":"分组交叉验证记录、锁定配置的测试结果、带协议与描述子版本的CSV。","trap":"测试后不再开放本页参数调整。刷新后再挑参数属于继续探索，不能视作新的独立测试。小样本单井结果不代表跨井泛化。"}];
 
   function reportHeight() {
@@ -32,7 +31,7 @@
     });
     ['background','workflow','demo'].forEach(function (name) { $('panel-' + name).hidden = name !== next; });
     if (next === 'workflow') renderWorkflow();
-    if (ready && next === 'demo') drawQuery();
+    if (ready && next === 'demo') { drawQuery(); renderDepth(); }
     try { window.history.replaceState(null, '', '#' + next); } catch (e) { /* file and sandbox history are optional */ }
     if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:'instant'});
     reportHeight();
@@ -157,13 +156,12 @@
   function voteMarkup(result) {
     return classes.map(function(c){var count=result.votes[c.id]||0;return '<div class="vote-row"><header><span>'+c.name+'</span><span>'+count+' / '+result.k+' 票</span></header><div class="vote-track"><span style="--lith-color:'+c.color+';width:'+(count/result.k*100)+'%"></span></div></div>';}).join('');
   }
-  function selectSample(id) {
+  function selectSample(id, focusRecord) {
     if (!ready || !byId[id] || !activeSamples().some(function(s){return s.id===id;})) return;
-    currentId=id;revealed=false;$('sample-select').value=id;$('original-label').hidden=true;
-    $('reveal-label').textContent='显示原数据标签';
+    currentId=id;$('sample-select').value=id;
     var image=byId[id]; selectedDepthGroup=image.group; showFieldSample(image); renderRockLesson(image.classId,image); $('query-image').src=image.image;
     $('query-id').textContent=image.id; $('query-depth').textContent='源记录井深 '+image.depth+' m · 井 '+image.well;
-    drawQuery(); renderFeatureMap(); renderDepth();
+    drawQuery(); renderDepth(focusRecord);
   }
   function drawQuery() {
     if (!ready || !currentId) return;
@@ -174,15 +172,18 @@
     $('image-statistics').innerHTML='<span>平均亮度<b>'+currentFeatures.stats.brightness.toFixed(1)+'</b></span><span>灰度对比度<b>'+currentFeatures.stats.contrast.toFixed(1)+'</b></span><span>边缘像素比例<b>'+pct(currentFeatures.stats.edges)+'</b></span><span>清晰度统计<b>'+currentFeatures.stats.sharpness.toFixed(0)+'</b></span>';
     $('feature-histogram').innerHTML=histogramMarkup(currentFeatures);
     var context=queryContext();currentResult=MODEL.predict(currentFeatures,context.samples,config(),context.scaler);
-    $('prediction').textContent=className(currentResult.classId);
+    var source=byId[currentId],different=currentResult.classId!==source.classId;
+    $('prediction').textContent=className(currentResult.classId);$('prediction').setAttribute('style',lithStyle(currentResult.classId));
+    $('original-label').textContent=className(source.classId);$('original-label').setAttribute('style',lithStyle(source.classId));
+    $('result-condition').textContent=(exposure!==0||contrast!==1)?'光照调整后':'原图条件';
+    $('comparison-note').classList.toggle('is-different',different);
+    $('comparison-note').textContent=different?'候选与原标签不同。请结合相似照片和现场资料核对。':'候选与原标签一致。仍可查看参考照片，并结合其他资料判断。';
     $('vote-summary').textContent='最高票 '+currentResult.votes[currentResult.classId]+' / '+currentResult.k+' · 投票占比 '+pct(currentResult.share);
     $('vote-bars').innerHTML=voteMarkup(currentResult);
-    var weak=currentResult.share<threshold();
-    $('result-state').classList.toggle('needs-review',weak);$('result-state').textContent=weak?'优先复核':'候选已生成';
-    $('neighbors').innerHTML=currentResult.neighbors.map(function(n,i){var s=byId[n.id],c=byClass[n.classId];return '<article class="neighbor" style="--lith-color:'+c.color+'"><span class="neighbor-rank">NEIGHBOR '+(i+1)+'</span><img src="'+s.image+'" alt="近邻 '+s.id+'，原标签 '+c.name+'"><b>'+c.name+'</b><small>'+s.id+'<br>距离 '+n.distance.toFixed(3)+'<br>原井深 '+s.depth+' m</small></article>';}).join('');
+    $('result-state').classList.toggle('needs-review',different);$('result-state').textContent=different?'与原标签不一致':'与原标签一致';
+    $('neighbors').innerHTML=currentResult.neighbors.map(function(n,i){var s=byId[n.id],c=byClass[n.classId];return '<article class="neighbor" style="--lith-color:'+c.color+'"><span class="neighbor-rank">近邻 '+(i+1)+'</span><img src="'+s.image+'" alt="近邻 '+s.id+'，原标签 '+c.name+'"><b>'+c.name+'</b><small>'+s.depth+' m<br>距离 '+n.distance.toFixed(3)+'</small></article>';}).join('');
     $('review-class').value=reviews[currentId]?reviews[currentId].classId:currentResult.classId;
     $('review-status').textContent=reviews[currentId]?'本次会话已复核为 '+className(reviews[currentId].classId)+'。模型原始记录保留。':'尚未复核 · 共 '+Object.keys(reviews).length+' 条人工记录';
-    if (revealed) $('original-label').textContent='原数据标签：'+className(byId[currentId].classId)+'。仅用于对照，不作为分类输入。';
     if (view==='workflow') renderWorkflow(); publishLessonState(); reportHeight();
   }
   function updateEvaluation() {
@@ -190,11 +191,12 @@
     if(evaluationStage==='test')evaluation=MODEL.evaluate(tests,references,ids,config(),scaler);
     else{var key=JSON.stringify(config());if(!validationCache[key])validationCache[key]=MODEL.crossValidate(references,ids,config());evaluation=validationCache[key];}
     syncEvaluationControls();
-    $('evaluation-stats').innerHTML=[[evaluationStage==='test'?'锁定测试':'交叉验证折外样本',String(evaluation.count),'共 '+new Set(activeSamples().map(function(s){return byId[s.id].group;})).size+' 个井段组'],['准确率',pct(evaluation.accuracy),evaluation.hit+' / '+evaluation.count+' 张与原标签一致'],['宏平均 F1',evaluation.macroF1.toFixed(3),'三个类别等权平均'],['待优先复核',String(evaluation.predictions.filter(function(p){return p.result.share<threshold();}).length),'以当前 '+pct(threshold())+' 投票门槛统计']].map(function(x){return '<div class="evaluation-stat"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>';}).join('');
+    $('evaluation-stats').innerHTML=[[evaluationStage==='test'?'锁定测试':'交叉验证折外样本',String(evaluation.count),'共 '+new Set(activeSamples().map(function(s){return byId[s.id].group;})).size+' 个井段组'],['与原标签一致率',pct(evaluation.accuracy),evaluation.hit+' / '+evaluation.count+' 张'],['宏平均 F1',evaluation.macroF1.toFixed(3),'三个类别等权平均']].map(function(x){return '<div class="evaluation-stat"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>';}).join('');
     var max=Math.max.apply(null,[1].concat.apply([1],evaluation.matrix));
     $('confusion-matrix').innerHTML='<table class="matrix" aria-label="模型原始输出的混淆矩阵"><thead><tr><th>原标签 ↓<br>预测 →</th>'+classes.map(function(c){return '<th scope="col">'+c.name+'</th>';}).join('')+'</tr></thead><tbody>'+evaluation.matrix.map(function(row,i){return '<tr><th scope="row">'+classes[i].name+'</th>'+row.map(function(n,j){return '<td><button type="button" class="matrix-cell" data-truth="'+classes[i].id+'" data-predicted="'+classes[j].id+'" data-off="'+(i!==j)+'" style="--strength:'+(n?.2+.6*n/max:.05)+'" aria-label="'+classes[i].name+'预测为'+classes[j].name+'：'+n+'张">'+n+'</button></td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
     if(matrixFilter) renderMatrixSelection(matrixFilter.truth,matrixFilter.predicted);
-    renderFeatureMap();renderDepth();if(view==='workflow')renderWorkflow();
+    $('next-disagreement').disabled=evaluation.hit===evaluation.count;
+    renderDepth();if(view==='workflow')renderWorkflow();
   }
   function renderMatrixSelection(truth,predicted) {
     matrixFilter={truth:truth,predicted:predicted};
@@ -202,32 +204,33 @@
     $('matrix-selection').innerHTML=className(truth)+' → '+className(predicted)+'：'+chosen.length+' 张。 '+chosen.map(function(p){return '<button type="button" data-pick="'+p.id+'">'+p.id+'</button>';}).join('');
   }
   $('confusion-matrix').addEventListener('click',function(event){var b=event.target.closest('[data-truth]');if(b&&ready)renderMatrixSelection(b.dataset.truth,b.dataset.predicted);});
-  $('matrix-selection').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick);});
-
-  function renderFeatureMap() {
-    if(!ready)return;
-    var all=evaluationStage==='test'?references.concat(tests):references;
-    var x0=45,y0=190,w=350,h=155;
-    var means=all.map(function(s){return s.features.stats.brightness;}),edges=all.map(function(s){return s.features.stats.edges;});
-    var xmin=Math.min.apply(null,means)-5,xmax=Math.max.apply(null,means)+5,ymax=Math.max(.1,Math.max.apply(null,edges)*1.12);
-    function point(sample){return [x0+(sample.features.stats.brightness-xmin)/(xmax-xmin)*w,y0-sample.features.stats.edges/ymax*h];}
-    var svg='<svg class="feature-map-svg" viewBox="0 0 430 232" role="img" aria-label="原图中心区域平均亮度与边缘比例的双变量散点图"><path d="M45 25V190H405" fill="none" stroke="#d8d2c2"/>';
-    [0,.5,1].forEach(function(t){var y=y0-t*h;svg+='<line x1="45" y1="'+y+'" x2="405" y2="'+y+'" stroke="#e8e1d2" stroke-dasharray="3 5"/><text x="37" y="'+(y+3)+'" text-anchor="end">'+(t*ymax*100).toFixed(0)+'%</text>';var x=x0+t*w;svg+='<text x="'+x+'" y="207" text-anchor="middle">'+(xmin+t*(xmax-xmin)).toFixed(0)+'</text>';});
-    all.forEach(function(s){var p=point(s),color=byClass[s.classId].color,shape=byId[s.id].split==='test'?'<path d="M'+p[0]+' '+(p[1]-4)+'l4 4-4 4-4-4Z"':'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5"';svg+=shape+' class="point" fill="'+color+'"><title>'+s.id+' · 原标签 '+className(s.classId)+'</title>'+(shape.indexOf('circle')>=0?'</circle>':'</path>');if(s.id===currentId)svg+='<circle class="current-point" cx="'+p[0]+'" cy="'+p[1]+'" r="8"/>';});
-    svg+='<text x="220" y="226" text-anchor="middle">平均亮度（0—255）</text><text x="45" y="15">边缘比例</text></svg>';
-    $('feature-map').innerHTML=svg;
-  }
+  $('matrix-selection').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b){selectSample(b.dataset.pick);if($('sample-detail').scrollIntoView)$('sample-detail').scrollIntoView({block:'start',behavior:'smooth'});}});
   function lithStyle(id) { return byClass[id]?'--lith-color:'+byClass[id].color+';--lith-bg:'+byClass[id].color+'20':''; }
-  function renderDepth() {
+  function renderDepth(focusRecord) {
     if(!ready||!evaluation)return;
     $('depth-legend').innerHTML=classes.map(function(c){return '<span><i style="--lith-color:'+c.color+'"></i>'+c.name+'</span>';}).join('');
     var groups=[],lastDepth=null;
     evaluation.predictions.slice().sort(function(a,b){return byId[a.id].depth-byId[b.id].depth;}).forEach(function(p){var sample=byId[p.id];if(lastDepth!==null&&sample.depth-lastDepth>10)groups.push({gap:sample.depth-lastDepth});groups.push(p);lastDepth=sample.depth;});
-    var html='<div class="depth-group"><div class="depth-row header"><b>井深 / m</b><span>原数据标签</span><span>模型折外 / 测试预测</span><span>人工复核</span></div>';
-    groups.forEach(function(p){if(p.gap){html+='<div class="depth-gap">⋮ 相邻展示样本间隔 '+p.gap+' m，未补造中间记录</div>';return;}var s=byId[p.id],r=reviews[p.id];html+='<div class="depth-row'+(p.id===currentId?' is-current':'')+'"><button type="button" data-pick="'+p.id+'">'+s.depth.toFixed(0)+'</button><span style="'+lithStyle(p.truth)+'">'+className(p.truth)+'</span><span style="'+lithStyle(p.result.classId)+'">'+className(p.result.classId)+'</span><span style="'+(r?lithStyle(r.classId):'')+'">'+(r?className(r.classId):'待复核')+'</span></div>';});
-    $('depth-log').innerHTML=html+'</div>';
+    var disagree=evaluation.count-evaluation.hit,reviewed=evaluation.predictions.filter(function(p){return !!reviews[p.id];}).length;
+    $('depth-summary').textContent=(evaluationStage==='test'?'锁定测试':'训练集分组验证')+' · '+evaluation.count+' 张 · '+disagree+' 张与原标签不同 · '+reviewed+' 张已复核';
+    var html='';groups.forEach(function(p){
+      if(p.gap){html+='<div class="well-gap">样品间隔 '+p.gap+' m · 中间未展示</div>';return;}
+      var s=byId[p.id],r=reviews[p.id],different=p.truth!==p.result.classId;
+      var label=s.depth+' 米，模型候选 '+className(p.result.classId)+'，原标签 '+className(p.truth)+'，'+(different?'标签不一致，':'标签一致，')+(r?'人工复核 '+className(r.classId):'待复核');
+      html+='<button type="button" class="well-row'+(p.id===currentId?' is-current':'')+'" data-pick="'+esc(p.id)+'" aria-pressed="'+String(p.id===currentId)+'" aria-label="'+esc(label)+'"><span class="well-depth">'+s.depth.toFixed(0)+'</span><img class="well-thumb" src="'+s.image+'" alt=""><span class="well-label" style="'+lithStyle(p.result.classId)+'">'+className(p.result.classId)+(different?'<small>不一致</small>':'')+'</span><span class="well-label" style="'+lithStyle(p.truth)+'">'+className(p.truth)+'</span><span class="well-label'+(r?'':' review-empty')+'" style="'+(r?lithStyle(r.classId):'')+'">'+(r?className(r.classId):'待复核')+'</span></button>';
+    });
+    var log=$('depth-log');log.innerHTML=html;
+    var selected=log.querySelector('[data-pick="'+currentId+'"]');
+    if(selected&&Number.isFinite(selected.offsetTop)&&log.clientHeight)log.scrollTop=Math.max(0,selected.offsetTop-(log.clientHeight-selected.offsetHeight)/2);
+    if(focusRecord&&selected&&selected.focus)selected.focus({preventScroll:true});
   }
-  $('depth-log').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick);});
+  $('depth-log').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick,true);});
+  $('next-disagreement').addEventListener('click',function(){
+    if(!ready||!evaluation)return;
+    var different=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;}).sort(function(a,b){return byId[a.id].depth-byId[b.id].depth;});
+    if(!different.length)return;
+    var at=different.findIndex(function(p){return p.id===currentId;});selectSample(different[(at+1)%different.length].id);
+  });
     // Hyperparameters are explored using training-only grouped CV, then frozen for the holdout.
   function activeSamples(){return evaluationStage==='test'?tests:references;}
   function queryContext(){
@@ -241,6 +244,7 @@
   function syncEvaluationControls(){
     var frozen=evaluationStage==='test',description=frozen?'阶段 2 · 已锁定 k='+lockedConfig.k+'、颜色权重='+lockedConfig.colorWeight.toFixed(1)+'，正在查看 24 张测试图。':'阶段 1 · 用 42 张训练图做分组交叉验证；每次排除待检照片所在的整个井段组。24 张测试图暂不开放。';
     $('evaluation-status').textContent=description;
+    $('export-stage-note').textContent=frozen?'测试导出只包含测试样品；训练阶段记录需在锁定前另行导出。':'训练阶段的复核如需保留，请先导出本阶段；测试导出只包含测试样品。';
     $('loading-status').textContent=frozen?'当前为测试集，k 和颜色权重已锁定。':'已就绪 · 先从一张训练集照片开始；参数锁定后可查看测试照片。';
     $('flow-status').textContent=frozen?'当前为锁定测试阶段，展示测试样品的原始照片。':'当前在训练集内探索；可在示范页锁定参数并查看测试图。';
     ['k-select','color-weight','flow-k-select','flow-color-weight','reset-parameters','finalize-test'].forEach(function(id){$(id).disabled=!ready||frozen;});
@@ -371,12 +375,10 @@
   $('sample-select').addEventListener('change',function(){selectSample(this.value);});
   $('k-select').addEventListener('change',function(){if(lockedConfig)return;drawQuery();updateEvaluation();});
   $('color-weight').addEventListener('input',function(){if(lockedConfig)return;var n=Number(this.value);$('weight-value').textContent=n+' / '+(100-n);drawQuery();updateEvaluation();});
-  $('review-threshold').addEventListener('input',function(){$('threshold-value').textContent=this.value+'%';drawQuery();updateEvaluation();});
   function updateDisturbance(){exposure=Number($('exposure').value);contrast=Number($('contrast').value)/100;$('exposure-value').textContent=String(exposure);$('contrast-value').textContent=contrast.toFixed(1)+'×';drawQuery();}
   $('exposure').addEventListener('input',updateDisturbance);$('contrast').addEventListener('input',updateDisturbance);
   $('reset-image').addEventListener('click',function(){$('exposure').value='0';$('contrast').value='100';updateDisturbance();});
-  $('reset-parameters').addEventListener('click',function(){if(lockedConfig)return;$('k-select').value='5';$('color-weight').value='50';$('weight-value').textContent='50 / 50';$('exposure').value='0';$('contrast').value='100';$('review-threshold').value='70';$('threshold-value').textContent='70%';updateDisturbance();updateEvaluation();});
-  $('reveal-label').addEventListener('click',function(){if(!ready)return;revealed=!revealed;$('original-label').hidden=!revealed;this.textContent=revealed?'隐藏原数据标签':'显示原数据标签';$('original-label').textContent='原数据标签：'+className(byId[currentId].classId)+'。仅用于对照，不作为分类输入。';reportHeight();});
+  $('reset-parameters').addEventListener('click',function(){if(lockedConfig)return;$('k-select').value='5';$('color-weight').value='50';$('weight-value').textContent='50 / 50';$('exposure').value='0';$('contrast').value='100';updateDisturbance();updateEvaluation();});
   $('save-review').addEventListener('click',function(){
     if(!ready||!currentResult)return;
     reviews[currentId]={classId:$('review-class').value,time:new Date().toISOString(),modelAtReview:currentResult.classId,k:config().k,colorWeight:config().colorWeight,exposure:exposure,contrast:contrast};
@@ -422,7 +424,7 @@
   if(embedded)window.parent.postMessage({__m1StateRequest:true},'*');
   setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
-  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test'];
+  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test','next-disagreement'];
   demoControls.forEach(function(id){$(id).disabled=true;});
   Promise.all(DATA.samples.map(imageFeatures)).then(function(results){
     references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=((pendingRock&&references.filter(function(s){return s.classId===pendingRock;})[0])||references[0]).id;

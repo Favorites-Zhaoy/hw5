@@ -67,6 +67,8 @@ test('grouped validation excludes the complete validation group and fits scales 
   assert.throws(()=>model.crossValidate(training.slice(0,2),['sandstone','shale'],{k:1}),/至少需要两个组/);
 });
 test('the public subset preserves original image bytes, labels and disjoint depth groups',()=>{
+  const original={window:{}};vm.runInNewContext(read('tools/m1/runtime/data.js'),original);
+  assert.deepEqual(data,plain(original.window.M1_DATA),'embedded data and reconstructed source URLs must remain identical');
   assert.equal(data.samples.length,66);assert.equal(data.samples.filter(s=>s.split==='reference').length,42);assert.equal(data.samples.filter(s=>s.split==='test').length,24);
   assert.equal(new Set(data.samples.map(s=>s.group)).size,17);
   const groupSets={reference:new Set(),test:new Set()},hashes=new Set();
@@ -77,7 +79,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.6.2');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.7.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -127,7 +129,7 @@ function appRuntime(embedded=false,reduced=false,portalView=null){
   const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;if(e.listeners.click)e.listeners.click.call(e,{target:e});};e.closest=()=>e;return e;};
   for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
   for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock|field-step)="([^"]+)"/g))e.dataset[a[1].replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=a[2];buttons.push(e);}
-  const defaults={'k-select':'5','color-weight':'50','review-threshold':'70',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
+  const defaults={'k-select':'5','color-weight':'50',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
   const canvasContext=owner=>{let rgba=pixelImage(96,96);return {drawImage(image){rgba=image.rgba;},getImageData(){return {data:rgba};},createImageData(w,h){return {data:new Uint8ClampedArray(w*h*4)};},putImageData(pixels){owner.pixels=new Uint8ClampedArray(pixels.data);}};};
   nodes.get('processed-canvas').getContext=()=>canvasContext(nodes.get('processed-canvas'));
@@ -229,9 +231,32 @@ test('standalone case switches all three sections and runs the sample-to-predict
   const before=rt.stats.predict;rt.nodes.get('k-select').value='3';rt.event('k-select','change');assert.ok(rt.stats.predict>before);assert.match(rt.nodes.get('vote-summary').textContent,/\/ 3/);
   const original=rt.nodes.get('image-statistics').innerHTML;rt.nodes.get('exposure').value='40';rt.event('exposure','input');assert.notEqual(rt.nodes.get('image-statistics').innerHTML,original);
 });
-test('label reveal and manual review keep model metrics separate and CSV retains provenance',async()=>{
+test('the depth record links real photographs, source labels, candidates, neighbors and review',async()=>{
+  const rt=appRuntime();await settle();
+  const log=rt.nodes.get('depth-log');
+  const training=data.samples.filter(s=>s.split==='reference'),holdout=data.samples.filter(s=>s.split==='test');
+  for(const s of training){assert.ok(log.innerHTML.includes('data-pick="'+s.id+'"'));assert.ok(log.innerHTML.includes(s.image));}
+  for(const s of holdout)assert.ok(!log.innerHTML.includes('data-pick="'+s.id+'"'));
+  assert.match(log.innerHTML,/样品间隔 100 m/);assert.match(rt.nodes.get('depth-summary').textContent,/42 张/);
+  assert.equal(rt.nodes.get('next-disagreement').disabled,false);rt.event('next-disagreement','click');
+  const picked=rt.nodes.get('query-id').textContent,sample=data.samples.find(s=>s.id===picked);
+  assert.equal(rt.nodes.get('query-image').src,sample.image);
+  assert.equal(rt.nodes.get('original-label').textContent,data.classes.find(c=>c.id===sample.classId).name);
+  assert.notEqual(rt.nodes.get('prediction').textContent,rt.nodes.get('original-label').textContent);
+  assert.match(rt.nodes.get('comparison-note').textContent,/不同/);assert.match(rt.nodes.get('vote-summary').textContent,/最高票/);
+  assert.equal((rt.nodes.get('neighbors').innerHTML.match(/class="neighbor"/g)||[]).length,5);
+  const metrics=rt.nodes.get('evaluation-stats').innerHTML;rt.nodes.get('review-class').value='shale';rt.event('save-review','click');
+  assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);assert.match(rt.nodes.get('depth-summary').textContent,/1 张已复核/);
+  assert.match(rt.nodes.get('depth-log').innerHTML,new RegExp('data-pick="'+picked+'"[^>]*aria-pressed="true"'));
+  rt.nodes.get('exposure').value='30';rt.event('exposure','input');assert.equal(rt.nodes.get('result-condition').textContent,'光照调整后');
+  assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);
+  rt.event('finalize-test','click');assert.match(rt.nodes.get('depth-summary').textContent,/24 张/);
+  for(const s of training)assert.ok(!rt.nodes.get('depth-log').innerHTML.includes('data-pick="'+s.id+'"'));
+  for(const s of holdout)assert.ok(rt.nodes.get('depth-log').innerHTML.includes('data-pick="'+s.id+'"'));
+});
+test('source labels and manual review keep model metrics separate and CSV retains provenance',async()=>{
   const rt=appRuntime();await settle();const metrics=rt.nodes.get('evaluation-stats').innerHTML,prediction=rt.nodes.get('prediction').textContent;
-  rt.event('reveal-label','click');assert.equal(rt.nodes.get('original-label').hidden,false);assert.equal(rt.nodes.get('prediction').textContent,prediction);
+  const sample=data.samples.find(s=>s.id===rt.nodes.get('query-id').textContent);assert.equal(rt.nodes.get('original-label').textContent,data.classes.find(c=>c.id===sample.classId).name);assert.equal(rt.nodes.get('prediction').textContent,prediction);
   rt.nodes.get('review-class').value='shale';rt.event('save-review','click');assert.match(rt.nodes.get('review-status').textContent,/已复核/);assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);
   rt.event('export-csv','click');assert.equal(rt.blobs.length,1);const csv=await rt.blobs[0].text();assert.equal(csv.trim().split('\r\n').length,43);assert.match(csv,/image_sha256/);assert.match(csv,/review_exposure/);assert.ok(csv.includes(data.source.commit));
 });
@@ -313,7 +338,7 @@ test('the rock lesson shows the case data rather than unrelated paper samples',a
 test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
   const tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
-  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.6.2&'));assert.ok(bg.src.endsWith('section=background'));
+  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.7.0&'));assert.ok(bg.src.endsWith('section=background'));
   const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});
   click('flow');const flow=rt.document.getElementById('case-flow-root').children[0];assert.ok(flow.src.endsWith('section=workflow'));
   click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.endsWith('section=demo'));

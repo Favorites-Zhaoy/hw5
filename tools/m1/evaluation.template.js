@@ -11,6 +11,7 @@
   function syncEvaluationControls(){
     var frozen=evaluationStage==='test',description=frozen?'阶段 2 · 已锁定 k='+lockedConfig.k+'、颜色权重='+lockedConfig.colorWeight.toFixed(1)+'，正在查看 24 张测试图。':'阶段 1 · 用 42 张训练图做分组交叉验证；每次排除待检照片所在的整个井段组。24 张测试图暂不开放。';
     $('evaluation-status').textContent=description;
+    $('export-stage-note').textContent=frozen?'测试导出只包含测试样品；训练阶段记录需在锁定前另行导出。':'训练阶段的复核如需保留，请先导出本阶段；测试导出只包含测试样品。';
     $('loading-status').textContent=frozen?'当前为测试集，k 和颜色权重已锁定。':'已就绪 · 先从一张训练集照片开始；参数锁定后可查看测试照片。';
     $('flow-status').textContent=frozen?'当前为锁定测试阶段，展示测试样品的原始照片。':'当前在训练集内探索；可在示范页锁定参数并查看测试图。';
     ['k-select','color-weight','flow-k-select','flow-color-weight','reset-parameters','finalize-test'].forEach(function(id){$(id).disabled=!ready||frozen;});

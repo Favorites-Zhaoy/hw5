@@ -9,14 +9,13 @@
   DATA.samples.forEach(function (s) { byId[s.id] = s; });
   var references = [], tests = [], scaler, evaluation, ready = false, currentId, currentResult, currentFeatures;
   var evaluationStage='validation',lockedConfig=null,foldContexts=Object.create(null),validationCache=Object.create(null);
-  var workflowStep = 0, view = 'background', motionPaused = false, revealed = false;
+  var workflowStep = 0, view = 'background', motionPaused = false;
   var cropSize = 96, exposure = 0, contrast = 1, matrixFilter = null;
   var imageStage = 0, flowVoteCount = null, voteContext = '', selectedDepthGroup = null;
   var sharingReady=false,sharedPending=null,shareInitialized=false,applyingShared=false,navigationPending=null,pendingRock=null;
   var className = function (id) { return byClass[id] ? byClass[id].name : '尚未复核'; };
   var pct = function (v) { return (v * 100).toFixed(1) + '%'; };
   var config = function () { return lockedConfig?{k:lockedConfig.k,colorWeight:lockedConfig.colorWeight}:{ k: Number($('k-select').value), colorWeight: Number($('color-weight').value) / 100 }; };
-  var threshold = function () { return Number($('review-threshold').value) / 100; };
   var flowText = /* M1_FLOW_TEXT */ [];
 
   function reportHeight() {
@@ -32,7 +31,7 @@
     });
     ['background','workflow','demo'].forEach(function (name) { $('panel-' + name).hidden = name !== next; });
     if (next === 'workflow') renderWorkflow();
-    if (ready && next === 'demo') drawQuery();
+    if (ready && next === 'demo') { drawQuery(); renderDepth(); }
     try { window.history.replaceState(null, '', '#' + next); } catch (e) { /* file and sandbox history are optional */ }
     if(scroll && !embedded && $('panel-'+next).scrollIntoView) $('panel-'+next).scrollIntoView({block:'start',behavior:'instant'});
     reportHeight();
@@ -157,13 +156,12 @@
   function voteMarkup(result) {
     return classes.map(function(c){var count=result.votes[c.id]||0;return '<div class="vote-row"><header><span>'+c.name+'</span><span>'+count+' / '+result.k+' 票</span></header><div class="vote-track"><span style="--lith-color:'+c.color+';width:'+(count/result.k*100)+'%"></span></div></div>';}).join('');
   }
-  function selectSample(id) {
+  function selectSample(id, focusRecord) {
     if (!ready || !byId[id] || !activeSamples().some(function(s){return s.id===id;})) return;
-    currentId=id;revealed=false;$('sample-select').value=id;$('original-label').hidden=true;
-    $('reveal-label').textContent='显示原数据标签';
+    currentId=id;$('sample-select').value=id;
     var image=byId[id]; selectedDepthGroup=image.group; showFieldSample(image); renderRockLesson(image.classId,image); $('query-image').src=image.image;
     $('query-id').textContent=image.id; $('query-depth').textContent='源记录井深 '+image.depth+' m · 井 '+image.well;
-    drawQuery(); renderFeatureMap(); renderDepth();
+    drawQuery(); renderDepth(focusRecord);
   }
   function drawQuery() {
     if (!ready || !currentId) return;
@@ -174,15 +172,18 @@
     $('image-statistics').innerHTML='<span>平均亮度<b>'+currentFeatures.stats.brightness.toFixed(1)+'</b></span><span>灰度对比度<b>'+currentFeatures.stats.contrast.toFixed(1)+'</b></span><span>边缘像素比例<b>'+pct(currentFeatures.stats.edges)+'</b></span><span>清晰度统计<b>'+currentFeatures.stats.sharpness.toFixed(0)+'</b></span>';
     $('feature-histogram').innerHTML=histogramMarkup(currentFeatures);
     var context=queryContext();currentResult=MODEL.predict(currentFeatures,context.samples,config(),context.scaler);
-    $('prediction').textContent=className(currentResult.classId);
+    var source=byId[currentId],different=currentResult.classId!==source.classId;
+    $('prediction').textContent=className(currentResult.classId);$('prediction').setAttribute('style',lithStyle(currentResult.classId));
+    $('original-label').textContent=className(source.classId);$('original-label').setAttribute('style',lithStyle(source.classId));
+    $('result-condition').textContent=(exposure!==0||contrast!==1)?'光照调整后':'原图条件';
+    $('comparison-note').classList.toggle('is-different',different);
+    $('comparison-note').textContent=different?'候选与原标签不同。请结合相似照片和现场资料核对。':'候选与原标签一致。仍可查看参考照片，并结合其他资料判断。';
     $('vote-summary').textContent='最高票 '+currentResult.votes[currentResult.classId]+' / '+currentResult.k+' · 投票占比 '+pct(currentResult.share);
     $('vote-bars').innerHTML=voteMarkup(currentResult);
-    var weak=currentResult.share<threshold();
-    $('result-state').classList.toggle('needs-review',weak);$('result-state').textContent=weak?'优先复核':'候选已生成';
-    $('neighbors').innerHTML=currentResult.neighbors.map(function(n,i){var s=byId[n.id],c=byClass[n.classId];return '<article class="neighbor" style="--lith-color:'+c.color+'"><span class="neighbor-rank">NEIGHBOR '+(i+1)+'</span><img src="'+s.image+'" alt="近邻 '+s.id+'，原标签 '+c.name+'"><b>'+c.name+'</b><small>'+s.id+'<br>距离 '+n.distance.toFixed(3)+'<br>原井深 '+s.depth+' m</small></article>';}).join('');
+    $('result-state').classList.toggle('needs-review',different);$('result-state').textContent=different?'与原标签不一致':'与原标签一致';
+    $('neighbors').innerHTML=currentResult.neighbors.map(function(n,i){var s=byId[n.id],c=byClass[n.classId];return '<article class="neighbor" style="--lith-color:'+c.color+'"><span class="neighbor-rank">近邻 '+(i+1)+'</span><img src="'+s.image+'" alt="近邻 '+s.id+'，原标签 '+c.name+'"><b>'+c.name+'</b><small>'+s.depth+' m<br>距离 '+n.distance.toFixed(3)+'</small></article>';}).join('');
     $('review-class').value=reviews[currentId]?reviews[currentId].classId:currentResult.classId;
     $('review-status').textContent=reviews[currentId]?'本次会话已复核为 '+className(reviews[currentId].classId)+'。模型原始记录保留。':'尚未复核 · 共 '+Object.keys(reviews).length+' 条人工记录';
-    if (revealed) $('original-label').textContent='原数据标签：'+className(byId[currentId].classId)+'。仅用于对照，不作为分类输入。';
     if (view==='workflow') renderWorkflow(); publishLessonState(); reportHeight();
   }
   function updateEvaluation() {
@@ -190,11 +191,12 @@
     if(evaluationStage==='test')evaluation=MODEL.evaluate(tests,references,ids,config(),scaler);
     else{var key=JSON.stringify(config());if(!validationCache[key])validationCache[key]=MODEL.crossValidate(references,ids,config());evaluation=validationCache[key];}
     syncEvaluationControls();
-    $('evaluation-stats').innerHTML=[[evaluationStage==='test'?'锁定测试':'交叉验证折外样本',String(evaluation.count),'共 '+new Set(activeSamples().map(function(s){return byId[s.id].group;})).size+' 个井段组'],['准确率',pct(evaluation.accuracy),evaluation.hit+' / '+evaluation.count+' 张与原标签一致'],['宏平均 F1',evaluation.macroF1.toFixed(3),'三个类别等权平均'],['待优先复核',String(evaluation.predictions.filter(function(p){return p.result.share<threshold();}).length),'以当前 '+pct(threshold())+' 投票门槛统计']].map(function(x){return '<div class="evaluation-stat"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>';}).join('');
+    $('evaluation-stats').innerHTML=[[evaluationStage==='test'?'锁定测试':'交叉验证折外样本',String(evaluation.count),'共 '+new Set(activeSamples().map(function(s){return byId[s.id].group;})).size+' 个井段组'],['与原标签一致率',pct(evaluation.accuracy),evaluation.hit+' / '+evaluation.count+' 张'],['宏平均 F1',evaluation.macroF1.toFixed(3),'三个类别等权平均']].map(function(x){return '<div class="evaluation-stat"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></div>';}).join('');
     var max=Math.max.apply(null,[1].concat.apply([1],evaluation.matrix));
     $('confusion-matrix').innerHTML='<table class="matrix" aria-label="模型原始输出的混淆矩阵"><thead><tr><th>原标签 ↓<br>预测 →</th>'+classes.map(function(c){return '<th scope="col">'+c.name+'</th>';}).join('')+'</tr></thead><tbody>'+evaluation.matrix.map(function(row,i){return '<tr><th scope="row">'+classes[i].name+'</th>'+row.map(function(n,j){return '<td><button type="button" class="matrix-cell" data-truth="'+classes[i].id+'" data-predicted="'+classes[j].id+'" data-off="'+(i!==j)+'" style="--strength:'+(n?.2+.6*n/max:.05)+'" aria-label="'+classes[i].name+'预测为'+classes[j].name+'：'+n+'张">'+n+'</button></td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
     if(matrixFilter) renderMatrixSelection(matrixFilter.truth,matrixFilter.predicted);
-    renderFeatureMap();renderDepth();if(view==='workflow')renderWorkflow();
+    $('next-disagreement').disabled=evaluation.hit===evaluation.count;
+    renderDepth();if(view==='workflow')renderWorkflow();
   }
   function renderMatrixSelection(truth,predicted) {
     matrixFilter={truth:truth,predicted:predicted};
@@ -202,44 +204,43 @@
     $('matrix-selection').innerHTML=className(truth)+' → '+className(predicted)+'：'+chosen.length+' 张。 '+chosen.map(function(p){return '<button type="button" data-pick="'+p.id+'">'+p.id+'</button>';}).join('');
   }
   $('confusion-matrix').addEventListener('click',function(event){var b=event.target.closest('[data-truth]');if(b&&ready)renderMatrixSelection(b.dataset.truth,b.dataset.predicted);});
-  $('matrix-selection').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick);});
-
-  function renderFeatureMap() {
-    if(!ready)return;
-    var all=evaluationStage==='test'?references.concat(tests):references;
-    var x0=45,y0=190,w=350,h=155;
-    var means=all.map(function(s){return s.features.stats.brightness;}),edges=all.map(function(s){return s.features.stats.edges;});
-    var xmin=Math.min.apply(null,means)-5,xmax=Math.max.apply(null,means)+5,ymax=Math.max(.1,Math.max.apply(null,edges)*1.12);
-    function point(sample){return [x0+(sample.features.stats.brightness-xmin)/(xmax-xmin)*w,y0-sample.features.stats.edges/ymax*h];}
-    var svg='<svg class="feature-map-svg" viewBox="0 0 430 232" role="img" aria-label="原图中心区域平均亮度与边缘比例的双变量散点图"><path d="M45 25V190H405" fill="none" stroke="#d8d2c2"/>';
-    [0,.5,1].forEach(function(t){var y=y0-t*h;svg+='<line x1="45" y1="'+y+'" x2="405" y2="'+y+'" stroke="#e8e1d2" stroke-dasharray="3 5"/><text x="37" y="'+(y+3)+'" text-anchor="end">'+(t*ymax*100).toFixed(0)+'%</text>';var x=x0+t*w;svg+='<text x="'+x+'" y="207" text-anchor="middle">'+(xmin+t*(xmax-xmin)).toFixed(0)+'</text>';});
-    all.forEach(function(s){var p=point(s),color=byClass[s.classId].color,shape=byId[s.id].split==='test'?'<path d="M'+p[0]+' '+(p[1]-4)+'l4 4-4 4-4-4Z"':'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5"';svg+=shape+' class="point" fill="'+color+'"><title>'+s.id+' · 原标签 '+className(s.classId)+'</title>'+(shape.indexOf('circle')>=0?'</circle>':'</path>');if(s.id===currentId)svg+='<circle class="current-point" cx="'+p[0]+'" cy="'+p[1]+'" r="8"/>';});
-    svg+='<text x="220" y="226" text-anchor="middle">平均亮度（0—255）</text><text x="45" y="15">边缘比例</text></svg>';
-    $('feature-map').innerHTML=svg;
-  }
+  $('matrix-selection').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b){selectSample(b.dataset.pick);if($('sample-detail').scrollIntoView)$('sample-detail').scrollIntoView({block:'start',behavior:'smooth'});}});
   function lithStyle(id) { return byClass[id]?'--lith-color:'+byClass[id].color+';--lith-bg:'+byClass[id].color+'20':''; }
-  function renderDepth() {
+  function renderDepth(focusRecord) {
     if(!ready||!evaluation)return;
     $('depth-legend').innerHTML=classes.map(function(c){return '<span><i style="--lith-color:'+c.color+'"></i>'+c.name+'</span>';}).join('');
     var groups=[],lastDepth=null;
     evaluation.predictions.slice().sort(function(a,b){return byId[a.id].depth-byId[b.id].depth;}).forEach(function(p){var sample=byId[p.id];if(lastDepth!==null&&sample.depth-lastDepth>10)groups.push({gap:sample.depth-lastDepth});groups.push(p);lastDepth=sample.depth;});
-    var html='<div class="depth-group"><div class="depth-row header"><b>井深 / m</b><span>原数据标签</span><span>模型折外 / 测试预测</span><span>人工复核</span></div>';
-    groups.forEach(function(p){if(p.gap){html+='<div class="depth-gap">⋮ 相邻展示样本间隔 '+p.gap+' m，未补造中间记录</div>';return;}var s=byId[p.id],r=reviews[p.id];html+='<div class="depth-row'+(p.id===currentId?' is-current':'')+'"><button type="button" data-pick="'+p.id+'">'+s.depth.toFixed(0)+'</button><span style="'+lithStyle(p.truth)+'">'+className(p.truth)+'</span><span style="'+lithStyle(p.result.classId)+'">'+className(p.result.classId)+'</span><span style="'+(r?lithStyle(r.classId):'')+'">'+(r?className(r.classId):'待复核')+'</span></div>';});
-    $('depth-log').innerHTML=html+'</div>';
+    var disagree=evaluation.count-evaluation.hit,reviewed=evaluation.predictions.filter(function(p){return !!reviews[p.id];}).length;
+    $('depth-summary').textContent=(evaluationStage==='test'?'锁定测试':'训练集分组验证')+' · '+evaluation.count+' 张 · '+disagree+' 张与原标签不同 · '+reviewed+' 张已复核';
+    var html='';groups.forEach(function(p){
+      if(p.gap){html+='<div class="well-gap">样品间隔 '+p.gap+' m · 中间未展示</div>';return;}
+      var s=byId[p.id],r=reviews[p.id],different=p.truth!==p.result.classId;
+      var label=s.depth+' 米，模型候选 '+className(p.result.classId)+'，原标签 '+className(p.truth)+'，'+(different?'标签不一致，':'标签一致，')+(r?'人工复核 '+className(r.classId):'待复核');
+      html+='<button type="button" class="well-row'+(p.id===currentId?' is-current':'')+'" data-pick="'+esc(p.id)+'" aria-pressed="'+String(p.id===currentId)+'" aria-label="'+esc(label)+'"><span class="well-depth">'+s.depth.toFixed(0)+'</span><img class="well-thumb" src="'+s.image+'" alt=""><span class="well-label" style="'+lithStyle(p.result.classId)+'">'+className(p.result.classId)+(different?'<small>不一致</small>':'')+'</span><span class="well-label" style="'+lithStyle(p.truth)+'">'+className(p.truth)+'</span><span class="well-label'+(r?'':' review-empty')+'" style="'+(r?lithStyle(r.classId):'')+'">'+(r?className(r.classId):'待复核')+'</span></button>';
+    });
+    var log=$('depth-log');log.innerHTML=html;
+    var selected=log.querySelector('[data-pick="'+currentId+'"]');
+    if(selected&&Number.isFinite(selected.offsetTop)&&log.clientHeight)log.scrollTop=Math.max(0,selected.offsetTop-(log.clientHeight-selected.offsetHeight)/2);
+    if(focusRecord&&selected&&selected.focus)selected.focus({preventScroll:true});
   }
-  $('depth-log').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick);});
+  $('depth-log').addEventListener('click',function(event){var b=event.target.closest('[data-pick]');if(b)selectSample(b.dataset.pick,true);});
+  $('next-disagreement').addEventListener('click',function(){
+    if(!ready||!evaluation)return;
+    var different=evaluation.predictions.filter(function(p){return p.truth!==p.result.classId;}).sort(function(a,b){return byId[a.id].depth-byId[b.id].depth;});
+    if(!different.length)return;
+    var at=different.findIndex(function(p){return p.id===currentId;});selectSample(different[(at+1)%different.length].id);
+  });
   /* M1_EVALUATION_SCRIPT */
   /* M1_WORKFLOW_SCRIPT */
 
   $('sample-select').addEventListener('change',function(){selectSample(this.value);});
   $('k-select').addEventListener('change',function(){if(lockedConfig)return;drawQuery();updateEvaluation();});
   $('color-weight').addEventListener('input',function(){if(lockedConfig)return;var n=Number(this.value);$('weight-value').textContent=n+' / '+(100-n);drawQuery();updateEvaluation();});
-  $('review-threshold').addEventListener('input',function(){$('threshold-value').textContent=this.value+'%';drawQuery();updateEvaluation();});
   function updateDisturbance(){exposure=Number($('exposure').value);contrast=Number($('contrast').value)/100;$('exposure-value').textContent=String(exposure);$('contrast-value').textContent=contrast.toFixed(1)+'×';drawQuery();}
   $('exposure').addEventListener('input',updateDisturbance);$('contrast').addEventListener('input',updateDisturbance);
   $('reset-image').addEventListener('click',function(){$('exposure').value='0';$('contrast').value='100';updateDisturbance();});
-  $('reset-parameters').addEventListener('click',function(){if(lockedConfig)return;$('k-select').value='5';$('color-weight').value='50';$('weight-value').textContent='50 / 50';$('exposure').value='0';$('contrast').value='100';$('review-threshold').value='70';$('threshold-value').textContent='70%';updateDisturbance();updateEvaluation();});
-  $('reveal-label').addEventListener('click',function(){if(!ready)return;revealed=!revealed;$('original-label').hidden=!revealed;this.textContent=revealed?'隐藏原数据标签':'显示原数据标签';$('original-label').textContent='原数据标签：'+className(byId[currentId].classId)+'。仅用于对照，不作为分类输入。';reportHeight();});
+  $('reset-parameters').addEventListener('click',function(){if(lockedConfig)return;$('k-select').value='5';$('color-weight').value='50';$('weight-value').textContent='50 / 50';$('exposure').value='0';$('contrast').value='100';updateDisturbance();updateEvaluation();});
   $('save-review').addEventListener('click',function(){
     if(!ready||!currentResult)return;
     reviews[currentId]={classId:$('review-class').value,time:new Date().toISOString(),modelAtReview:currentResult.classId,k:config().k,colorWeight:config().colorWeight,exposure:exposure,contrast:contrast};
@@ -285,7 +286,7 @@
   if(embedded)window.parent.postMessage({__m1StateRequest:true},'*');
   setView(portalSection||window.location.hash.slice(1)||'background',false);renderWorkflow();
   // Prevent controls from acting on incomplete computations; all content remains readable.
-  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','review-threshold','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test'];
+  var demoControls=['sample-select','k-select','color-weight','exposure','contrast','save-review','export-csv','flow-sample-select','flow-k-select','flow-color-weight','finalize-test','next-disagreement'];
   demoControls.forEach(function(id){$(id).disabled=true;});
   Promise.all(DATA.samples.map(imageFeatures)).then(function(results){
     references=results.filter(function(s){return byId[s.id].split==='reference';});tests=results.filter(function(s){return byId[s.id].split==='test';});scaler=MODEL.fit(references);Array.from(new Set(references.map(function(s){return s.group;}))).forEach(function(group){var subset=references.filter(function(s){return s.group!==group;});foldContexts[group]={samples:subset,scaler:MODEL.fit(subset)};});ready=true;currentId=((pendingRock&&references.filter(function(s){return s.classId===pendingRock;})[0])||references[0]).id;

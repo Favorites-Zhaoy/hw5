@@ -14,11 +14,11 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 1050 220" role="img" aria-label="七步技术流程，颜色与灰度纹理并行合并，训练参考集与查询图采用相同处理">'+flowContent.map((s,i)=>{const x=i*150;return '<g transform="translate('+x+',12)"><rect width="140" height="146" rx="10" fill="#fff9ee" stroke="#e4d6c0"/><text x="13" y="33" font-size="21" fill="#c59562">0'+(i+1)+'</text><text x="13" y="68" font-size="10" fill="#365261">'+s.name+'</text><text x="13" y="99" font-size="10" fill="#869084">'+['42 参考 / 24 测试','中心 72% / 96×96','RGB → 12 维','灰度 22 + 颜色 12','42 个加权距离','前 k 张 / 每图 1 票','批量评价 / 人工复核'][i]+'</text></g>';}).join('')+'<text x="10" y="192" font-size="13" fill="#7c8c80">颜色与灰度纹理为并行分支；参考图和查询图采用相同处理；尺度仅由训练参考集拟合。</text></svg>';
 const feature='<svg viewBox="0 0 720 125" role="img" aria-label="34维图像特征的组成"><text x="0" y="18" fill="#8d866c" font-size="12">图像 → 34 维描述 → 加权距离 → 近邻证据</text>'+[[12,'12 维颜色','#c69570'],[10,'10维Uniform LBP','#95a888'],[8,'8 维梯度方向','#86a7b6'],[4,'4 个统计量','#aa9abd']].map((s,i,all)=>{const start=all.slice(0,i).reduce((n,v)=>n+v[0],0)*17;return '<rect x="'+start+'" y="37" width="'+(s[0]*17-4)+'" height="35" rx="4" fill="'+s[2]+'"/><text x="'+start+'" y="101" fill="#8a9585" font-size="11">'+s[1]+'</text>';}).join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id&&s.split==='reference');return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：传统视觉特征与kNN监督分类',methods:['cv'],version:'1.6.2',updated:'2026-10-29',status:'ready',tabs:{
+const definition={id:'m1-cuttings-knn',sceneId:'m1',title:'岩屑岩性辅助识别：传统视觉特征与kNN监督分类',methods:['cv'],version:'1.7.0',updated:'2026-10-29',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'跟随一张真实岩屑照片，拆解七步技术计算',lead:['训练参考集准备与待识别图像采用相同的处理；颜色与灰度纹理并行计算后合成34维。方法定位为传统计算机视觉手工特征与kNN；训练集内部交叉验证调参，锁定后测试。'],stats:[['真实照片','66 张'],['训练 / 测试','42 / 24'],['步骤 / 特征','7 / 34']],steps:flowContent.map(s=>({name:s.name,role:s.role,do:s.process,effect:s.output,trap:s.trap})),metrics:{title:'从训练参考集到单图候选的七步技术链',html:style+'<div class="m1c">'+workflow+'</div>'+flowContent.map((s,i)=>'<h4>0'+(i+1)+' · '+s.name+'</h4><p><b>输入：</b>'+s.input+'</p><p><b>处理：</b>'+s.process+'</p><p><b>原因：</b>'+s.why+'</p><p><b>输出：</b>'+s.output+'</p>').join('')},fails:[{name:'拍摄条件替代岩性特征',why:'颜色与纹理受光照、背景和拍摄批次影响，需要独立验证。'},{name:'把距离或票数当作物理鉴定',why:'输出为图像分类候选，仍需人工与其他地质证据复核。'},{name:'把人工修改计入模型分数',why:'批量模型评价与逐样品人工意见分别保存。'}]},
 
-demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'选择真实留出样品，调整 k、颜色与纹理权重，在训练集分组交叉验证中探索，锁定后查看测试结果与原井深记录；人工复核与模型输出分别保存，可导出 CSV。',height:1040}
+demo:{mode:'page',html:'demo/index.html',label:'可视化示范',intro:'沿井深选择真实岩屑照片，对照模型候选与原数据标签，查看相似参考图并记录人工复核；训练集分组验证与锁定测试分别展示。',height:1040}
 }};
 // Retain the same teaching points in original-protocol HTML for older portals.
 const rockOverview='<p><b>细砂岩</b>：可进一步核对原岩颗粒与胶结；<b>页岩</b>：碎块未必保留完整层理；<b>灰质白云岩</b>：需要核验碳酸盐组分。上方为本例真实岩屑照片，论文图为独立图例。外观不能直接证明矿物含量、孔渗或油气。</p>';
@@ -40,18 +40,28 @@ css=css.replace(/(\.(?:hero-art|well-art|scene-art|art-vision|art-review|art-lab
 // Both styles travel with body-only HTML previews as well as the complete page.
 css+='\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
 const artworkCSS=':root{--m1-art-sheet:url("'+artwork+'")}';
-const workflowCSS=fs.readFileSync(path.join(__dirname,'m1/workflow.template.css'),'utf8');
+const workflowCSS=fs.readFileSync(path.join(__dirname,'m1/workflow.template.css'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'m1/demo.template.css'),'utf8');
 const appSource=fs.readFileSync(path.join(__dirname,'m1/app.template.js'),'utf8').replace('/* M1_FLOW_TEXT */ []',()=>JSON.stringify(flowContent)).replace('/* M1_EVALUATION_SCRIPT */',()=>fs.readFileSync(path.join(__dirname,'m1/evaluation.template.js'),'utf8')).replace('/* M1_WORKFLOW_SCRIPT */',()=>fs.readFileSync(path.join(__dirname,'m1/workflow.template.js'),'utf8'));
 let html=fs.readFileSync(path.join(__dirname,'m1/index.template.html'),'utf8');
+html=html.replace('<!-- M1_DEMO -->',()=>fs.readFileSync(path.join(__dirname,'m1/demo.template.html'),'utf8'));
 html=html.replace('<!-- M1_WORKFLOW -->',()=>fs.readFileSync(path.join(__dirname,'m1/workflow.template.html'),'utf8').replace('<!-- M1_WORKFLOW_NAV -->',()=>flowContent.map((s,i)=>'<button data-step="'+i+'" type="button" aria-pressed="'+String(i===0)+'"><span class="journey-step-number">0'+(i+1)+'</span><strong>'+['分组','裁切','颜色','纹理','比较','投票','核验'][i]+'</strong><span class="journey-card-visual" id="flow-viz-'+i+'"><span class="journey-loading">准备中…</span></span><small>'+['划分数据','保留中心','RGB 分布','局部明暗','参考图距离','近邻给候选','评价与复核'][i]+'</small></button>').join('')));
-html=html.replace('<!-- M1_EVALUATION:demo -->',()=>'<aside class="evaluation-protocol warm-board"><div><span class="mini-label">下一步 / 固定参数后查看测试集</span><p id="evaluation-status" role="status">正在准备训练集分组交叉验证…</p><small>锁定后本次会话不能再调整 k 和权重。这批公开图像已在历史版本展示，此处演示流程隔离，不作为独立盲测。</small></div><button id="finalize-test" type="button" class="primary-button" disabled>锁定参数并运行测试集</button></aside>');
+html=html.replace('<!-- M1_EVALUATION:demo -->',()=>'<aside class="evaluation-protocol warm-board"><div><span class="mini-label">下一步 / 固定参数后查看测试集</span><p id="evaluation-status" role="status">正在准备训练集分组交叉验证…</p><small>锁定后本次会话不能再调整 k 和权重。<span id="export-stage-note">训练阶段的复核如需保留，请先导出本阶段；测试导出只包含测试样品。</span>公开图像已在历史版本展示，此处演示流程隔离，不作为独立盲测。</small></div><button id="finalize-test" type="button" class="primary-button" disabled>锁定参数并运行测试集</button></aside>');
 html=html.replace('<!-- M1_BACKGROUND -->',()=>fs.readFileSync(path.join(__dirname,'m1/background.template.html'),'utf8').replace('<!-- M1_OBSERVATIONS -->',()=>paperFigures.full()));
 html=html.replace('<link rel="stylesheet" href="demo.css">',()=>'<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>\n<style data-m1-style="workflow">'+workflowCSS+'</style>\n<style data-m1-style="artwork">'+artworkCSS+'</style>');
 html=html.replace(/<img\b[^>]*\bsrc="\.\.\/assets\/m1-dioramas\.webp"[^>]*>/g,tag=>{
   const alt=/\balt="([^"]*)"/.exec(tag);
   return '<span class="art-sheet" role="img" aria-label="'+(alt?alt[1]:'教学设备插画')+'"></span>';
 });
-const scripts=[['data.js','dataset',fs.readFileSync(path.join(runtime,'data.js'),'utf8')],['model.js','model',fs.readFileSync(path.join(runtime,'model.js'),'utf8')],['demo.js','app',appSource]];
+// Source URLs share a prefix. Reconstruct them on load to keep the complete,
+// self-contained teaching package within the portal's browser storage budget.
+const sourcePrefixes=new Set(data.samples.map(s=>s.sourceUrl.endsWith(s.sourcePath)?s.sourceUrl.slice(0,-s.sourcePath.length):null));
+let datasetSource=fs.readFileSync(path.join(runtime,'data.js'),'utf8');
+if(sourcePrefixes.size===1&&!sourcePrefixes.has(null)){
+  const compactData=JSON.parse(JSON.stringify(data));compactData.samples.forEach(s=>{delete s.sourceUrl;});
+  const prefix=Array.from(sourcePrefixes)[0];
+  datasetSource='(function(){var d='+JSON.stringify(compactData)+';d.samples.forEach(function(s){s.sourceUrl='+JSON.stringify(prefix)+'+s.sourcePath;});window.M1_DATA=d;}());';
+}
+const scripts=[['data.js','dataset',datasetSource],['model.js','model',fs.readFileSync(path.join(runtime,'model.js'),'utf8')],['demo.js','app',appSource]];
 scripts.forEach(([name,label,source])=>{html=html.replace('<script src="'+name+'"></script>','<script data-m1="'+label+'">'+source.replace(/<\/script/gi,'<\\/script')+'</script>');});
 fs.writeFileSync(path.join(pack,'demo/index.html'),html);
 fs.writeFileSync(path.join(runtime,'demo.css'),fs.readFileSync(path.join(__dirname,'m1/style.template.css'),'utf8')+'\n'+workflowCSS);
@@ -67,7 +77,7 @@ tab.unmount=function(){global.removeEventListener('message',resize);if(frame)fra
 // Stable local ID replaces the earlier prototype; package ID stays free for standard import.
 definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261029-m1case12');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261029-m1case13');
 ['case-demo-host','case-upload','shell'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261029-sections3');});
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));
