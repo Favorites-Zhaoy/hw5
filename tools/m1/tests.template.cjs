@@ -79,7 +79,7 @@ test('the public subset preserves original image bytes, labels and disjoint dept
 });
 test('the ready case has visuals in background, workflow and demo and cleans up its frame',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),pkg=JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(c.status,'ready');assert.equal(c.version,'1.8.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
+  assert.equal(c.status,'ready');assert.equal(c.version,'1.9.0');assert.deepEqual(plain(c.tabs.background),pkg.tabs.background);
   assert.ok(pkg.tabs.background.sections.some(s=>s.html.includes('<svg')));assert.ok(pkg.tabs.workflow.metrics.html.includes('<svg'));
   assert.match(read('m1-cuttings-case/demo/index.html'),/id="processed-canvas"/);
   assert.equal(rt.ctx.Cases.validate(c).filter(x=>x.level==='error').length,0);
@@ -127,7 +127,7 @@ test('the directly opened entry embeds its theme, artwork, data and executable s
 function appRuntime(embedded=false,reduced=false,portalView=null){
   const html=read('m1-cuttings-case/demo/index.html'),nodes=new Map(),buttons=[];
   const create=tag=>{const e=new support.El(tag);e.getAttribute=name=>e.attributes[name]??null;e.style.setProperty=(k,v)=>{e.style[k]=v;};e.getBoundingClientRect=()=>({height:1800,top:0});e.click=()=>{e.clicked=true;if(e.listeners.click)e.listeners.click.call(e,{target:e});};e.closest=()=>e;return e;};
-  for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
+  for(const match of html.matchAll(/<([\w-]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const e=create(match[1]);for(const a of match[2].matchAll(/\b(src|alt|aria-pressed)="([^"]*)"/g))e.setAttribute(a[1],a[2]);nodes.set(match[3],e);}
   for(const match of html.matchAll(/<button\b([^>]*)>/g)){const attr=match[1],id=/\bid="([^"]+)"/.exec(attr);const e=id?nodes.get(id[1]):create('button');for(const a of attr.matchAll(/data-(view|go|step|rock|field-step)="([^"]+)"/g))e.dataset[a[1].replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=a[2];buttons.push(e);}
   const defaults={'k-select':'5','color-weight':'50',exposure:'0',contrast:'100','lag-minutes':'30',rop:'12'};
   for(const [id,value]of Object.entries(defaults))nodes.get(id).value=value;
@@ -145,6 +145,23 @@ function appRuntime(embedded=false,reduced=false,portalView=null){
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function flowEvent(rt,selector,dataset,type='click',value){const target={dataset,value,closest:s=>s===selector?target:null};rt.nodes.get('flow-snapshot').listeners[type]({target});}
+
+test('research figures demonstrate labels lighting and output granularity without changing model results',async()=>{
+  const rt=appRuntime();await settle();
+  const sample=rt.nodes.get('query-id').textContent,metrics=rt.nodes.get('evaluation-stats').innerHTML;
+  assert.match(rt.nodes.get('research-label-viz').innerHTML,/circle/);
+  rt.event('research-label-toggle','click');assert.equal(rt.nodes.get('research-label-viz').classList.contains('is-auditing'),true);
+  assert.match(rt.nodes.get('research-label-note').textContent,/不能证明/);
+  rt.event('research-label-toggle','click');assert.equal(rt.nodes.get('research-label-viz').classList.contains('is-auditing'),false);
+  rt.event('research-capture-toggle','click');assert.equal(rt.nodes.get('research-capture-viz').classList.contains('is-dim'),false);
+  assert.equal(rt.nodes.get('research-capture-a').src,data.samples.find(s=>s.id===sample).image);
+  assert.equal(rt.nodes.get('research-capture-a').src,rt.nodes.get('research-capture-b').src);
+  rt.event('research-grain-toggle','click');assert.equal(rt.nodes.get('research-grain-viz').classList.contains('is-grain'),true);
+  assert.match(rt.nodes.get('research-grain-note').textContent,/非本课分割结果/);
+  assert.equal(rt.nodes.get('query-id').textContent,sample);assert.equal(rt.nodes.get('evaluation-stats').innerHTML,metrics);
+  rt.buttons.find(b=>b.dataset.rock==='shale').listeners.click();
+  assert.equal(rt.nodes.get('research-capture-b').src,data.samples.find(s=>s.classId==='shale'&&s.split==='reference').image);
+});
 
 test('training-only exploration hides test samples and freezes parameters before one holdout evaluation',async()=>{
   const rt=appRuntime();await settle();assert.equal(rt.stats.evaluate,0);assert.match(rt.nodes.get('evaluation-status').textContent,/阶段 1/);
@@ -346,7 +363,7 @@ test('the rock lesson shows the case data rather than unrelated paper samples',a
 test('portal lessons mount separate matching views and tab switches preserve demo state',()=>{
   const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings-preview-local'),sc=rt.ctx.ATLAS.index.byScene.m1;
   const tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}
-  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.8.0&'));assert.ok(bg.src.endsWith('section=background'));
+  rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=1.9.0&'));assert.ok(bg.src.endsWith('section=background'));
   const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});
   click('flow');const flow=rt.document.getElementById('case-flow-root').children[0];assert.ok(flow.src.endsWith('section=workflow'));
   click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.endsWith('section=demo'));

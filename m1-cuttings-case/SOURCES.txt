@@ -107,3 +107,9 @@ SPWLA 67th Annual Logging Symposium, paper SPWLA-2026-0085.
 摘要集：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf
 最终议程：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/Technical%20Program/Final-2026-SPWLA-Technical-Program-with-Times-and-Session-Names.pdf
 作为前沿方向介绍，明确依据为会议摘要。没有采用摘要的性能数字或数据，本课没有颗粒级标注，不宣称已实现颗粒含量估计。
+
+
+技术前沿的交互图解
+标签点图的位置与颜色关系为机理示意，不是本课CNN嵌入、聚类或标签纠错结果；外观相似不证明标签错误。
+明暗对照复用当前真实照片，仅用浏览器brightness滤镜进行受控偏暗模拟；不是现场采集前后对照或标准化校正结果。
+颗粒图为原创SVG机理示意，切换输出表达粒度；没有生成、估计或声称获得本例颗粒分割、组分或矿物含量。

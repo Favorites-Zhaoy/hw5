@@ -125,11 +125,14 @@
   var fieldSample=DATA.samples.filter(function(sample){return sample.split==='reference';})[0];
   function showFieldSample(sample){
     $('field-sample-image').src=sample.image;
+    $('research-capture-a').src=sample.image;$('research-capture-b').src=sample.image;
     $('field-sample-credit').textContent='本例公开原图 · '+sample.id+' · 源井深 '+sample.depth+' m · 原标签：'+className(sample.classId);
   }
   showFieldSample(fieldSample);
   Array.prototype.forEach.call(document.querySelectorAll('[data-field-step]'),function(button){button.addEventListener('click',function(){showFieldStory(Number(button.dataset.fieldStep));});});
   showFieldStory(0);
+
+  /* M1_BACKGROUND_VISUALS */
 
   function imageFeatures(sample) {
     return new Promise(function(resolve,reject){
