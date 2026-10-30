@@ -1,6 +1,7 @@
 (function(){
   'use strict';
-  var DATA=window.M1_DATA,RESULTS=window.M1_RESULTS,AUDIT=window.M1_AUDIT;
+  var DATA=window.M1_DATA,RESULTS=window.M1_RESULTS,AUDIT=window.M1_AUDIT,BASELINE=window.M1_BASELINE;
+  var TEACHING=/* M1_TEACHING_CONTENT */ {};
   var $=function(id){return document.getElementById(id);};
   var esc=function(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});};
   var classes=DATA.classes,ids=classes.map(function(c){return c.id;}),byClass={},byId={};
@@ -19,7 +20,7 @@
     if(['background','workflow','demo'].indexOf(next)<0)next='background';view=next;
     Array.prototype.forEach.call(document.querySelectorAll('[data-view]'),function(b){var active=b.dataset.view===next;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;if(active&&focus)b.focus({preventScroll:true});});
     ['background','workflow','demo'].forEach(function(n){$('panel-'+n).hidden=n!==next;});
-    if(next==='workflow')renderWorkflow();if(next==='demo')renderIdentification(true);
+    if(next!=='demo'&&typeof stopBatchPlayback==='function')stopBatchPlayback();if(next==='workflow')renderWorkflow();if(next==='demo')renderIdentification(true);
     try{window.history.replaceState(null,'','#'+next);}catch(e){}
     if(scroll&&!embedded&&$('panel-'+next).scrollIntoView)$('panel-'+next).scrollIntoView({block:'start',behavior:'instant'});reportHeight();
   }
@@ -61,7 +62,7 @@
   renderRockLesson('sandstone');
   function splitMarkup() {
     return classes.map(function(c){var reference=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='reference';}).length;var test=DATA.samples.filter(function(s){return s.classId===c.id&&s.split==='test';}).length;
-      return '<div class="split-row"><header><span>'+c.name+'</span><span>'+reference+' 参考 / '+test+' 测试</span></header><div class="split-track"><span class="reference" style="width:'+reference/(reference+test)*100+'%">'+reference+'</span><span class="test" style="width:'+test/(reference+test)*100+'%">'+test+'</span></div></div>';
+      return '<div class="split-row"><header><span>'+c.name+'</span><span>'+reference+' 开发 / '+test+' 留出</span></header><div class="split-track"><span class="reference" style="width:'+reference/(reference+test)*100+'%">'+reference+'</span><span class="test" style="width:'+test/(reference+test)*100+'%">'+test+'</span></div></div>';
     }).join('')+'<div class="split-legend"><span><i></i>开发用资料 42 张</span><span><i class="test"></i>留出资料 24 张</span></div>';
   }
   $('split-bars').innerHTML = splitMarkup();
@@ -85,7 +86,6 @@
   var fieldSample=DATA.samples.filter(function(sample){return sample.split==='reference';})[0];
   function showFieldSample(sample){
     $('field-sample-image').src=sample.image;
-    $('research-capture-a').src=sample.image;$('research-capture-b').src=sample.image;
     $('field-sample-credit').textContent='本例公开原图 · '+sample.id+' · 源井深 '+sample.depth+' m · 原标签：'+className(sample.classId);
   }
   showFieldSample(fieldSample);
@@ -112,12 +112,12 @@
     showFieldSample(byId[id]);renderRockLesson(byId[id].classId,byId[id]);renderWorkflow();renderIdentification(Boolean(focus));publishLessonState();reportHeight();
   }
   function renderDepth(focus){
-    var samples=phaseSamples(),y=34,previous=null,parts=[],mobile=window.matchMedia&&window.matchMedia('(max-width:600px)').matches,chartWidth=mobile?300:474,photoX=mobile?46:64,sourceX=mobile?86:112,resultX=mobile?144:195,scoreStart=mobile?201:280,scoreWidth=mobile?79:154,bandWidth=mobile?36:48;recordY={};
+    var samples=phaseSamples(),y=34,previous=null,parts=[],chartWidth=600,photoX=64,sourceX=118,baselineX=217,resultX=316,scoreStart=416,scoreWidth=148,bandWidth=48;recordY={};
     samples.forEach(function(s,index){var gap=previous===null?0:s.depth-previous;if(index){if(gap>20){y+=68;parts.push('<g class="depth-break"><path d="M6 '+(y-34)+'l9 -5 9 5 9 -5"/><text x="52" y="'+(y-31)+'">间隔 '+gap+' m · 断轴</text></g>');}else y+=gap*10;}recordY[s.id]=y;
       var result=RESULTS.samples[s.id],different=result.prediction!==s.classId,selected=s.id===currentId;
-      var label='井深 '+s.depth+' 米，原始记录 '+className(s.classId)+'，识别结果 '+className(result.prediction);
+      var label='井深 '+s.depth+' 米，原始记录 '+className(s.classId)+'，颜色参照 '+className(BASELINE.samples[s.id].prediction)+'，CNN 结果 '+className(result.prediction);
       var scoreX=scoreStart,scoreBars=result.scores.map(function(score,c){var x=scoreX;scoreX+=score*scoreWidth;return '<rect x="'+x.toFixed(2)+'" y="'+(y-6)+'" width="'+(score*scoreWidth).toFixed(2)+'" height="12" fill="'+classes[c].color+'"/>';}).join('');
-      parts.push('<g class="depth-record '+(different?'is-different':'is-same')+(selected?' is-current':'')+'" data-pick="'+s.id+'" data-depth="'+s.depth+'" data-y="'+y+'" role="button" tabindex="'+(selected?'0':'-1')+'" aria-pressed="'+selected+'" aria-label="'+esc(label)+'"><title>'+esc(label)+'；'+classes.map(function(c,i){return c.name+' '+pct(result.scores[i]);}).join('，')+'</title><rect class="depth-hit" x="0" y="'+(y-10)+'" width="'+(chartWidth-4)+'" height="20"/><text class="depth-value" x="5" y="'+(y+4)+'">'+s.depth+'</text><image href="'+s.image+'" x="'+photoX+'" y="'+(y-9)+'" width="22" height="18" preserveAspectRatio="xMidYMid slice"/><rect x="'+sourceX+'" y="'+(y-5)+'" width="'+bandWidth+'" height="10" rx="2" fill="'+byClass[s.classId].color+'"/><rect x="'+resultX+'" y="'+(y-5)+'" width="'+bandWidth+'" height="10" rx="2" fill="'+byClass[result.prediction].color+'"/>'+scoreBars+(different?'<text class="record-difference" x="'+(mobile?286:446)+'" y="'+(y+5)+'">≠</text>':'')+'</g>');previous=s.depth;
+      parts.push('<g class="depth-record '+(different?'is-different':'is-same')+(selected?' is-current':'')+'" data-pick="'+s.id+'" data-depth="'+s.depth+'" data-y="'+y+'" role="button" tabindex="'+(selected?'0':'-1')+'" aria-pressed="'+selected+'" aria-label="'+esc(label)+'"><title>'+esc(label)+'；'+classes.map(function(c,i){return c.name+' '+pct(result.scores[i]);}).join('，')+'</title><rect class="depth-hit" x="0" y="'+(y-10)+'" width="'+(chartWidth-4)+'" height="20"/><text class="depth-value" x="5" y="'+(y+4)+'">'+s.depth+'</text><image href="'+s.image+'" x="'+photoX+'" y="'+(y-9)+'" width="22" height="18" preserveAspectRatio="xMidYMid slice"/><rect x="'+sourceX+'" y="'+(y-5)+'" width="'+bandWidth+'" height="10" rx="2" fill="'+byClass[s.classId].color+'"/><rect x="'+baselineX+'" y="'+(y-5)+'" width="'+bandWidth+'" height="10" rx="2" fill="'+byClass[BASELINE.samples[s.id].prediction].color+'"/><rect x="'+resultX+'" y="'+(y-5)+'" width="'+bandWidth+'" height="10" rx="2" fill="'+byClass[result.prediction].color+'"/>'+scoreBars+(different?'<text class="record-difference" x="'+580+'" y="'+(y+5)+'">≠</text>':'')+'</g>');previous=s.depth;
     });
     var log=$('depth-log');log.innerHTML='<svg class="depth-track" viewBox="0 0 '+chartWidth+' '+(y+24)+'" role="group" aria-label="真实井深上的离散照片、原始岩性和分类结果">'+parts.join('')+'</svg>';
     if(focus&&log.clientHeight)log.scrollTop=Math.max(0,recordY[currentId]*log.clientWidth/chartWidth-log.clientHeight/2);
@@ -129,13 +129,13 @@
     $('sample-select').innerHTML=phaseSamples().map(function(p){return '<option value="'+p.id+'">'+p.depth+' m · '+p.id+'</option>';}).join('');$('sample-select').value=s.id;
     $('phase-validation').setAttribute('aria-pressed',String(evaluationStage==='validation'));$('phase-test').setAttribute('aria-pressed',String(evaluationStage==='test'));
     $('evaluation-sample-badge').textContent=(evaluationStage==='test'?'留出组':'开发组')+' / 井 '+s.well;
-    $('query-image').src=s.image;$('query-id').textContent=s.id;$('query-depth').textContent='源井深 '+s.depth+' m';$('prediction').textContent=className(r.prediction);$('original-label').textContent=className(s.classId);
+    $('query-image').src=s.image;$('query-id').textContent=s.id;$('query-depth').textContent='源井深 '+s.depth+' m';$('prediction').textContent=className(r.prediction);$('original-label').textContent=className(s.classId);$('baseline-label').textContent=className(BASELINE.samples[s.id].prediction);
     $('result-state').textContent=different?'与记录不同':'与记录相同';$('result-state').classList.toggle('is-different',different);$('comparison-note').classList.toggle('is-different',different);
-    $('comparison-note').textContent=different?'两列给出的岩性不同，可沿井深对照相邻照片。':'识别结果与原始记录相同，可继续查看相邻井深的变化。';
+    $('comparison-note').textContent=different?'CNN 与原始记录不同，可沿井深对照相邻照片及颜色参照。':'识别结果与原始记录相同，可继续查看相邻井深的变化。';
     $('class-scores').innerHTML=classes.map(function(c,i){return '<button type="button" class="class-score" data-cam-class="'+c.id+'" aria-pressed="'+(currentCamClass===c.id)+'"><span>'+c.name+'</span><i><b style="width:'+r.scores[i]*100+'%;background:'+c.color+'"></b></i><strong>'+pct(r.scores[i])+'</strong></button>';}).join('');
     $('response-label').textContent=className(currentCamClass)+' / 图像响应';drawSampleCanvas($('response-image'),currentCamClass);
     $('depth-legend').innerHTML=classes.map(function(c){return '<span><i style="background:'+c.color+'"></i>'+c.name+'</span>';}).join('');
-    renderDepth(focus);renderEvaluation();
+    renderDepth(focus);renderEvaluation();renderDemoComparison();
   }
   function renderEvaluation(){
     $('phase-comparison').innerHTML=['validation','test'].map(function(phase){var m=RESULTS.metrics[phase];return '<div><span>'+(phase==='test'?'留出组 · 24 张':'开发组 · 42 张')+'</span><b>'+pct(m.accuracy)+'</b><small>与原始标签一致<br>宏平均 F1 '+m.macroF1.toFixed(3)+'</small></div>';}).join('');
@@ -154,11 +154,14 @@
   function csvCell(value){return '"'+String(value==null?'':value).replace(/"/g,'""')+'"';}
   function downloadCSV(rows,name){var blob=new Blob(['\ufeff'+rows.map(function(row){return row.map(csvCell).join(',');}).join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();window.setTimeout(function(){URL.revokeObjectURL(url);},1000);}
   function exportData(){var rows=[['sample_id','well','source_depth_m','source_label','source_path','source_url','image_sha256','width_px','height_px','roi_xyxy','group_20m','split','capture_conditions','lag_correction']];DATA.samples.forEach(function(s){var a=AUDIT[s.id];rows.push([s.id,s.well,s.depth,s.label,s.sourcePath,s.sourceUrl,s.sha256,a.width,a.height,a.roi.join(':'),s.group,s.split,'not_provided','not_provided']);});downloadCSV(rows,'m1-cuttings-data-manifest.csv');}
-  $('export-identification').addEventListener('click',function(){var rows=[['sample_id','well','source_depth_m','source_label','identified_lithology','score_sandstone','score_shale','score_dolomite','experiment_phase','fit_images','excluded_group','weights_sha256','image_sha256']];phaseSamples().forEach(function(s){var r=RESULTS.samples[s.id];rows.push([s.id,s.well,s.depth,s.label,className(r.prediction)].concat(r.scores,[evaluationStage,r.fitCount,r.fold==='holdout'?'':r.fold,RESULTS.method.weightsSha256,s.sha256]));});downloadCSV(rows,'m1-identification-'+evaluationStage+'.csv');});
+  function exportIdentificationRecords(){var rows=[['sample_id','well','source_depth_m','source_label','color_baseline_lithology','identified_lithology','score_sandstone','score_shale','score_dolomite','experiment_phase','fit_images','excluded_group','weights_sha256','image_sha256']];phaseSamples().forEach(function(s){var r=RESULTS.samples[s.id];rows.push([s.id,s.well,s.depth,s.label,className(BASELINE.samples[s.id].prediction),className(r.prediction)].concat(r.scores,[evaluationStage,r.fitCount,r.fold==='holdout'?'':r.fold,RESULTS.method.weightsSha256,s.sha256]));});downloadCSV(rows,'m1-identification-'+evaluationStage+'.csv');}
+  $('export-identification').addEventListener('click',exportIdentificationRecords);
   function publishLessonState(){if(embedded&&sharingReady&&!applyingShared)window.parent.postMessage({__m1StateUpdate:{sampleId:currentId,stage:evaluationStage}},'*');}
   window.addEventListener('message',function(event){if(event.source!==window.parent||!event.data)return;if(embedded&&event.data.__m1ScrollToTop)window.scrollTo(0,0);if(event.data.__m1NavigationAck===navigationPending)navigationPending=null;if(Object.prototype.hasOwnProperty.call(event.data,'__m1SharedState')){sharingReady=true;var state=event.data.__m1SharedState;if(state&&byId[state.sampleId]){applyingShared=true;selectSample(state.sampleId);applyingShared=false;}else publishLessonState();}});
   $('flow-sample-select').innerHTML=DATA.samples.map(function(s){return '<option value="'+s.id+'">'+s.id+' · '+s.depth+' m</option>';}).join('');
+  /* M1_TEACHING_SCRIPT */
   /* M1_WORKFLOW_SCRIPT */
+  renderTerminology();
   selectSample(currentId);setView(portalSection||window.location.hash.slice(1)||'background',false);
   if(embedded)window.parent.postMessage({__m1StateRequest:true},'*');
   if(window.ResizeObserver)new window.ResizeObserver(reportHeight).observe(document.body);window.addEventListener('load',reportHeight);window.addEventListener('resize',function(){renderDepth(false);reportHeight();});

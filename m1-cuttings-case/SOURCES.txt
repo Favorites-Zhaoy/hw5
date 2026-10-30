@@ -1,4 +1,4 @@
-背景资料核验：2026-10-24；论文图例核查与更新：2026-10-28；技术前沿与四部分背景核验：2026-10-30
+背景资料核验：2026-10-24；论文图例核查与更新：2026-10-28；最新技术前沿与五部分背景核验：2026-10-30
 
 [1] 真实 RGB 岩屑图像、岩性与井深标签
 nature9420/-ResNet-HMM-Lithology
@@ -57,7 +57,7 @@ https://glossary.slb.com/terms/c/cuttings
 用于说明岩屑由钻头破岩产生，以及组成、大小、形态、颜色与纹理等观察维度。
 
 专业背景组织参考
-本版按用户要求改为：真实背景 / 技术前沿 / 示例数据 / 技术难度与参考方向。第四部分参照用户所给截图呈现分档、难度条、参考技术与交叉环节；评级仅指课程实现条件，不套用截图中其他主题的方法或工期。
+本版按教师最新要求组织：真实背景 / 技术前沿 / 示例数据 / 技术难度与参考方向 / 术语对照表。第四部分参照用户所给截图呈现分档、难度条、参考技术与交叉环节；评级仅指课程实现条件，不套用截图中其他主题的方法或工期。
 
 [11] 不同岩屑、同类差异与污染：真实岩屑图像
 Tolstaya E, Shakirov A, Mezghani M, Safonov S (2023).
@@ -102,10 +102,31 @@ Automated Lithology Recognition in Drill Cuttings: From Global Context to Instan
 SPWLA 67th Annual Logging Symposium, paper SPWLA-2026-0085.
 摘要集：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/FINAL%20Abstracts%20-%202026-Final.pdf
 最终议程：https://www.spwla.org/common/Uploaded%20files/2026%20Symposium%20Website/Technical%20Program/Final-2026-SPWLA-Technical-Program-with-Times-and-Session-Names.pdf
-作为前沿方向介绍，明确依据为会议摘要。没有采用摘要的性能数字或数据，本课没有颗粒级标注，不宣称已实现颗粒含量估计。
+仅保留为扩展阅读，依据为会议摘要；当前主线改用下方正式期刊论文。没有采用摘要的性能数字或数据，本课没有颗粒级标注，不宣称已实现颗粒含量估计。
 
 
-技术前沿的交互图解
-标签点图的位置与颜色关系为机理示意，不是本课CNN嵌入、聚类或标签纠错结果；外观相似不证明标签错误。
-明暗对照复用当前真实照片，仅用浏览器brightness滤镜进行受控偏暗模拟；不是现场采集前后对照或标准化校正结果。
-颗粒图为原创SVG机理示意，切换输出表达粒度；没有生成、估计或声称获得本例颗粒分割、组分或矿物含量。
+[20] 基础 CNN 的注意力变体（2026-10-27）
+Zhang Y, Zhang F, Li J, Huang L, Li R.
+A multi-attention mechanism-improved ResNet18 approach for lithology identification and classification.
+PLOS One (2026). DOI: 10.1371/journal.pone.0361625
+https://doi.org/10.1371/journal.pone.0361625
+出版方正文核对：ResNet-18 比较多种注意模块；CBAM 位于最后残差阶段之后、平均池化之前，包含通道与空间注意。论文用岩石图像分类数据，本课为 RGB 岩屑；本课未运行 CBAM，也不采用论文成绩。
+
+[21] 岩屑多属性、知识引导多任务学习（2026-05-27 在线）
+Hou L, Li X, Tian W-Z, Su Q-X, Huang R-Q, Song M-H, Du P, Ren Y-L.
+A knowledge-guided multi-task learning method for drill cuttings analysis.
+Petroleum Science 23(9) (2026), 5624–5635. DOI: 10.1016/j.petsci.2026.05.037
+https://doi.org/10.1016/j.petsci.2026.05.037
+出版方摘要：颜色、形状和颗粒类型的多任务学习，利用地质属性先验关联。未据摘要推定具体骨干网络。本课没有这些多属性标签，未复现。未引用或改编其论文图片。
+
+[22] 微 CT 岩屑的基础 ResNet-18 迁移学习（2025-02）
+Olsen N, Chen Y, Turberg P, Moreau A, Alahi A.
+X-ray Micro-CT based characterization of rock cuttings with deep learning.
+Applied Computing and Geosciences 25 (2025), 100220. DOI: 10.1016/j.acags.2025.100220
+https://doi.org/10.1016/j.acags.2025.100220
+研究用预训练 ResNet-18 分类五类微 CT 岩屑图像。本课借鉴基础 CNN 和迁移学习的思路；RGB 与微 CT 成像不同，不互用结果，也不宣称复现其模型训练方案。
+
+机制图与实际结果的区分
+现场过程、砂岩颗粒/页岩层理/碳酸盐晶体结构、注意力加权、多任务分支为本课原创机制图，未作为样本测量。
+CNN 分类得分、逐类别响应与常规颜色参照来自本课固定实验。常规参照与 CNN 同图、同裁切、同井段分组；没有人工识别准确率或耗时数据。两组实际成绩均保留，结果回放时间不作为效率测量。
+术语表为专业含义与本课计算任务的对应，组织形式参考 saphirv3。岩屑与矿物测量依据见 AAPG、SLB；CNN 与分组方法见官方技术文档。

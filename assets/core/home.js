@@ -36,7 +36,7 @@
   }
   function firstLesson() {
     return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，了解它从哪里来，整理照片、井深和标签，再对照岩性沿井深的变化。</p><a href="#/scene/m1?case=m1-cuttings&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
-      '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>整理数据</b><small>照片、井深和标签怎样对应？</small></li><li><span>03</span><b>辅助识别</b><small>沿井深对照照片与岩性。</small></li></ol></section>';
+      '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>传统与 CNN</b><small>AI 接替了哪一段判断？</small></li><li><span>03</span><b>结果对照</b><small>同一批照片，分类后有什么变化？</small></li></ol></section>';
   }
   function sceneLeaf(sc, st) {
     var ready = C.bySceneAll(sc.id).length;

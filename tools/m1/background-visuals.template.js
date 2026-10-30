@@ -1,17 +1,13 @@
-  // Mechanism illustrations only: positions and particles are not measured data.
-  var researchColors=classes.map(function(c){return c.color;});
-  var researchPoints=[[65,66,0],[88,55,0],[109,72,0],[57,93,0],[81,91,1],[105,103,0],[72,116,0],[126,91,0],[203,57,2],[225,48,2],[244,68,2],[218,78,2],[201,123,1],[225,112,1],[245,132,1],[219,145,1]];
-  $('research-label-viz').innerHTML='<svg viewBox="0 0 310 192" role="img" aria-label="外观相似的样本在图中特征位置靠近，颜色表示已有标签；蓝灰点位于砂色点群中，提示需要核对。"><text x="16" y="23">外观特征空间 · 示意</text>'+researchPoints.map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="7" fill="'+researchColors[p[2]]+'"/>';}).join('')+'<g class="audit-mark"><circle cx="81" cy="91" r="16" fill="none" stroke="#cf514b" stroke-width="2.5"/><path d="M96 96L157 164H281" fill="none" stroke="#cf514b" stroke-width="1.5"/><text x="161" y="156">标签值得核对</text></g></svg>';
-  var researchLegend='<div class="research-legend">'+classes.map(function(c){return '<span><i style="background:'+c.color+'"></i>'+c.name+'</span>';}).join('')+'</div>';
-  $('research-label-viz').innerHTML+=researchLegend;
-  var researchParticles=['42,56 70,43 84,65 64,83 39,74','107,48 133,53 142,77 119,87 100,71','171,48 197,43 210,66 188,82 167,68','231,54 257,49 273,75 246,85 228,71','49,108 77,100 90,122 75,145 48,138','113,111 136,100 151,123 136,146 112,139','177,111 199,103 216,123 199,147 174,136','237,108 266,105 279,129 254,146 233,131'];
-  $('research-grain-viz').innerHTML='<svg viewBox="0 0 310 192" role="img" aria-label="同一盘示意岩屑的两种输出表达；整图模式给一个标签，颗粒模式为各碎块显示类别。"><rect class="grain-tray" x="18" y="33" width="275" height="127" rx="13"/><text class="whole-caption" x="18" y="22">整图：一个标签</text><text class="grain-caption" x="18" y="22">逐颗：保留类别差异</text>'+researchParticles.map(function(p,i){return '<polygon class="research-particle" points="'+p+'" style="--particle:'+researchColors[[0,0,1,0,2,0,1,0][i]]+'"/>';}).join('')+'</svg><div class="grain-legend">'+researchLegend+'</div>';
-  $('research-label-toggle').addEventListener('click',function(){
-    var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(on));$('research-label-viz').classList.toggle('is-auditing',on);
-    $('research-label-note').textContent=on?'圈出的点与周围标签不同；外观相近本身不能证明原标签错误。':'特征空间示意：同色为同类标签，点靠近表示外观相似。';reportHeight();
-  });
-  $('research-capture-toggle').addEventListener('click',function(){var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(on));$('research-capture-viz').classList.toggle('is-dim',on);});
-  $('research-grain-toggle').addEventListener('click',function(){
-    var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(on));$('research-grain-viz').classList.toggle('is-grain',on);
-    $('research-grain-note').textContent=on?'机理示意，非本课分割结果；颜色表示类别，不是实测矿物含量。':'输出粒度示意：整盘只给一个标签，会省略混合样品中的类别差异。';reportHeight();
-  });
+  // Mechanism drawings describe cited methods; they are not measured weights or predictions.
+  var attentionOn=false,multitaskOn=false;
+  function renderAttention(){
+    $('research-attention-viz').innerHTML='<svg viewBox="0 0 330 185" role="img" aria-label="残差网络特征先经过通道注意，再经过空间注意的机制示意"><text x="12" y="20">特征：哪些通道、哪些位置更有用？</text>'+[0,1,2].map(function(i){return '<rect x="'+(18+i*11)+'" y="'+(56-i*9)+'" width="62" height="68" fill="'+['#bdcfc1','#9ab4a9','#769e96'][i]+'" stroke="#698982"/>';}).join('')+'<path d="M111 90H133M211 90H234" stroke="#ac9c7f" stroke-width="2"/><rect x="136" y="47" width="70" height="82" rx="6" fill="#f1dfbf"/><text x="145" y="72">通道注意</text>'+[0,1,2,3].map(function(i){var weights=attentionOn?[.25,.9,.5,.72]:[.5,.5,.5,.5];return '<rect x="'+(146+i*13)+'" y="'+(115-weights[i]*33)+'" width="8" height="'+(weights[i]*33)+'" fill="#b88950"/>';}).join('')+'<rect x="237" y="47" width="80" height="82" rx="6" fill="#dae7df"/><text x="246" y="72">空间注意</text>'+[0,1,2,3,4,5,6,7,8].map(function(i){var op=attentionOn?[.1,.2,.2,.3,.95,.7,.2,.6,.4][i]:.35;return '<rect x="'+(252+i%3*16)+'" y="'+(80+Math.floor(i/3)*13)+'" width="13" height="10" fill="#b88146" opacity="'+op+'"/>';}).join('')+'<text x="18" y="160">CNN 特征</text><text x="136" y="160">选择通道</text><text x="238" y="160">突出位置</text></svg>';
+    $('research-attention-note').textContent=attentionOn?'不同柱高与深浅只解释加权机制；不是本课权重，本课没有运行 CBAM。':'ResNet-18 + CBAM 机制示意；展开查看两种注意怎样作用。';
+  }
+  function renderMultitask(){
+    $('research-multitask-viz').innerHTML='<svg viewBox="0 0 330 185" role="img" aria-label="一份共享图像表示分别用于颜色、形状与颗粒类型任务，地质属性关联连接各任务"><rect x="10" y="63" width="96" height="64" rx="7" fill="#cadbd1"/><text x="24" y="90">共享图像表示</text><text x="28" y="113">同一张岩屑图</text>'+['颜色','形状','颗粒类型'].map(function(n,i){return '<path d="M106 95H142V'+(35+i*58)+'H173" fill="none" stroke="#8bada3" stroke-width="2"/><rect x="177" y="'+(16+i*58)+'" width="99" height="38" rx="6" fill="#eee0c9"/><text x="194" y="'+(41+i*58)+'">'+n+'</text>';}).join('')+(multitaskOn?'<path d="M284 35H307V151H284M284 93H307" fill="none" stroke="#bd7746" stroke-width="2" stroke-dasharray="4 3"/><text x="17" y="172">知识引导：利用属性之间的先验关联</text>':'<text x="17" y="172">一个输入，多个预测任务</text>')+'</svg>';
+    $('research-multitask-note').textContent=multitaskOn?'橙色连线表示属性关联的机制；本课缺少多属性标签，未复现该方法。':'颜色、形状、颗粒类型共用图像表示；连线为机制示意。';
+  }
+  $('research-attention-toggle').addEventListener('click',function(){attentionOn=!attentionOn;this.setAttribute('aria-pressed',String(attentionOn));renderAttention();reportHeight();});
+  $('research-multitask-toggle').addEventListener('click',function(){multitaskOn=!multitaskOn;this.setAttribute('aria-pressed',String(multitaskOn));renderMultitask();reportHeight();});
+  renderAttention();renderMultitask();
