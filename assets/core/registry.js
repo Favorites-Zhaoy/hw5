@@ -18,20 +18,11 @@
   var order = [];
   var problems = [];
 
-  // Historical copies of this course case must not replace the maintained lesson.
-  // Keep other uploaded cases, including custom M1 cases, under the normal rules.
-  var M1_PREVIOUS = ['m1-cuttings-preview-local', 'm1-cuttings-knn', 'm1-cuttings-resnet'];
-  function versionBefore(a, b) {
-    var left = String(a || '0').split('.'), right = String(b || '0').split('.');
-    for (var n = 0; n < 3; n++) {
-      var x = parseInt(left[n], 10) || 0, y = parseInt(right[n], 10) || 0;
-      if (x !== y) return x < y;
-    }
-    return false;
-  }
+  // M1 has one maintained lesson. Stored copies cannot replace any of its tabs,
+  // even if their IDs or version strings were edited. Other scenes keep imports.
   function isRetired(c) {
     var current = store['m1-cuttings'];
-    return !!(current && c && c.sceneId === 'm1' && M1_PREVIOUS.indexOf(c.id) >= 0 && versionBefore(c.version, current.version));
+    return !!(current && c && c !== current && c.sceneId === 'm1' && (c.id !== current.id || c.imported));
   }
 
   function reg(def) {
@@ -68,6 +59,7 @@
 
   /* 一个场景可以挂多个案例；后导入的优先，插件案例按注册顺序兜底 */
   function bySceneAll(sceneId) {
+    if (sceneId === 'm1' && store['m1-cuttings']) return [store['m1-cuttings']];
     var imported = [], builtin = [];
     for (var i = 0; i < order.length; i++) {
       var c = store[order[i]];
@@ -84,15 +76,15 @@
   }
 
   function resolveScene(sceneId, id) {
+    if (sceneId === 'm1' && store['m1-cuttings']) return store['m1-cuttings'];
     var all = bySceneAll(sceneId);
     var exact = all.filter(function (c) { return c.id === id; })[0];
     if (exact) return exact;
-    if (sceneId === 'm1' && M1_PREVIOUS.indexOf(id) >= 0 && store['m1-cuttings']) return store['m1-cuttings'];
     return all[0] || null;
   }
 
   function list() {
-    return order.map(function (id) { return store[id]; });
+    return order.map(function (id) { return store[id]; }).filter(function (c) { return !isRetired(c); });
   }
 
   /* ---------- 校验：返回结构化结果，供控制台展示 ---------- */

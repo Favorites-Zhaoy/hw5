@@ -14,17 +14,17 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 1050 180" role="img" aria-label="从原始照片到数据清单的七步整理流程">'+flowContent.map((s,i)=>{const x=i*150;return '<g transform="translate('+x+',12)"><rect width="140" height="146" rx="10" fill="#fff9ee" stroke="#e4d6c0"/><text x="13" y="33" font-size="21" fill="#c59562">0'+(i+1)+'</text><text x="13" y="68" font-size="12" fill="#365261">'+s.name+'</text><text x="13" y="99" font-size="11" fill="#869084">'+['原图与来源','照片对应记录','曝光与重复','中心裁切与缩放','三类统一词表','17 个井段组','逐图 CSV 清单'][i]+'</text></g>';}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 130" role="img" aria-label="辅助识别使用固定 ResNet-18 图像特征和三类分类层"><text x="0" y="20" fill="#8d866c" font-size="13">整理完成的照片，进入辅助识别</text>'+['224×224 照片','固定 ResNet-18','三类分类得分','井深上的岩性对照'].map((label,i)=>'<g transform="translate('+(i*180)+',42)"><rect width="164" height="55" rx="8" fill="'+['#ead8bb','#c9dadd','#dcd9c0','#d3dfd0'][i]+'"/><text x="12" y="32" fill="#365261" font-size="12">'+label+'</text></g>').join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id&&s.split==='reference');return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-resnet',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'2.0.1',updated:'2026-10-30',status:'ready',tabs:{
+const definition={id:'m1-cuttings',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'2.0.2',updated:'2026-10-30',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'这些照片，怎样整理到能用？',lead:['跟随同一张真实照片，把原图、井深、标签和用途整理清楚。这些工作先于识别方法，决定数据能否继续使用。'],stats:[['真实照片','66 张'],['数据整理','7 步'],['井段分组','17 组']],steps:flowContent.map(s=>({name:s.name,role:s.role,do:s.process,effect:s.output,trap:s.trap})),metrics:{title:'从原始照片到数据清单',html:style+'<div class="m1c">'+workflow+'</div>'+flowContent.map((s,i)=>'<h4>0'+(i+1)+' · '+s.name+'</h4><p><b>输入：</b>'+s.input+'</p><p><b>处理：</b>'+s.process+'</p><p><b>原因：</b>'+s.why+'</p><p><b>输出：</b>'+s.output+'</p>').join('')},fails:[{name:'照片与井深错位',why:'没有取样与迟到记录，无法保证照片对应正确井段。'},{name:'标签含义不清',why:'整图标签不能直接当作每颗岩屑的标签。'},{name:'相邻照片分散到不同用途',why:'相似成像条件和相邻井段会让数据代表性被高估。'}]},
-demo:{mode:'page',html:'demo/index.html',label:'辅助识别',intro:'沿井深选择真实岩屑照片，对照原始岩性、分类得分和图像响应。识别结果来自固定的 ResNet-18 图像特征与三类分类层实验。',height:1040}
+demo:{mode:'page',html:'demo/lesson.html',label:'辅助识别',intro:'沿井深选择真实岩屑照片，对照原始岩性、分类得分和图像响应。识别结果来自固定的 ResNet-18 图像特征与三类分类层实验。',height:1040}
 }};
 // Retain the same teaching points in original-protocol HTML for older portals.
 const rockOverview='<p><b>细砂岩</b>：可进一步核对原岩颗粒与胶结；<b>页岩</b>：碎块未必保留完整层理；<b>灰质白云岩</b>：需要核验碳酸盐组分。上方为本例真实岩屑照片，论文图为独立图例。外观不能直接证明矿物含量、孔渗或油气。</p>';
 
 definition.tabs.background=require('./m1/background-metadata.cjs')({style,well,feature,photos,split,rockOverview,observationGallery:paperFigures.legacy()});
-definition.tabs.background.page={html:'demo/index.html',view:'background',height:1040};
-definition.tabs.workflow.page={html:'demo/index.html',view:'workflow',height:1040};
+definition.tabs.background.page={html:'demo/lesson.html',view:'background',height:1040};
+definition.tabs.workflow.page={html:'demo/lesson.html',view:'workflow',height:1040};
 definition.tabs.demo.view='demo';
 const grouped={};data.samples.forEach(s=>{if(!grouped[s.group])grouped[s.group]=[];grouped[s.group].push(s);});
 const groupDiagram='<svg viewBox="0 0 820 265" role="img" aria-label="本案例实际17个20米井段分组及用途">'+Object.keys(grouped).sort((a,b)=>Number(a.split('-').pop())-Number(b.split('-').pop())).map((key,i)=>{const start=Number(key.split('-').pop()),samples=grouped[key],test=samples[0].split==='test',x=(i%6)*137,y=Math.floor(i/6)*78;return '<g transform="translate('+x+','+y+')"><rect width="126" height="65" rx="6" fill="'+(test?'#efd0a9':'#c9dadd')+'"/><text x="10" y="25" fill="#6b7e80" font-size="12">'+start+'—'+(start+19)+' m</text><text x="10" y="49" fill="#83907e" font-size="10">'+samples.length+' 张 / '+(test?'留出':'开发')+'</text></g>';}).join('')+'<text x="0" y="257" fill="#a3957a" font-size="11">整组划分：42 张开发用资料、24 张留出资料；颜色表示用途。</text></svg>';
@@ -65,7 +65,7 @@ if(sourcePrefixes.size===1&&!sourcePrefixes.has(null)){
 }
 const scripts=[['data.js','dataset',datasetSource],['results.js','results','window.M1_RESULTS='+fs.readFileSync(path.join(runtime,'resnet-results.json'),'utf8')+';window.M1_AUDIT='+fs.readFileSync(path.join(runtime,'data-audit.json'),'utf8')+';'],['demo.js','app',appSource]];
 scripts.forEach(([name,label,source])=>{html=html.replace('<script src="'+name+'"></script>','<script data-m1="'+label+'">'+source.replace(/<\/script/gi,'<\\/script')+'</script>');});
-fs.writeFileSync(path.join(pack,'demo/index.html'),html);
+fs.writeFileSync(path.join(pack,'demo/lesson.html'),html);
 fs.writeFileSync(path.join(runtime,'demo.css'),fs.readFileSync(path.join(__dirname,'m1/style.template.css'),'utf8')+'\n'+workflowCSS);
 fs.writeFileSync(path.join(runtime,'demo.js'),appSource);
 fs.copyFileSync(path.join(__dirname,'m1/tests.template.cjs'),path.join(root,'tests/m1-preview.cjs'));
@@ -73,15 +73,15 @@ const wrapper=`/* Generated from m1-cuttings-case/case.json by tools/build-m1-ca
 (function(global){'use strict';var definition=${JSON.stringify(definition)};
 function attachSection(name,section){var frame=null;var tab=definition.tabs[name];
 function resize(event){if(!frame||event.source!==frame.contentWindow)return;var h=event.data&&event.data.__m1Height;if(typeof h==='number'&&isFinite(h))frame.style.height=Math.max(700,Math.min(10000,h+2))+'px';}
-tab.mount=function(root){tab.unmount();frame=document.createElement('iframe');frame.src='m1-cuttings-case/demo/index.html?v='+encodeURIComponent(definition.version)+'&embed=portal&section='+section;frame.setAttribute('title','M1 · '+tab.label);frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='display:block;width:100%;height:1040px;border:0;border-radius:12px;background:#fcf6eb';global.addEventListener('message',resize);root.appendChild(frame);};
+tab.mount=function(root){tab.unmount();frame=document.createElement('iframe');frame.src='m1-cuttings-case/demo/lesson.html?v='+encodeURIComponent(definition.version)+'&embed=portal&section='+section;frame.setAttribute('title','M1 · '+tab.label);frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='display:block;width:100%;height:1040px;border:0;border-radius:12px;background:#fcf6eb';global.addEventListener('message',resize);root.appendChild(frame);};
 tab.unmount=function(){global.removeEventListener('message',resize);if(frame)frame.remove();frame=null;};}
 ['background','workflow','demo'].forEach(function(name){attachSection(name,name);});
-// Canonical website case; the import package keeps its independent ID.
+// One canonical case identity for the site and the current standalone package.
 definition.id='m1-cuttings';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1case17');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1case18');
 indexText=indexText.replace(/(assets\/data\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1-data2');
-['registry','case-demo-host','case-upload','shell','home','mudlogging'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261030-routes5');});
+['registry','case-demo-host','case-upload','shell','home','mudlogging'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261030-routes6');});
 indexText=indexText.replace(/(assets\/core\/mudlogging\.css\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-ml2');
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

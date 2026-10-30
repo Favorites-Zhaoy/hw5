@@ -326,7 +326,7 @@
     /* 1 id */
     if (!meta.id) err('案例 id 没填', '建议「环节-关键词」，例如 welllog-layer');
     else if (!ID_RE.test(meta.id)) err('案例 id 格式不合法：' + meta.id, '只能小写字母、数字、连字符，不能有空格或下划线');
-    else if (global.Cases.isRetired && global.Cases.isRetired(meta)) err('这是已停用的 M1 旧版案例包', '请使用当前岩屑案例或下载新版作业包。');
+    else if (global.Cases.isRetired && global.Cases.isRetired(meta)) err('这个 M1 案例包已停用', '岩屑案例只保留站点中的当前版本，请直接打开当前案例。');
     else if (global.Cases.get(meta.id)) err('案例 id 已被占用：' + meta.id, '换一个 id；若是之前上传的旧版本，先在案例库里移除');
     else ok('id 可用：' + meta.id);
 
@@ -1558,7 +1558,11 @@
   }
 
   function exported() {
-    return saved.map(function (r) {
+    var maintainedM1 = global.Cases.get('m1-cuttings');
+    return saved.filter(function (r) {
+      if (maintainedM1 && !maintainedM1.imported && r.meta.sceneId === 'm1') return false;
+      return !global.Cases.isRetired || !global.Cases.isRetired(r.meta);
+    }).map(function (r) {
       return { id: r.meta.id, title: r.meta.title, sceneId: r.meta.sceneId, files: (r.files || []).length, savedAt: r.savedAt };
     });
   }
@@ -1570,7 +1574,11 @@
     remove: remove,
     restore: restore,
     updateMeta: updateMeta,
-    blockedList: readBlocklist,
+    blockedList: function () {
+      return readBlocklist().filter(function (id) {
+        return !(global.Cases.get('m1-cuttings') && id !== 'm1-cuttings' && id.indexOf('m1-cuttings-') === 0);
+      });
+    },
     list: exported,
     template: templateManifest,
     check: function (pkg, meta) { return checkAll(pkg, meta, S.files); },

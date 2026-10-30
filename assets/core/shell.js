@@ -47,7 +47,7 @@
     if (route.parts[0] !== 'scene' || route.parts[1] !== 'm1') return;
     var current = Cases.resolveScene('m1', route.q.case);
     if (!current) return;
-    var aliases = { bg: 'bg', background: 'bg', '1': 'bg', flow: 'flow', workflow: 'flow', '2': 'flow', demo: 'demo', visualization: 'demo', '3': 'demo' };
+    var aliases = { bg: 'bg', background: 'bg', '1': 'bg', flow: 'flow', workflow: 'flow', '2': 'flow', identify: 'identify', identification: 'identify', demo: 'identify', visualization: 'identify', '3': 'identify' };
     var tab = aliases[route.q.tab] || 'bg';
     if (route.q.case === current.id && route.q.tab === tab) return;
     route.q.case = current.id; route.q.tab = tab;
@@ -357,7 +357,7 @@
     var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet');
 
     var caseSwitch = '';
-    if (allCases.length > 1) {
+    if (!isM1Lesson && allCases.length > 1) {
       caseSwitch = '<div class="case-switch"><span class="cs-lbl">本场景共有 ' + allCases.length +
         ' 个案例，当前展示</span>' + allCases.map(function (x) {
           var on = c && x.id === c.id;
@@ -556,10 +556,12 @@
       var b = e.target.closest('.tab');
       if (!b) return;
       activate(b.dataset.tab, true);
-      setHashQuiet('#/scene/' + sc.id + '?case=' + encodeURIComponent(c.id) + '&tab=' + encodeURIComponent(b.dataset.tab));
+      var routeTab = sc.id === 'm1' && b.dataset.tab === 'demo' ? 'identify' : b.dataset.tab;
+      setHashQuiet('#/scene/' + sc.id + '?case=' + encodeURIComponent(c.id) + '&tab=' + encodeURIComponent(routeTab));
     });
 
     var want = { 1: 'bg', 2: 'flow', 3: 'demo' }[parseHash().q.tab] || parseHash().q.tab;
+    if (sc.id === 'm1' && (want === 'identify' || want === 'identification')) want = 'demo';
     if (want && tabsEl.querySelector('[data-tab="' + want + '"]')) activate(want, false);
       else if (tabsEl.children.length) activate(tabsEl.children[0].dataset.tab, false);
 

@@ -1,11 +1,11 @@
 {
-  "id": "m1-cuttings-resnet",
+  "id": "m1-cuttings",
   "sceneId": "m1",
   "title": "岩屑岩性辅助识别",
   "methods": [
     "cv"
   ],
-  "version": "2.0.1",
+  "version": "2.0.2",
   "updated": "2026-10-30",
   "status": "ready",
   "tabs": {
@@ -61,7 +61,7 @@
         }
       ],
       "page": {
-        "html": "demo/index.html",
+        "html": "demo/lesson.html",
         "view": "background",
         "height": 1040
       }
@@ -156,14 +156,14 @@
         }
       ],
       "page": {
-        "html": "demo/index.html",
+        "html": "demo/lesson.html",
         "view": "workflow",
         "height": 1040
       }
     },
     "demo": {
       "mode": "page",
-      "html": "demo/index.html",
+      "html": "demo/lesson.html",
       "label": "辅助识别",
       "intro": "沿井深选择真实岩屑照片，对照原始岩性、分类得分和图像响应。识别结果来自固定的 ResNet-18 图像特征与三类分类层实验。",
       "height": 1040,

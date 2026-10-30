@@ -39,7 +39,7 @@ class Element {
   scrollIntoView(options) { this.scrollOptions = options; }
 }
 
-function runtime(seed = {}) {
+function runtime(seed = {}, options = {}) {
   const values = new Map(Object.entries(seed));
   const storage = { getItem: k => values.get(k) || null, setItem: (k, v) => values.set(k, String(v)) };
   const nodes = new Map(); const timers = []; const panels = [];
@@ -62,6 +62,7 @@ function runtime(seed = {}) {
   };
   ctx.window = ctx; vm.createContext(ctx);
   const run = name => {
+    if (options.skipManagedM1 && name === 'assets/cases/m1-cuttings.case.js') return;
     let source = read(name);
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
@@ -541,11 +542,11 @@ test('mud logging pauses both native SVG and CSS motion, observes system prefere
 
 test('original-format mud logging case packs remain importable and the illustrated entrance displays the registered case', async () => {
   const rt = runtime(), { pkg, files } = sample();
-  pkg.id = 'mudlogging-imported-example'; pkg.sceneId = 'm1'; pkg.title = '录井上传验证';
+  pkg.id = 'mudlogging-imported-example'; pkg.sceneId = 'm3'; pkg.title = '录井上传验证';
   await importThroughControls(rt, pkg, files);
   const html = rt.ctx.__shellTest.stageHTML(rt.ctx.ATLAS.index.byStage.mudlogging, { m: 'cv' });
-  assert.match(html, /查看讲解与案例 · 2 个已接入/);
-  const sceneHtml = rt.ctx.__shellTest.sceneHTML(rt.ctx.ATLAS.index.byScene.m1, {});
+  assert.match(html, /查看讲解与案例 · 1 个已接入/);
+  const sceneHtml = rt.ctx.__shellTest.sceneHTML(rt.ctx.ATLAS.index.byScene.m3, {});
   assert.match(sceneHtml, /案例 mudlogging-imported-example/);
   assert.match(sceneHtml, /data-tab="bg"/); assert.match(sceneHtml, /data-tab="flow"/); assert.match(sceneHtml, /data-tab="demo"/);
 });

@@ -10,7 +10,7 @@ const base = read('tests/regression.cjs').split("test('all JavaScript files comp
 const support = { require, __dirname: path.join(site, 'tests'), process, Buffer, Blob, TextEncoder, Event, console, setImmediate };
 vm.createContext(support); vm.runInContext(base + '\nglobalThis.makeRuntime=runtime;globalThis.El=Element;', support);
 
-test('retired M1 browser archives cannot replace the current lesson; custom uploads still work', () => {
+test('retired M1 archives cannot replace the maintained lesson; other scenes retain uploads', () => {
   const aliases = ['m1-cuttings-preview-local', 'm1-cuttings-knn', 'm1-cuttings-resnet'];
   const archives = aliases.map(id => ({ v: 2, pkg: { id, sceneId: 'm1', tabs: {} }, meta: { id, sceneId: 'm1', title: '旧版 M1', version: '1.9.0' }, files: [] }));
   const saved = JSON.stringify(archives), rt = support.makeRuntime({ 'atlas.casepack.v2': saved });
@@ -19,13 +19,13 @@ test('retired M1 browser archives cannot replace the current lesson; custom uplo
   assert.equal(rt.values.get('atlas.casepack.v2'), saved, 'private archive files are not rewritten');
   const checks = rt.ctx.__importTest.checkAll(archives[0].pkg, archives[0].meta, []);
   assert.ok(checks.some(x => x.level === 'error' && x.msg.includes('已停用')));
-  rt.ctx.Cases.register({ id: 'custom-m1-example', sceneId: 'm1', version: '1.0.0', imported: true, tabs: {} });
-  assert.equal(rt.ctx.Cases.resolveScene('m1', 'custom-m1-example').id, 'custom-m1-example');
+  rt.ctx.Cases.register({ id: 'custom-m3-example', sceneId: 'm3', version: '1.0.0', imported: true, tabs: {} });
+  assert.equal(rt.ctx.Cases.resolveScene('m3', 'custom-m3-example').id, 'custom-m3-example');
 });
 
 test('old case IDs and section aliases resolve to the maintained case and correct tab', () => {
   const rt = support.makeRuntime();
-  for (const [id, tab, expected] of [['m1-cuttings-knn', 'workflow', 'flow'], ['m1-cuttings-preview-local', 'background', 'bg'], ['m1-cuttings-resnet', '3', 'demo'], [null, null, 'bg']]) {
+  for (const [id, tab, expected] of [['m1-cuttings-knn', 'workflow', 'flow'], ['m1-cuttings-preview-local', 'background', 'bg'], ['m1-cuttings-resnet', '3', 'identify'], [null, null, 'bg']]) {
     rt.ctx.location.hash = '#/scene/m1' + (id ? '?case=' + id + '&tab=' + tab : '');
     rt.ctx.__shellTest.render();
     const q = rt.ctx.__shellTest.parseHash().q;
@@ -37,8 +37,30 @@ test('old case IDs and section aliases resolve to the maintained case and correc
   rt.ctx.__shellTest.render(); assert.equal(rt.ctx.location.hash, '#/scene/w1?case=welllog-layer&tab=3');
 });
 
+test('renamed and reversioned old identification pages have no default, direct, switcher or library entrance', () => {
+  const aliases = ['m1-cuttings-preview-local', 'm1-cuttings-knn', 'm1-cuttings-resnet', 'copied-old-identification', 'm1-cuttings'];
+  const archives = aliases.map(id => ({ v: 2, pkg: { id, sceneId: 'm1', tabs: { demo: { mode: 'page', html: 'demo/index.html' } } }, meta: { id, sceneId: 'm1', title: 'Old identification page', version: '99.0.0' }, files: [{ name: 'demo/index.html', enc: 'text', data: '<html><body>OLD_IDENTIFICATION_PAGE</body></html>' }] }));
+  const rt = support.makeRuntime({ 'atlas.casepack.v2': JSON.stringify(archives), 'atlas.case.blocked.v1': JSON.stringify(['m1-cuttings-knn', 'm1-cuttings-preview-local']) });
+  assert.equal(rt.ctx.Cases.byScene('m1').id, 'm1-cuttings');
+  assert.equal(rt.ctx.Cases.bySceneAll('m1').length, 1);
+  assert.equal(rt.ctx.Cases.list().filter(c => c.sceneId === 'm1').length, 1);
+  assert.equal(rt.ctx.CaseImport.list().length, 0); assert.equal(rt.ctx.CaseImport.blockedList().length, 0);
+  for (const id of aliases) {
+    assert.equal(rt.ctx.Cases.resolveScene('m1', id).id, 'm1-cuttings');
+    rt.ctx.location.hash = '#/scene/m1?case=' + id + '&tab=demo';
+    rt.ctx.__shellTest.render();
+    assert.equal(rt.ctx.location.hash, '#/scene/m1?case=m1-cuttings&tab=identify');
+    const html = rt.ctx.__shellTest.sceneHTML(rt.ctx.ATLAS.index.byScene.m1, {});
+    assert.ok(!html.includes('case-switch')); assert.ok(!html.includes('OLD_IDENTIFICATION_PAGE'));
+  }
+  assert.equal(fs.existsSync(path.join(site, 'm1-cuttings-case/demo/index.html')), false);
+  const current = JSON.parse(read('m1-cuttings-case/case.json'));
+  assert.equal(current.id, 'm1-cuttings'); assert.equal(current.tabs.demo.html, 'demo/lesson.html');
+  assert.equal(current.tabs.demo.view, 'demo');
+});
+
 test('the abandoned introduction is absent from the standalone case and all website entrances use the canonical ID', () => {
-  const html = read('m1-cuttings-case/demo/index.html').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
+  const html = read('m1-cuttings-case/demo/lesson.html').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
   assert.ok(!html.includes('<section class="hero">')); assert.ok(!html.includes('读懂一次判断'));
   const rt = support.makeRuntime(), home = rt.ctx.__shellTest.homeHTML(), mud = rt.ctx.__shellTest.stageHTML(rt.ctx.ATLAS.index.byStage.mudlogging, {});
   for (const entry of [home, mud]) assert.ok(entry.includes('#/scene/m1?case=m1-cuttings&amp;tab=bg'));
