@@ -326,6 +326,7 @@
     /* 1 id */
     if (!meta.id) err('案例 id 没填', '建议「环节-关键词」，例如 welllog-layer');
     else if (!ID_RE.test(meta.id)) err('案例 id 格式不合法：' + meta.id, '只能小写字母、数字、连字符，不能有空格或下划线');
+    else if (global.Cases.isRetired && global.Cases.isRetired(meta)) err('这是已停用的 M1 旧版案例包', '请使用当前岩屑案例或下载新版作业包。');
     else if (global.Cases.get(meta.id)) err('案例 id 已被占用：' + meta.id, '换一个 id；若是之前上传的旧版本，先在案例库里移除');
     else ok('id 可用：' + meta.id);
 

@@ -2,7 +2,9 @@
 (function (global) {
   'use strict';
 
-  var IMAGE = 'assets/images/mudlogging-process.png';
+  var IMAGE = 'assets/images/mudlogging-process.webp';
+  var IMAGE_SET = 'assets/images/mudlogging-process-small.webp 768w, ' + IMAGE + ' 1448w';
+  var IMAGE_SIZES = '(max-width:700px) calc(100vw - 28px), 1448px';
   var WIDTH = 1448, HEIGHT = 1086;
   var METHODS = [
     { id: '', abbr: 'ALL', name: '完整流程', note: '从井底取样，到地面分析，再到同一深度轴上的证据汇总。' },
@@ -28,7 +30,7 @@
   function scene(ctx, id) { return ctx.stage.scenes.filter(function (s) { return s.id === id; })[0]; }
   function crop(box, className) {
     return '<span class="ml-crop ' + (className || '') + '" style="aspect-ratio:' + box[2] + '/' + box[3] + '">' +
-      '<img src="' + IMAGE + '" alt="" width="1448" height="1086" draggable="false" style="width:' +
+      '<img src="' + IMAGE + '" srcset="' + IMAGE_SET + '" sizes="' + IMAGE_SIZES + '" loading="lazy" decoding="async" alt="" width="1448" height="1086" draggable="false" style="width:' +
       (WIDTH / box[2] * 100).toFixed(5) + '%;left:' + (-box[0] / box[2] * 100).toFixed(5) +
       '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
   }
@@ -42,10 +44,11 @@
     };
     return '<svg class="ml-tech-effect" viewBox="0 0 ' + t.box[2] + ' ' + t.box[3] + '" aria-hidden="true">' + shapes[t.id] + '</svg>';
   }
+  function sceneHref(id) { return '#/scene/' + id + (id === 'm1' ? '?case=m1-cuttings&amp;tab=bg' : ''); }
   function spot(ctx, t, focus) {
     var sc = scene(ctx, t.id), b = t.box, active = focus && focus === t.method, esc = ctx.K.esc;
     return '<a class="ml-spot ml-spot-' + t.id + (active ? ' is-relevant' : focus ? ' is-dim' : '') +
-      '" href="#/scene/' + t.id + '" data-ml-spot="' + t.id + '" data-ml-tech-method="' + t.method +
+      '" href="' + sceneHref(t.id) + '" data-ml-spot="' + t.id + '" data-ml-tech-method="' + t.method +
       '" aria-label="' + esc(sc.name + '，' + method(t.method).name + '，查看场景讲解') +
       '" style="--tech:' + t.color + ';left:' + (b[0] / WIDTH * 100).toFixed(5) + '%;top:' +
       (b[1] / HEIGHT * 100).toFixed(5) + '%;width:' + (b[2] / WIDTH * 100).toFixed(5) +
@@ -83,7 +86,7 @@
     var esc = ctx.K.esc;
     return available(ctx).filter(function (t) { return !focus || t.method === focus; }).map(function (t) {
       var sc = scene(ctx, t.id), count = ctx.cases.bySceneAll(t.id).length;
-      return '<a class="ml-read-card" href="#/scene/' + t.id + '" style="--tech:' + t.color + '">' +
+      return '<a class="ml-read-card" href="' + sceneHref(t.id) + '" style="--tech:' + t.color + '">' +
         '<span class="ml-read-art">' + crop(t.art) + '<span class="ml-read-id">' + t.id.toUpperCase() + ' · ' + method(t.method).abbr + '</span></span>' +
         '<div class="ml-read-text"><h3>' + esc(sc.name) + '</h3><p>' + esc(sc.point) + '</p>' +
         '<dl><div><dt>输入</dt><dd>' + esc(t.input) + '</dd></div><div><dt>输出</dt><dd>' + esc(t.output) + '</dd></div></dl>' +
@@ -111,8 +114,9 @@
         return '<button type="button" data-ml-method-button="' + m.id + '" aria-pressed="' + (focus === m.id) + '" aria-controls="ml-map ml-deck"><b>' + m.abbr + '</b><span>' + m.name + '</span></button>';
       }).join('') + '</div><button class="ml-motion" type="button" data-ml-toggle aria-pressed="true"><span data-ml-toggle-icon>Ⅱ</span><span data-ml-toggle-label>暂停动效</span></button></div>' +
       '<div class="ml-status"><span class="ml-status-icon">↳</span><p data-ml-status role="status">' + method(focus).note + '</p><span class="ml-status-hint">图画可点击 <b>↗</b></span></div>' +
-      '<div class="ml-map' + (focus ? ' has-focus' : '') + '" id="ml-map" data-ml-map>' +
-      '<img class="ml-base" src="' + IMAGE + '" width="1448" height="1086" draggable="false" alt="录井流程：钻头破岩，钻井液携带岩屑与气体返回地面，经过岩性、气测、荧光、钻时分析，统一深度并汇总报告。">' +
+      '<div class="ml-map' + (focus ? ' has-focus' : '') + '" id="ml-map" data-ml-map data-ml-image-state="loading" aria-busy="true">' +
+      '<img class="ml-base" src="' + IMAGE + '" srcset="' + IMAGE_SET + '" sizes="' + IMAGE_SIZES + '" fetchpriority="high" decoding="async" loading="eager" data-ml-image width="1448" height="1086" draggable="false" alt="录井流程：钻头破岩，钻井液携带岩屑与气体返回地面，经过岩性、气测、荧光、钻时分析，统一深度并汇总报告。">' +
+      '<span class="ml-image-status" data-ml-image-status role="status">正在载入图解…</span><button class="ml-image-retry" type="button" data-ml-image-retry hidden>重新载入图解</button>' +
       '<div class="ml-veil" aria-hidden="true"></div>' + available(ctx).map(function (t) { return spot(ctx, t, focus); }).join('') + drawing() +
       '<div class="ml-map-caption"><span class="ml-live-dot"></span><span data-ml-running>信号正在流动</span><i>示意动画</i></div></div>' +
       '<div class="ml-map-footer"><span><b>01</b> 井底取样 <i>→</i> <b>02</b> 地面分析 <i>→</i> <b>03</b> 深度对齐 <i>→</i> <b>04</b> 证据汇总</span><p>岩屑与气测需做迟到校正；钻时还需结合钻压、转速等工况解读。</p></div></section>' +
@@ -131,6 +135,20 @@
     var svgs = [].slice.call(root.querySelectorAll('[data-ml-motion]'));
     var mq = global.matchMedia ? global.matchMedia('(prefers-reduced-motion: reduce)') : null;
     var paused = !!(mq && mq.matches);
+    var map = root.querySelector('[data-ml-map]'), baseImage = root.querySelector('[data-ml-image]');
+    var imageStatus = root.querySelector('[data-ml-image-status]'), imageRetry = root.querySelector('[data-ml-image-retry]');
+    function imageReady() {
+      if (disposed) return;
+      map.dataset.mlImageState = 'ready'; map.setAttribute('aria-busy', 'false');
+      imageStatus.hidden = true; imageRetry.hidden = true;
+    }
+    function imageFailed() {
+      if (disposed) return;
+      map.dataset.mlImageState = 'error'; map.setAttribute('aria-busy', 'false');
+      imageStatus.hidden = false; imageStatus.textContent = '图解暂未载入'; imageRetry.hidden = false;
+    }
+    baseImage.addEventListener('load', imageReady); baseImage.addEventListener('error', imageFailed);
+    if (baseImage.complete && baseImage.naturalWidth > 0) imageReady();
 
     function applyFocus(value, updateUrl) {
       focus = selected(value);
@@ -176,6 +194,14 @@
       });
     }
     function click(e) {
+      if (e.target.closest('[data-ml-image-retry]')) {
+        map.dataset.mlImageState = 'loading'; map.setAttribute('aria-busy', 'true');
+        imageStatus.hidden = false; imageStatus.textContent = '正在载入图解…'; imageRetry.hidden = true;
+        var retrySource = IMAGE + '?retry=' + Date.now();
+        baseImage.srcset = ''; baseImage.src = retrySource;
+        [].forEach.call(root.querySelectorAll('.ml-crop img'), function (image) { image.srcset = ''; image.src = retrySource; });
+        return;
+      }
       var choice = e.target.closest('[data-ml-method-button]');
       if (choice) { applyFocus(choice.dataset.mlMethodButton, true); return; }
       if (e.target.closest('[data-ml-toggle]')) { paused = !paused; applyMotion(); }
@@ -200,6 +226,7 @@
       if (disposed) return;
       disposed = true;
       root.removeEventListener('click', click); root.removeEventListener('keydown', keydown);
+      baseImage.removeEventListener('load', imageReady); baseImage.removeEventListener('error', imageFailed);
       if (mq && mq.removeEventListener) mq.removeEventListener('change', preference);
       svgs.forEach(function (svg) { if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations(); });
     } };

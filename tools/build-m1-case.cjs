@@ -14,7 +14,7 @@ const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分
 const workflow='<svg viewBox="0 0 1050 180" role="img" aria-label="从原始照片到数据清单的七步整理流程">'+flowContent.map((s,i)=>{const x=i*150;return '<g transform="translate('+x+',12)"><rect width="140" height="146" rx="10" fill="#fff9ee" stroke="#e4d6c0"/><text x="13" y="33" font-size="21" fill="#c59562">0'+(i+1)+'</text><text x="13" y="68" font-size="12" fill="#365261">'+s.name+'</text><text x="13" y="99" font-size="11" fill="#869084">'+['原图与来源','照片对应记录','曝光与重复','中心裁切与缩放','三类统一词表','17 个井段组','逐图 CSV 清单'][i]+'</text></g>';}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 130" role="img" aria-label="辅助识别使用固定 ResNet-18 图像特征和三类分类层"><text x="0" y="20" fill="#8d866c" font-size="13">整理完成的照片，进入辅助识别</text>'+['224×224 照片','固定 ResNet-18','三类分类得分','井深上的岩性对照'].map((label,i)=>'<g transform="translate('+(i*180)+',42)"><rect width="164" height="55" rx="8" fill="'+['#ead8bb','#c9dadd','#dcd9c0','#d3dfd0'][i]+'"/><text x="12" y="32" fill="#365261" font-size="12">'+label+'</text></g>').join('')+'</svg>';
 const photos=data.classes.map(c=>{const s=data.samples.find(s=>s.classId===c.id&&s.split==='reference');return '<div class="m1c-photo"><img src="'+s.image+'" alt="公开原图：'+c.name+'"><b>'+c.name+'</b><small>'+s.id+' · '+s.depth+' m<br>原始数据标签，非模型输出</small></div>';}).join('');
-const definition={id:'m1-cuttings-resnet',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'2.0.0',updated:'2026-10-30',status:'ready',tabs:{
+const definition={id:'m1-cuttings-resnet',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'2.0.1',updated:'2026-10-30',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'这些照片，怎样整理到能用？',lead:['跟随同一张真实照片，把原图、井深、标签和用途整理清楚。这些工作先于识别方法，决定数据能否继续使用。'],stats:[['真实照片','66 张'],['数据整理','7 步'],['井段分组','17 组']],steps:flowContent.map(s=>({name:s.name,role:s.role,do:s.process,effect:s.output,trap:s.trap})),metrics:{title:'从原始照片到数据清单',html:style+'<div class="m1c">'+workflow+'</div>'+flowContent.map((s,i)=>'<h4>0'+(i+1)+' · '+s.name+'</h4><p><b>输入：</b>'+s.input+'</p><p><b>处理：</b>'+s.process+'</p><p><b>原因：</b>'+s.why+'</p><p><b>输出：</b>'+s.output+'</p>').join('')},fails:[{name:'照片与井深错位',why:'没有取样与迟到记录，无法保证照片对应正确井段。'},{name:'标签含义不清',why:'整图标签不能直接当作每颗岩屑的标签。'},{name:'相邻照片分散到不同用途',why:'相似成像条件和相邻井段会让数据代表性被高估。'}]},
 demo:{mode:'page',html:'demo/index.html',label:'辅助识别',intro:'沿井深选择真实岩屑照片，对照原始岩性、分类得分和图像响应。识别结果来自固定的 ResNet-18 图像特征与三类分类层实验。',height:1040}
@@ -76,11 +76,12 @@ function resize(event){if(!frame||event.source!==frame.contentWindow)return;var 
 tab.mount=function(root){tab.unmount();frame=document.createElement('iframe');frame.src='m1-cuttings-case/demo/index.html?v='+encodeURIComponent(definition.version)+'&embed=portal&section='+section;frame.setAttribute('title','M1 · '+tab.label);frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='display:block;width:100%;height:1040px;border:0;border-radius:12px;background:#fcf6eb';global.addEventListener('message',resize);root.appendChild(frame);};
 tab.unmount=function(){global.removeEventListener('message',resize);if(frame)frame.remove();frame=null;};}
 ['background','workflow','demo'].forEach(function(name){attachSection(name,name);});
-// Stable local ID replaces the earlier prototype; package ID stays free for standard import.
-definition.id='m1-cuttings-preview-local';global.Cases.register(definition);}(window));\n`;
+// Canonical website case; the import package keeps its independent ID.
+definition.id='m1-cuttings';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1case16');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1case17');
 indexText=indexText.replace(/(assets\/data\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1-data2');
-['case-demo-host','case-upload','shell','home'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261030-sections4');});
+['registry','case-demo-host','case-upload','shell','home','mudlogging'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261030-routes5');});
+indexText=indexText.replace(/(assets\/core\/mudlogging\.css\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-ml2');
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));

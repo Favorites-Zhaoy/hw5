@@ -303,7 +303,7 @@ test('homepage contains all stage branches, valid scene links, and local cover a
   assert.match(html, /data-home-matrix="coverage"/);
   assert.match(html, /data-home-scope="ready"/);
   assert.ok(html.indexOf('id="first-lesson-title"') < html.indexOf('id="stage-map"'));
-  assert.match(html, /href="#\/scene\/m1\?case=m1-cuttings-preview-local&amp;tab=bg"/);
+  assert.match(html, /href="#\/scene\/m1\?case=m1-cuttings&amp;tab=bg"/);
   assert.doesNotMatch(html, /DATA LAYER|SHELL|atlas@example.com/);
 });
 
@@ -481,7 +481,7 @@ test('mud logging artwork links all five techniques to valid explanations and ke
   const html = P.stageHTML(A.index.byStage.mudlogging, {});
   assert.equal((html.match(/data-ml-spot=/g) || []).length, 5);
   assert.ok((html.match(/<animateMotion /g) || []).length >= 20);
-  for (const id of ['m1', 'm2', 'm3', 'm4', 'm5']) assert.match(html, new RegExp('href="#/scene/' + id + '"'));
+  for (const id of ['m1', 'm2', 'm3', 'm4', 'm5']) assert.match(html, new RegExp('href="#/scene/' + id + '(?:\\?[^"]*)?"'));
   for (const match of html.matchAll(/href="#\/scene\/([^"?]+)(?:[^"]*)"/g)) assert.ok(A.index.byScene[match[1]]);
   assert.ok(fs.existsSync(path.join(site, 'assets/images/mudlogging-process.png')));
   assert.doesNotMatch(P.stageHTML(A.index.byStage.welllog, {}), /data-ml-stage/);
@@ -492,7 +492,7 @@ test('mud logging artwork links all five techniques to valid explanations and ke
 test('method selection magnifies the correct illustrations and updates deep links, flow emphasis and enlarged cards', () => {
   const rt = runtime(), { root, choose, spots, flows, buttons } = mudControls(rt);
   const active = () => spots.filter(s => s.classList.contains('is-relevant')).map(s => s.dataset.mlSpot);
-  const deckIds = () => [...root.querySelector('[data-ml-deck]').innerHTML.matchAll(/href="#\/scene\/(m\d)"/g)].map(m => m[1]);
+  const deckIds = () => [...root.querySelector('[data-ml-deck]').innerHTML.matchAll(/href="#\/scene\/(m\d)(?:\?[^\"]*)?"/g)].map(m => m[1]);
   for (const [m, ids] of [['cv', ['m1', 'm3']], ['ts', ['m2', 'm4']], ['nlp', ['m5']]]) {
     choose(m);
     assert.deepEqual(active(), ids); assert.deepEqual(deckIds(), ids);

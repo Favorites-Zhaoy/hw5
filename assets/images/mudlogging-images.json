@@ -1,0 +1,24 @@
+{
+  "source": {
+    "file": "mudlogging-process.png",
+    "bytes": 2565940,
+    "sha256": "021c8c3ba7975f320d929c20c05b36681602a4e41833a31163d476ee2d00c8e6"
+  },
+  "assets": [
+    {
+      "file": "mudlogging-process.webp",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 241278,
+      "sha256": "17d653dba2234206a41bb13f7478ea8e9f186073e53e853760a25a3b6fc9b753"
+    },
+    {
+      "file": "mudlogging-process-small.webp",
+      "width": 768,
+      "height": 576,
+      "bytes": 100084,
+      "sha256": "1e526dc3e5a4da684589baa4c0f324e15dadeb8db62f4a40e19cfab63f2eff40"
+    }
+  ],
+  "previewBytes": 1336
+}

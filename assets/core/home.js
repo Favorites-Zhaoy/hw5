@@ -25,7 +25,7 @@
       '<div class="atlas-cover-content atlas-width"><div class="atlas-cover-kicker"><span class="atlas-live-dot"></span> PETRO × AI ATLAS <span class="atlas-kicker-line"></span> 从现场出发</div>' +
       '<h1 id="cover-title">石油勘探开发的<br><span>智能化可能性地图</span></h1>' +
       '<p class="atlas-cover-desc">从石油现场的问题出发，理解专业背景与数据。<br>跟着案例看方法，再动手检查结果。</p>' +
-      '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">从岩屑案例开始 ' + arrow + '</a>' +
+      '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/scene/m1?case=m1-cuttings&amp;tab=bg">从岩屑案例开始 ' + arrow + '</a>' +
       '<button class="atlas-cover-secondary atlas-cover-map" data-home-jump="stage-map">浏览场景地图 <span>↓</span></button></div>' +
       '<div class="atlas-cover-index"><span>EXPLORATION</span><i></i><span>INTELLIGENCE</span></div></div>' +
       '<div class="atlas-cover-bottom atlas-width"><span>从地质勘察，一直走到加工。</span><button data-home-jump="stage-map" aria-label="向下浏览场景地图">向下探索 <span>↓</span></button></div></section>' +
@@ -35,7 +35,7 @@
       }).join('') + '</div>';
   }
   function firstLesson() {
-    return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，了解它从哪里来，整理照片、井深和标签，再对照岩性沿井深的变化。</p><a href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
+    return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，了解它从哪里来，整理照片、井深和标签，再对照岩性沿井深的变化。</p><a href="#/scene/m1?case=m1-cuttings&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
       '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>整理数据</b><small>照片、井深和标签怎样对应？</small></li><li><span>03</span><b>辅助识别</b><small>沿井深对照照片与岩性。</small></li></ol></section>';
   }
   function sceneLeaf(sc, st) {
@@ -106,7 +106,7 @@
   function matrixNote() { return matrixMode === 'coverage' ? '数字为已覆盖场景 / 候选场景；颜色越深，覆盖比例越高。点击格子进入筛选结果。' : '数字为关联场景数量；一个场景可对应多种方法。点击格子进入筛选结果。'; }
   function learning() {
     var available = C.list().filter(function (c) { return c.tabs && c.tabs.demo && typeof c.tabs.demo.mount === 'function' && A.index.byScene[c.sceneId]; });
-    var demo = available.filter(function (c) { return c.id === 'm1-cuttings-preview-local'; })[0] || available[0];
+    var demo = available.filter(function (c) { return c.id === 'm1-cuttings'; })[0] || available[0];
     var target = demo ? '#/scene/' + demo.sceneId + '?case=' + encodeURIComponent(demo.id) + '&tab=bg' : '#/cases';
     return '<section class="atlas-section atlas-learning-section" id="start-learning"><div class="atlas-width">' +
       '<div class="atlas-learning-top"><div>' + sectionHead('04', 'FROM KNOWING TO DOING', '不止看懂，<br><em>还要亲手试一试。</em>', '每个完整案例，都沿着同一条学习路径展开。') + '<a class="atlas-btn atlas-btn-dark" href="' + target + '">' + (demo ? '运行一个案例' : '浏览案例库') + ' ' + arrow + '</a></div>' +

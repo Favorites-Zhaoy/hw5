@@ -43,6 +43,18 @@
     catch (e) { /* 忽略：地址栏不同步不影响功能 */ }
   }
 
+  function canonicalLessonRoute(route) {
+    if (route.parts[0] !== 'scene' || route.parts[1] !== 'm1') return;
+    var current = Cases.resolveScene('m1', route.q.case);
+    if (!current) return;
+    var aliases = { bg: 'bg', background: 'bg', '1': 'bg', flow: 'flow', workflow: 'flow', '2': 'flow', demo: 'demo', visualization: 'demo', '3': 'demo' };
+    var tab = aliases[route.q.tab] || 'bg';
+    if (route.q.case === current.id && route.q.tab === tab) return;
+    route.q.case = current.id; route.q.tab = tab;
+    var query = Object.keys(route.q).map(function (key) { return encodeURIComponent(key) + '=' + encodeURIComponent(route.q[key]); }).join('&');
+    setHashQuiet('#/scene/m1?' + query);
+  }
+
   /* =========================================================
      二、公共片段
      ========================================================= */
@@ -341,8 +353,8 @@
     var st = A.index.byStage[sc.stageId];
     var allCases = Cases.bySceneAll(sc.id);
     /* 当前展示哪个案例：?case= 指定，默认第一个 */
-    var c = allCases.filter(function (x) { return x.id === q.case; })[0] || allCases[0] || null;
-    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn' || c.id === 'm1-cuttings-resnet');
+    var c = Cases.resolveScene(sc.id, q.case);
+    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet');
 
     var caseSwitch = '';
     if (allCases.length > 1) {
@@ -498,7 +510,7 @@
 
     // M1 lesson frames share the current sample and experiment phase.
     // Accept messages only from frames mounted in this case.
-    if (sc.id === 'm1' && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn' || c.id === 'm1-cuttings-resnet')) {
+    if (sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) {
       var sharedLessonState = null;
       var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
       function lessonFrames() {
@@ -961,6 +973,7 @@
 
   function render() {
     var r = parseHash();
+    canonicalLessonRoute(r);
     var p = r.parts;
     document.body.classList.toggle('is-home', !p.length);
     unmountCurrent();
@@ -994,8 +1007,7 @@
     }
     if (p[0] === 'scene') {
       var sc2 = A.index.byScene[p[1]];
-      var all2 = sc2 && Cases.bySceneAll(sc2.id);
-      var c2 = all2 && all2.filter(function (x) { return x.id === r.q.case; })[0] || (all2 && all2[0]) || null;
+      var c2 = sc2 && Cases.resolveScene(sc2.id, r.q.case);
       if (c2) bindTabs(sc2, c2);
       /* 多案例切换器 */
       [].forEach.call(view.querySelectorAll('.case-switch [data-case]'), function (b) {

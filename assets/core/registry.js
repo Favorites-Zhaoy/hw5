@@ -18,6 +18,22 @@
   var order = [];
   var problems = [];
 
+  // Historical copies of this course case must not replace the maintained lesson.
+  // Keep other uploaded cases, including custom M1 cases, under the normal rules.
+  var M1_PREVIOUS = ['m1-cuttings-preview-local', 'm1-cuttings-knn', 'm1-cuttings-resnet'];
+  function versionBefore(a, b) {
+    var left = String(a || '0').split('.'), right = String(b || '0').split('.');
+    for (var n = 0; n < 3; n++) {
+      var x = parseInt(left[n], 10) || 0, y = parseInt(right[n], 10) || 0;
+      if (x !== y) return x < y;
+    }
+    return false;
+  }
+  function isRetired(c) {
+    var current = store['m1-cuttings'];
+    return !!(current && c && c.sceneId === 'm1' && M1_PREVIOUS.indexOf(c.id) >= 0 && versionBefore(c.version, current.version));
+  }
+
   function reg(def) {
     if (!def || typeof def !== 'object') {
       problems.push('register() 收到非对象参数，已忽略');
@@ -27,6 +43,7 @@
       problems.push('案例缺少 id 字段，已忽略：' + (def.title || '(无标题)'));
       return null;
     }
+    if (isRetired(def)) return store['m1-cuttings'];
     if (store[def.id]) {
       problems.push('案例 id 重复，后者覆盖前者：' + def.id);
       var i = order.indexOf(def.id);
@@ -55,6 +72,7 @@
     for (var i = 0; i < order.length; i++) {
       var c = store[order[i]];
       if (c.sceneId !== sceneId) continue;
+      if (isRetired(c)) continue;
       (c.imported ? imported : builtin).push(c);
     }
     return imported.reverse().concat(builtin);
@@ -63,6 +81,14 @@
   function byScene(sceneId) {
     var all = bySceneAll(sceneId);
     return all.length ? all[0] : null;
+  }
+
+  function resolveScene(sceneId, id) {
+    var all = bySceneAll(sceneId);
+    var exact = all.filter(function (c) { return c.id === id; })[0];
+    if (exact) return exact;
+    if (sceneId === 'm1' && M1_PREVIOUS.indexOf(id) >= 0 && store['m1-cuttings']) return store['m1-cuttings'];
+    return all[0] || null;
   }
 
   function list() {
@@ -168,6 +194,8 @@
     get: get,
     byScene: byScene,
     bySceneAll: bySceneAll,
+    resolveScene: resolveScene,
+    isRetired: isRetired,
     list: list,
     validate: validate,
     validateAll: validateAll,
