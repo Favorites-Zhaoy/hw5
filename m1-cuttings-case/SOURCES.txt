@@ -1,4 +1,4 @@
-背景资料核验：2026-10-24；论文图例复核与更新：2026-10-28；技术前沿与四部分背景核验：2026-10-30
+背景资料核验：2026-10-24；论文图例核查与更新：2026-10-28；技术前沿与四部分背景核验：2026-10-30
 
 [1] 真实 RGB 岩屑图像、岩性与井深标签
 nature9420/-ResNet-HMM-Lithology
@@ -13,10 +13,11 @@ SLB — The Defining Series: Mud Logging
 https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging
 页面中迟到深度公式为恒定钻速下的教学简化，不作为工程迟到计算。
 
-[3] k 近邻分类的一般方法
-scikit-learn 官方文档 — Nearest Neighbors
-https://scikit-learn.org/stable/modules/neighbors.html
-本例用原生 JavaScript 实现加权欧氏距离与多数投票，未在运行时加载 Python 或 scikit-learn。
+[3] ResNet-18 预训练权重与图像特征网络
+Torchvision 官方文档：https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html
+固定权重：https://download.pytorch.org/models/resnet18-f37072fd.pth
+SHA-256：f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec
+本课冻结编码器，仅拟合三类分类层。网页展示固定结果，不在浏览器下载或执行该网络。中心裁切为本课明确设定，未声称与 torchvision 默认裁切相同。
 
 [4] 分组留出与防止相关样本跨分区
 scikit-learn 官方文档 — Cross-validation
@@ -32,7 +33,7 @@ DOI: 10.5281/zenodo.5545058
 [6] 孔隙、连通性与渗透性的关系
 SLB — The Defining Series: Defining and Determining Permeability
 https://www.slb.com/resource-library/oilfield-review/defining-series/defining-permeability
-岩性结构互动图为定性机理示意，不给出样本孔渗数值。
+仅作背景扩展阅读；本例不给出样本孔渗数值。
 
 [7] 封盖的概念与岩石作用的验证
 SLB Energy Glossary — Seal
@@ -64,7 +65,7 @@ Fast Reservoir Characterization with AI-Based Lithology Prediction Using Drill C
 Journal of Imaging 9(7):126. DOI: 10.3390/jimaging9070126
 https://doi.org/10.3390/jimaging9070126
 图4显示不同岩屑类型；图6显示不同深度和地层的粉砂岩岩屑外观差异；图8显示泥浆污染照片。Sand和Dolomite不直接等同本例细砂岩和灰质白云岩，图8不是清洗前后配对。
-原研究使用CNN，本案例使用手工特征与kNN，两者数据和结果不可混同。
+原研究使用 CNN；本例使用固定 ResNet-18 和三类分类层，两者数据、配置与结果不可混同。
 
 [12] 岩屑碎块尺度：真实油气井岩屑薄片扫描
 Caja MÁ, Castillo JN, Santos CA, et al. (2023).
@@ -77,21 +78,16 @@ https://doi.org/10.3390/min13091140
 以上两篇论文图像均按 CC BY 4.0 引用，作者、图号、DOI、许可及文件校验值记录于 FIGURE-SOURCES.json。完整图像等比缩小并转为WebP，保留原图文字与标尺；外部论文图不进入本例66张图像的训练、验证或测试。
 原先的石窟砂岩、地下水露头薄片和页岩岩心图与岩屑识别的任务距离较远，已从课程图例中移出；核对与取舍记录见项目 docs/论文图例相关性核查.md。旧素材文件未删除。
 
-[15] Uniform LBP（本版实际实现）
-Ojala, Pietikainen & Maenpaa (2002). Multiresolution gray-scale and rotation invariant texture classification with local binary patterns. IEEE TPAMI 24(7):971–987.
-https://doi.org/10.1109/TPAMI.2002.1017623
-P=8、R=1圆周采样，双线性插值，riu2十类映射；只统计内部像素。没有复用论文图片。
-https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.local_binary_pattern
+[15] Grad-CAM 类别响应
+Selvaraju et al. Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization.
+https://arxiv.org/abs/1610.02391
+本例使用最后一层 7×7 特征与实际类别 logit 的梯度计算响应，逐图逐类别归一化。原图与响应都由当前样品及对应分组分类层产生，未绘制虚构热点。
 
-[16] 数据划分、交叉验证与测试集使用
+[16] 分类层与分组验证
+https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
 https://scikit-learn.org/stable/modules/cross_validation.html
 https://scikit-learn.org/stable/common_pitfalls.html
-本版在训练集上Leave-One-Group-Out交叉验证，折内拟合尺度，锁定超参数后开放测试。
-
-[17] 方法定位：基于实例的k近邻监督分类
-https://scikit-learn.org/stable/modules/neighbors.html
-使用手工视觉特征与等权投票，不宣称CNN或其他深度网络训练。
-
+开发组逐井段留出，每折仅用其他开发组拟合 StandardScaler 和三类分类层；固定 C=1。24 张留出照片的结果来自全部 42 张开发图拟合的分类层。配置未根据留出分数调整。
 
 [18] 规范采样成像与集成识别
 Li K, Ren T, Yao N, et al. (2025).

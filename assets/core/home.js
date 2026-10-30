@@ -35,8 +35,8 @@
       }).join('') + '</div>';
   }
   function firstLesson() {
-    return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，先理解它从哪里来，再看照片怎样变成候选，最后检查机器判断的依据。</p><a href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
-      '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>跟随样品</b><small>照片如何参与计算？</small></li><li><span>03</span><b>亲手复核</b><small>候选有怎样的依据？</small></li></ol></section>';
+    return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，了解它从哪里来，整理照片、井深和标签，再对照岩性沿井深的变化。</p><a href="#/scene/m1?case=m1-cuttings-preview-local&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
+      '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>整理数据</b><small>照片、井深和标签怎样对应？</small></li><li><span>03</span><b>辅助识别</b><small>沿井深对照照片与岩性。</small></li></ol></section>';
   }
   function sceneLeaf(sc, st) {
     var ready = C.bySceneAll(sc.id).length;

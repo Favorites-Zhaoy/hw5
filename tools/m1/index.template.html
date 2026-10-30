@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="demo.css">
   <aside class="style-fallback" role="status" style="margin:12px;padding:14px 18px;border:1px solid #e0bf93;border-radius:8px;background:#fff2df;color:#62482e;font:14px/1.8 'Microsoft YaHei',sans-serif">当前预览未应用网页样式。请用 Edge 或 Chrome 直接打开此 HTML 文件，查看完整排版与交互。</aside>
 <main class="case-page">
-  <header class="masthead"><a class="wordmark" href="#background"><b>m1</b><span>岩屑岩性辅助识别<small>MUD LOGGING / COMPUTER VISION</small></span></a><span class="edition">录井案例 v1.9.0 · 三部分交互</span><button id="motion-toggle" class="quiet-button" type="button" aria-pressed="false">暂停动效</button></header>
-  <section class="hero"><div><p class="eyebrow">一张照片，能帮录井人员做什么？</p><h1>从一盘岩屑，<br><em>读懂一次判断。</em></h1><p>先回到钻井现场，看看岩屑怎样成为地层记录；再跟随真实照片，拆解机器给出候选的过程，最后亲手检查它的依据。</p><div class="hero-facts"><span><b>66</b> 张公开原图</span><span><b>3</b> 类原始标签</span><span><b>34</b> 维图像特征</span></div></div><div class="hero-art art-lab" aria-hidden="true"><img src="../assets/m1-dioramas.webp" width="1254" height="1254" alt=""></div></section>
-  <nav class="case-tabs" aria-label="案例的三个部分" role="tablist"><button id="tab-background" data-view="background" role="tab" aria-selected="true" aria-controls="panel-background" type="button"><span>01</span>专业背景<small>为什么识别岩屑</small></button><button id="tab-workflow" data-view="workflow" role="tab" aria-selected="false" aria-controls="panel-workflow" type="button" tabindex="-1"><span>02</span>案例流程<small>图像怎样变成候选</small></button><button id="tab-demo" data-view="demo" role="tab" aria-selected="false" aria-controls="panel-demo" type="button" tabindex="-1"><span>03</span>可视化示范<small>亲手运行与复核</small></button></nav>
+  <header class="masthead"><a class="wordmark" href="#background"><b>m1</b><span>岩屑岩性辅助识别<small>MUD LOGGING / COMPUTER VISION</small></span></a><span class="edition">录井案例 v2.0.0 · 三部分交互</span><button id="motion-toggle" class="quiet-button" type="button" aria-pressed="false">暂停动效</button></header>
+  <section class="hero"><div><p class="eyebrow">一张照片，能帮录井人员做什么？</p><h1>从一盘岩屑，<br><em>读懂一次判断。</em></h1><p>先了解岩屑怎样取得，再把照片、井深和标签整理清楚，最后沿井深查看岩性分类。</p><div class="hero-facts"><span><b>66</b> 张公开原图</span><span><b>3</b> 类原始标签</span><span><b>17</b> 个井段组</span></div></div><div class="hero-art art-lab" aria-hidden="true"><img src="../assets/m1-dioramas.webp" width="1254" height="1254" alt=""></div></section>
+  <nav class="case-tabs" aria-label="案例的三个部分" role="tablist"><button id="tab-background" data-view="background" role="tab" aria-selected="true" aria-controls="panel-background" type="button"><span>01</span>专业背景<small>为什么识别岩屑</small></button><button id="tab-workflow" data-view="workflow" role="tab" aria-selected="false" aria-controls="panel-workflow" type="button" tabindex="-1"><span>02</span>案例流程<small>数据怎样整理到能用</small></button><button id="tab-demo" data-view="demo" role="tab" aria-selected="false" aria-controls="panel-demo" type="button" tabindex="-1"><span>03</span>辅助识别<small>照片、井深与岩性</small></button></nav>
 
   <section class="case-panel" id="panel-background" role="tabpanel" aria-labelledby="tab-background">
 <!-- M1_BACKGROUND -->
@@ -23,8 +23,8 @@
   <section class="case-panel" id="panel-demo" role="tabpanel" aria-labelledby="tab-demo" hidden>
 <!-- M1_DEMO -->
   </section>
-  <footer><span>M1 · 岩屑岩性辅助识别 / 可视化导论课程案例</span><div><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">原始样本 ↗</a><a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">专业背景 ↗</a><a href="https://scikit-learn.org/stable/modules/neighbors.html" target="_blank" rel="noopener noreferrer">近邻方法 ↗</a></div></footer>
+  <footer><span>M1 · 岩屑岩性辅助识别 / 可视化导论课程案例</span><div><a href="https://github.com/nature9420/-ResNet-HMM-Lithology" target="_blank" rel="noopener noreferrer">原始样本 ↗</a><a href="https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging" target="_blank" rel="noopener noreferrer">专业背景 ↗</a><a href="https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html" target="_blank" rel="noopener noreferrer">识别方法 ↗</a></div></footer>
 </main>
-<noscript><p>本案例需要 JavaScript 进行图像特征计算与交互。启用后可离线运行。</p></noscript>
-<script src="data.js"></script><script src="model.js"></script><script src="demo.js"></script>
+<noscript><p>本案例需要 JavaScript 进行图像显示与交互。启用后可离线运行。</p></noscript>
+<script src="data.js"></script><script src="results.js"></script><script src="demo.js"></script>
 </body></html>

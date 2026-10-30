@@ -8,7 +8,7 @@
   $('research-grain-viz').innerHTML='<svg viewBox="0 0 310 192" role="img" aria-label="同一盘示意岩屑的两种输出表达；整图模式给一个标签，颗粒模式为各碎块显示类别。"><rect class="grain-tray" x="18" y="33" width="275" height="127" rx="13"/><text class="whole-caption" x="18" y="22">整图：一个标签</text><text class="grain-caption" x="18" y="22">逐颗：保留类别差异</text>'+researchParticles.map(function(p,i){return '<polygon class="research-particle" points="'+p+'" style="--particle:'+researchColors[[0,0,1,0,2,0,1,0][i]]+'"/>';}).join('')+'</svg><div class="grain-legend">'+researchLegend+'</div>';
   $('research-label-toggle').addEventListener('click',function(){
     var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(on));$('research-label-viz').classList.toggle('is-auditing',on);
-    $('research-label-note').textContent=on?'圈出的点需要复核；外观相近本身不能证明原标签错误。':'特征空间示意：同色为同类标签，点靠近表示外观相似。';reportHeight();
+    $('research-label-note').textContent=on?'圈出的点与周围标签不同；外观相近本身不能证明原标签错误。':'特征空间示意：同色为同类标签，点靠近表示外观相似。';reportHeight();
   });
   $('research-capture-toggle').addEventListener('click',function(){var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(on));$('research-capture-viz').classList.toggle('is-dim',on);});
   $('research-grain-toggle').addEventListener('click',function(){

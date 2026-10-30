@@ -342,7 +342,7 @@
     var allCases = Cases.bySceneAll(sc.id);
     /* 当前展示哪个案例：?case= 指定，默认第一个 */
     var c = allCases.filter(function (x) { return x.id === q.case; })[0] || allCases[0] || null;
-    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn');
+    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn' || c.id === 'm1-cuttings-resnet');
 
     var caseSwitch = '';
     if (allCases.length > 1) {
@@ -496,9 +496,9 @@
     var tabsEl = document.getElementById('tabs');
     if (!tabsEl) return;
 
-    // M1's three isolated lesson frames share one current sample and locked
-    // evaluation state. Accept messages only from frames mounted in this case.
-    if (sc.id === 'm1' && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn')) {
+    // M1 lesson frames share the current sample and experiment phase.
+    // Accept messages only from frames mounted in this case.
+    if (sc.id === 'm1' && (c.id === 'm1-cuttings-preview-local' || c.id === 'm1-cuttings-knn' || c.id === 'm1-cuttings-resnet')) {
       var sharedLessonState = null;
       var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
       function lessonFrames() {
