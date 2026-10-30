@@ -519,7 +519,11 @@
       lessonMessageHandler = function (event) {
         var frames = lessonFrames(), sourceFrame = frames.filter(function (frame) { return frame.contentWindow === event.source; })[0];
         if (!sourceFrame || !event.data || typeof event.data !== 'object') return;
-        if (event.data.__m1StateRequest) event.source.postMessage({ __m1SharedState: sharedLessonState }, '*');
+        if (event.data.__m1StateRequest) {
+          var sectionNames = ['background', 'workflow', 'demo'];
+          var ownerIndex = lessonRoots.findIndex(function (id) { var root = document.getElementById(id); return root && root.querySelector('iframe') === sourceFrame; });
+          event.source.postMessage({ __m1Section: sectionNames[ownerIndex], __m1SharedState: sharedLessonState }, '*');
+        }
         if (event.data.__m1StateUpdate && typeof event.data.__m1StateUpdate === 'object') {
           sharedLessonState = event.data.__m1StateUpdate;
           frames.forEach(function (frame) { if (frame !== sourceFrame) frame.contentWindow.postMessage({ __m1SharedState: sharedLessonState }, '*'); });
@@ -539,6 +543,11 @@
         p.classList.toggle('on', p.dataset.panel === key);
       });
       mountCaseSection(sc, c, key);
+      if (sc.id === 'm1') {
+        var activeRoot = document.getElementById('case-' + key + '-root');
+        var activeFrame = activeRoot && activeRoot.querySelector('iframe');
+        if (activeFrame && activeFrame.contentWindow) activeFrame.contentWindow.postMessage({ __m1Section: { bg: 'background', flow: 'workflow', demo: 'demo' }[key] }, '*');
+      }
       if (scroll) {
         // The tabs are sticky; their screen position no longer represents their
         // original document position after a long read. Use a stationary anchor.

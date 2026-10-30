@@ -12,11 +12,13 @@
   var sharingReady=false,applyingShared=false,navigationPending=null;
   var flowText=/* M1_FLOW_TEXT */ [];
   var sectionQuery=new URLSearchParams(window.location.search||'');
-  var portalSection=window.__CASE_DEMO_VIEW__||sectionQuery.get('section');
-  var embedded=Boolean(window.__CASE_DEMO_VIEW__)||sectionQuery.get('embed')==='portal';
+  var frameSection=/^m1-lesson-(background|workflow|demo)$/.exec(String(window.name||''));
+  var portalSection=window.__CASE_DEMO_VIEW__||sectionQuery.get('section')||(frameSection&&frameSection[1]);
+  var embedded=window.parent!==window||Boolean(window.__CASE_DEMO_VIEW__)||sectionQuery.get('embed')==='portal';
   if(embedded){document.body.classList.add('embedded');var brand=document.querySelector?document.querySelector('.wordmark'):null;if(brand){brand.removeAttribute('href');brand.setAttribute('aria-label','M1 岩屑岩性辅助识别');}}
   function reportHeight(){if(window.parent!==window)window.parent.postMessage({__m1Height:Math.ceil(document.body.getBoundingClientRect().height)},'*');}
   function setView(next,focus,scroll){
+    if(embedded&&portalSection)next=portalSection;
     if(['background','workflow','demo'].indexOf(next)<0)next='background';view=next;
     Array.prototype.forEach.call(document.querySelectorAll('[data-view]'),function(b){var active=b.dataset.view===next;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;if(active&&focus)b.focus({preventScroll:true});});
     ['background','workflow','demo'].forEach(function(n){$('panel-'+n).hidden=n!==next;});
@@ -157,7 +159,8 @@
   function exportIdentificationRecords(){var rows=[['sample_id','well','source_depth_m','source_label','color_baseline_lithology','identified_lithology','score_sandstone','score_shale','score_dolomite','experiment_phase','fit_images','excluded_group','weights_sha256','image_sha256']];phaseSamples().forEach(function(s){var r=RESULTS.samples[s.id];rows.push([s.id,s.well,s.depth,s.label,className(BASELINE.samples[s.id].prediction),className(r.prediction)].concat(r.scores,[evaluationStage,r.fitCount,r.fold==='holdout'?'':r.fold,RESULTS.method.weightsSha256,s.sha256]));});downloadCSV(rows,'m1-identification-'+evaluationStage+'.csv');}
   $('export-identification').addEventListener('click',exportIdentificationRecords);
   function publishLessonState(){if(embedded&&sharingReady&&!applyingShared)window.parent.postMessage({__m1StateUpdate:{sampleId:currentId,stage:evaluationStage}},'*');}
-  window.addEventListener('message',function(event){if(event.source!==window.parent||!event.data)return;if(embedded&&event.data.__m1ScrollToTop)window.scrollTo(0,0);if(event.data.__m1NavigationAck===navigationPending)navigationPending=null;if(Object.prototype.hasOwnProperty.call(event.data,'__m1SharedState')){sharingReady=true;var state=event.data.__m1SharedState;if(state&&byId[state.sampleId]){applyingShared=true;selectSample(state.sampleId);applyingShared=false;}else publishLessonState();}});
+  window.addEventListener('message',function(event){if(event.source!==window.parent||!event.data)return;if(embedded&&['background','workflow','demo'].indexOf(event.data.__m1Section)>=0){portalSection=event.data.__m1Section;setView(portalSection,false);}
+    if(embedded&&event.data.__m1ScrollToTop)window.scrollTo(0,0);if(event.data.__m1NavigationAck===navigationPending)navigationPending=null;if(Object.prototype.hasOwnProperty.call(event.data,'__m1SharedState')){sharingReady=true;var state=event.data.__m1SharedState;if(state&&byId[state.sampleId]){applyingShared=true;selectSample(state.sampleId);applyingShared=false;}else publishLessonState();}});
   $('flow-sample-select').innerHTML=DATA.samples.map(function(s){return '<option value="'+s.id+'">'+s.id+' · '+s.depth+' m</option>';}).join('');
   /* M1_TEACHING_SCRIPT */
   /* M1_WORKFLOW_SCRIPT */
