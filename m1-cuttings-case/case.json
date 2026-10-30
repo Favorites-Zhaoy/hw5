@@ -5,7 +5,7 @@
   "methods": [
     "cv"
   ],
-  "version": "3.0.1",
+  "version": "3.0.2",
   "updated": "2026-10-30",
   "status": "ready",
   "tabs": {
@@ -62,7 +62,7 @@
         }
       ],
       "page": {
-        "html": "demo/lesson.html",
+        "html": "demo/background.html",
         "view": "background",
         "height": 1040
       }
@@ -151,14 +151,14 @@
         }
       ],
       "page": {
-        "html": "demo/lesson.html",
+        "html": "demo/workflow.html",
         "view": "workflow",
         "height": 1040
       }
     },
     "demo": {
       "mode": "page",
-      "html": "demo/lesson.html",
+      "html": "demo/identify.html",
       "label": "可运行示范",
       "intro": "同一批照片，对照普通查看方式与 AI 的批量分类记录；再沿井深比较原始记录、常规颜色参照与 CNN 结果。示范回放固定实验输出，不重新训练或推理。",
       "height": 1040,

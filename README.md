@@ -32,7 +32,7 @@ m1 岩屑岩性辅助识别案例已接入 `#/scene/m1`，三页为“专业背�
 
 可运行示范把同一组原图和 CNN 候选逐张对应，可回放固定实验的整批输出。井深图同时展示源记录、常规颜色参照和 CNN，联动原图、三类得分、类别响应并支持 CSV 导出。播放时间不代表推理耗时。
 
-当前提交文件夹为 `m1-cuttings-case/`，压缩包为 `submissions/m1-cuttings-case-v3.0.1.zip`，解压后按原协议导入；直接打开 `demo/lesson.html` 也能离线运行。入口已内嵌样式、脚本、66 张原始 JPEG、研究图例和固定实验结果。样品选择会在三页之间延续，切换页面时回到章节开头；支持导出数据清单和当前组识别记录。
+当前提交文件夹为 `m1-cuttings-case/`，压缩包为 `submissions/m1-cuttings-case-v3.0.2.zip`，解压后按原协议导入；直接打开 `demo/background.html`，其余两页为 `demo/workflow.html` 与 `demo/identify.html`。请保留完整文件夹，三页共用本地 assets 中的样式、脚本、原始图像与实验记录。样品选择会在三页之间延续，切换页面时回到章节开头；支持导出数据清单和当前组识别记录。
 
 识别采用 ImageNet 预训练的 ResNet-18，冻结卷积层，只拟合三类线性分类层。中心 72% 裁切后缩放为 224×224。开发用 42 张照片按 12 个井段组逐组留出，另有 24 张照片分为 5 个留出组；每折的缩放参数和分类层只用该折开发资料拟合。页面展示已经计算并保存的结果及逐类别 Grad-CAM，不在浏览器里重新训练或运行网络。实际开发组一致率 88.1%，留出组 33.3%；保留全部差异，不用论文性能替代本例结果。这是曾在旧版展示过的单井公开教学子集，不能声称独立盲测或新井效果。
 
@@ -40,7 +40,7 @@ m1 岩屑岩性辅助识别案例已接入 `#/scene/m1`，三页为“专业背�
 
 图像字节、源标签、井深和外层分组保持不变。缺失的现场采样、迟到和成像记录明确标为未提供；没有新增矿物或颗粒含量标注。论文图与本例数据分别注明来源，外部图不进入识别实验。详见 [论文图例相关性核查](docs/论文图例相关性核查.md) 与案例包说明。
 
-M1 网站入口统一为 `#/scene/m1?case=m1-cuttings&tab=bg`。M1 只挂载站点维护的当前案例；旧包即使修改 ID 或版本号，也不会恢复到默认页、案例切换器或案例库。辅助识别的新链接使用 `tab=identify`，旧 `demo` 链接会自动对应。其他场景继续按原协议导入。旧 HTML 入口 `m1-cuttings-case/demo/index.html` 已移除，当前文件为 `demo/lesson.html`。已移除重复的开场大图，独立 HTML 直接进入三部分内容。
+M1 网站入口统一为 `#/scene/m1?case=m1-cuttings&tab=bg`。M1 只挂载站点维护的当前案例；旧包即使修改 ID 或版本号，也不会恢复到默认页、案例切换器或案例库。辅助识别的新链接使用 `tab=identify`，旧 `demo` 链接会自动对应。其他场景继续按原协议导入。旧 HTML 入口 `m1-cuttings-case/demo/index.html` 已移除，现已分为 background.html、workflow.html、identify.html 三个章节文件，lesson.html 也已停用。已移除重复的开场大图，独立 HTML 直接进入三部分内容。
 
 可编辑源文件在 `tools/m1/`。修改后运行 `node tools/build-m1-case.cjs` 重建页面、清单与门户注册文件。复现实验需 Node.js、Python、NumPy、Pillow、scikit-learn、PyTorch 和 torchvision，运行 `python tools/m1/prepare-resnet.py`；首次从官方地址取得 ResNet-18 权重。实验制作工具不是网页运行依赖。
 

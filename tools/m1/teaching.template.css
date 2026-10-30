@@ -10,3 +10,5 @@
 .ordinary-photo-grid{min-height:270px;align-content:start}.batch-output small{white-space:nowrap}.batch-output b{white-space:nowrap}
 
 .research-study{grid-template-columns:74px minmax(0,1fr)}.research-date b{font-size:22px;white-space:nowrap}
+
+.section-controls{display:flex;justify-content:flex-end;padding:8px 0}.case-panel[hidden]{display:none!important}

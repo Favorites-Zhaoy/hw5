@@ -55,12 +55,12 @@ test('renamed and reversioned old identification pages have no default, direct, 
   }
   assert.equal(fs.existsSync(path.join(site, 'm1-cuttings-case/demo/index.html')), false);
   const current = JSON.parse(read('m1-cuttings-case/case.json'));
-  assert.equal(current.id, 'm1-cuttings'); assert.equal(current.tabs.demo.html, 'demo/lesson.html');
+  assert.equal(current.id, 'm1-cuttings'); assert.equal(current.tabs.demo.html, 'demo/identify.html');
   assert.equal(current.tabs.demo.view, 'demo');
 });
 
 test('the abandoned introduction is absent from the standalone case and all website entrances use the canonical ID', () => {
-  const html = read('m1-cuttings-case/demo/lesson.html').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
+  const html = read('m1-cuttings-case/demo/background.html').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
   assert.ok(!html.includes('<section class="hero">')); assert.ok(!html.includes('读懂一次判断'));
   const rt = support.makeRuntime(), home = rt.ctx.__shellTest.homeHTML(), mud = rt.ctx.__shellTest.stageHTML(rt.ctx.ATLAS.index.byStage.mudlogging, {});
   for (const entry of [home, mud]) assert.ok(entry.includes('#/scene/m1?case=m1-cuttings&amp;tab=bg'));
