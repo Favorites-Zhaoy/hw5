@@ -1,4 +1,4 @@
-M3 荧光图像智能判读 · 2.0.1
+M3 荧光图像智能判读 · 2.0.2
 
 打开 demo/background.html、demo/workflow.html、demo/identify.html。请保留完整文件夹；页面共用assets本地资源；固定回放和L2规则可离线查看。L3模型推理请使用静态HTTP站点，需要按需载入公共ONNX/WASM组件。也可按原协议导入未内置本案例的课程门户；本站已内置，无需重复导入。
 
@@ -15,6 +15,6 @@ M3 荧光图像智能判读 · 2.0.1
 
 真实资料（若有）见assets/dataset-v2.js；原合成实验结果见provenance.json及assets/experiment.js；文献见SOURCES.json。复现：python tools/mudlogging/prepare-experiments.py m3，然后 node tools/build-mudlogging-cases.cjs。模型权重在仓库tools/mudlogging/checkpoints。
 
-V2复现步骤：python tools/mudlogging/prepare-real-volve.py；python tools/mudlogging/prepare-drilling-forest.py；python tools/mudlogging/export-browser-models.py；node tools/build-mudlogging-cases.cjs。静态预览：python tools/preview-static.py。公共推理组件固定在assets/vendor/ort-1.31.1，不随每个案例包重复存储；导入后的在线推理使用同版本公共组件。
+V2复现步骤：python tools/mudlogging/prepare-real-volve.py；python tools/mudlogging/prepare-sequence-models.py；python tools/mudlogging/export-browser-models.py；node tools/build-mudlogging-cases.cjs。静态预览：python tools/preview-static.py。公共推理组件固定在assets/vendor/ort-1.31.1，不随每个案例包重复存储；导入后的在线推理使用同版本公共组件。
 
 三页为独立HTML，没有内部三页导航和完整网页嵌套；入口由父页面页签确定。

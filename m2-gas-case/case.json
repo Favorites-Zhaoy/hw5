@@ -2,7 +2,7 @@
   "id": "m2-gas",
   "sceneId": "m2",
   "title": "气测异常智能解释",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "updated": "2026-11-01",
   "status": "ready",
   "methods": [
@@ -12,17 +12,17 @@
   "tabs": {
     "background": {
       "label": "专业背景",
-      "lede": "先认识气体上返与迟到，再查看Volve真实全烃和工况记录。通过阈值与来源深度实验，比较单通道气峰和多通道新颖度候选。",
+      "lede": "先认识气体上返与迟到，再查看Volve真实全烃和工况记录。通过阈值与来源深度实验，比较单通道气峰和连续历史预测残差。",
       "judge": [
         {
           "label": "示例资料",
           "value": "真实观测＋合成教学",
-          "desc": "真实模式使用Volve 15/9-F-1-C井2013-08-22至28的分钟中位数记录。只使用实际存在的TG、流量、钻压、转速、扭矩和ROP；另保留30口合成井的原CNN实验。"
+          "desc": "真实模式使用Volve 15/9-F-1-C井2013-08-22至28的分钟中位数记录。GRU只读取当前分钟之前最多12条连续TG、流量、钻压、转速、扭矩和ROP，按日期划分拟合与检查；另保留30口合成井的时序卷积对照。"
         },
         {
           "label": "核心方法",
-          "value": "多通道自编码器",
-          "desc": "真实记录没有可靠事件类别标签。先学习常见通道组合，再把难以重构的记录列为候选，比直接训练有监督分类更符合现有资料。"
+          "value": "GRU 连续气测预测",
+          "desc": "总览将M2划为时序分析。气峰的升降与持续时间都依赖先后顺序；GRU逐分钟传递状态，用过去预测下一分钟，再找偏离预期的变化。"
         }
       ],
       "sections": [
@@ -39,7 +39,7 @@
         {
           "no": 3,
           "title": "示例数据",
-          "html": "<p>真实模式使用Volve 15/9-F-1-C井2013-08-22至28的分钟中位数记录。只使用实际存在的TG、流量、钻压、转速、扭矩和ROP；另保留30口合成井的原CNN实验。</p>"
+          "html": "<p>真实模式使用Volve 15/9-F-1-C井2013-08-22至28的分钟中位数记录。GRU只读取当前分钟之前最多12条连续TG、流量、钻压、转速、扭矩和ROP，按日期划分拟合与检查；另保留30口合成井的时序卷积对照。</p>"
         },
         {
           "no": 4,
@@ -49,7 +49,7 @@
         {
           "no": 5,
           "title": "术语对照表",
-          "html": "<table><tr><td>全烃 / TG</td><td>混合返出气体的总体烃类信号。</td><td>连续输入通道，不是储层产能。</td></tr><tr><td>组分 C1—C5</td><td>不同碳数的轻烃。</td><td>真实资料未接入组分；C2、C3相对比例只在合成对照中提供。</td></tr><tr><td>背景气</td><td>相对平稳工况下的背景水平。</td><td>阈值规则的参照基线。</td></tr><tr><td>接单根气</td><td>接单根后经过迟到返出的短气峰。</td><td>需要时间对齐的事件类别。</td></tr><tr><td>迟到 / Lag</td><td>从井底到地面的运输时间。</td><td>跨通道的时间偏移。</td></tr><tr><td>因果卷积（合成对照）</td><td>只用当前与之前的信息。</td><td>适合沿时间顺序输出候选。</td></tr><tr><td>扩张卷积（合成对照）</td><td>隔点读取，扩大观察范围。</td><td>1、2、4扩张率组合多尺度变化。</td></tr><tr><td>逐点分类（合成对照）</td><td>给每个时刻一个类别。</td><td>输出三类得分序列。</td></tr><tr><td>按井留出（合成对照）</td><td>另一口井整段用于检查。</td><td>分组划分，避免同井点位泄漏。</td></tr><tr><td>宏平均 F1（合成对照）</td><td>每个类别都占相同权重。</td><td>同时考虑误报和漏判。</td></tr><tr><td>自编码器 / Autoencoder</td><td>先压缩，再尝试还原输入。</td><td>本例6通道压缩至3维，再重构6通道。</td></tr><tr><td>重构残差</td><td>观测与重构之间相差多少。</td><td>标准化空间中的均方根误差；不是事件类别概率。</td></tr><tr><td>按日期留出</td><td>晚一些的资料先保留不用来拟合。</td><td>真实同井资料按日期分为拟合、验证和检查。</td></tr><tr><td>钻进气</td><td>钻进过程中进入循环系统的地层气体。</td><td>气测解释中的来源线索。</td></tr><tr><td>循环气</td><td>未脱尽的气体再次循环返出。</td><td>重复信号来源，不等于新事件。</td></tr></table>"
+          "html": "<table><tr><td>全烃 / TG</td><td>混合返出气体的总体烃类信号。</td><td>连续输入通道，不是储层产能。</td></tr><tr><td>组分 C1—C5</td><td>不同碳数的轻烃。</td><td>真实资料未接入组分；C2、C3相对比例只在合成对照中提供。</td></tr><tr><td>背景气</td><td>相对平稳工况下的背景水平。</td><td>阈值规则的参照基线。</td></tr><tr><td>接单根气</td><td>接单根后经过迟到返出的短气峰。</td><td>需要时间对齐的事件类别。</td></tr><tr><td>迟到 / Lag</td><td>从井底到地面的运输时间。</td><td>跨通道的时间偏移。</td></tr><tr><td>因果卷积（合成对照）</td><td>只用当前与之前的信息。</td><td>适合沿时间顺序输出候选。</td></tr><tr><td>扩张卷积（合成对照）</td><td>隔点读取，扩大观察范围。</td><td>1、2、4扩张率组合多尺度变化。</td></tr><tr><td>逐点分类（合成对照）</td><td>给每个时刻一个类别。</td><td>输出三类得分序列。</td></tr><tr><td>按井留出（合成对照）</td><td>另一口井整段用于检查。</td><td>分组划分，避免同井点位泄漏。</td></tr><tr><td>宏平均 F1（合成对照）</td><td>每个类别都占相同权重。</td><td>同时考虑误报和漏判。</td></tr><tr><td>GRU / 门控循环单元</td><td>按顺序更新状态，保留前面记录的信息。</td><td>最多12分钟×6通道，单向读取，12维隐藏状态。</td></tr><tr><td>预测残差</td><td>实际观测与此前历史的预测相差多少。</td><td>六个标准化通道的均方根误差；不是事件类别概率。</td></tr><tr><td>按日期留出</td><td>晚一些的资料先保留不用来拟合。</td><td>真实同井资料按日期分为拟合、验证和检查。</td></tr><tr><td>钻进气</td><td>钻进过程中进入循环系统的地层气体。</td><td>气测解释中的来源线索。</td></tr><tr><td>循环气</td><td>未脱尽的气体再次循环返出。</td><td>重复信号来源，不等于新事件。</td></tr></table>"
         }
       ],
       "page": {
@@ -71,7 +71,7 @@
         ],
         [
           "核心算法",
-          "多通道自编码器"
+          "GRU 连续气测预测"
         ],
         [
           "数据",
@@ -84,47 +84,47 @@
           "role": "资料与任务",
           "do": "从同井全烃和工况记录寻找气测异常候选，保留原始时刻。",
           "effect": "有来源ID的时间窗。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         },
         {
           "name": "原始记录与质控",
           "role": "资料与任务",
           "do": "核对TG的Euc单位、分钟聚合与缺测，不补造组分。",
           "effect": "保留来源与单位的分钟记录。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         },
         {
           "name": "传统气峰阈值",
           "role": "资料与任务",
           "do": "按背景倍数筛气峰；迟到假设只改变来源对应，不移动地面观测。",
           "effect": "阈值候选与假设来源深度。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         },
         {
-          "name": "自编码器学习通道关系",
+          "name": "GRU读取连续历史",
           "role": "重点 · AI处理",
-          "do": "早日期拟合六通道的常见组合；压缩后重构，查看残差大的记录。",
-          "effect": "多通道重构残差与阈值候选。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "do": "按分钟顺序读取此前最多12条六通道记录，预测下一分钟，再与当前观测比较。",
+          "effect": "历史窗口、逐步状态与预测残差候选。",
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         },
         {
           "name": "对照候选与适用范围",
           "role": "重点 · AI处理",
           "do": "把两类候选放回同一窗口查看。没有事件真值，不能以候选数量判断准确率。",
           "effect": "原始工况、候选差异与未证实的解释。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         },
         {
           "name": "整理来源与结果",
           "role": "资料与任务",
           "do": "保存原始记录、迟到假设、阈值和候选。",
           "effect": "可回查原始分钟记录的结果文件。",
-          "trap": "真实气测没有独立事件标签，Euc不写成百分比；自编码器异常不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
+          "trap": "真实气测没有独立事件标签，Euc不写成百分比；GRU预测残差不等于发现油气层。合成CNN分类仍只适用于生成器分布。"
         }
       ],
       "metrics": {
         "title": "基础算法与本课实现",
-        "html": "<div class=\"method-choice\" data-method=\"autoencoder\"><div class=\"method-choice-heading\"><span class=\"mini\">从任务选择方法 / 无监督异常检测</span><h3>多通道自编码器</h3></div><svg class=\"network-diagram method-diagram\" viewBox=\"0 0 960 154\" role=\"img\" aria-label=\"多通道自编码器：6个观测通道 → 压缩到3维 → 重构6个通道 → 残差筛选候选\"><defs><marker id=\"method-arrow-m2-real\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"5\" markerHeight=\"5\" orient=\"auto\"><path d=\"M1 1L8 5L1 9\" fill=\"none\" stroke=\"#6e9690\" stroke-width=\"1.5\"/></marker></defs><rect x=\"6\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"20\" y=\"62\" class=\"diagram-title\">6个观测通道</text><text x=\"20\" y=\"90\">TG、流量、WOB等</text><path d=\"M229 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"246\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#dbe8df\" stroke=\"#b9c4b2\"/><text x=\"260\" y=\"62\" class=\"diagram-title\">压缩到3维</text><text x=\"260\" y=\"90\">6→12→3</text><path d=\"M469 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"486\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"500\" y=\"62\" class=\"diagram-title\">重构6个通道</text><text x=\"500\" y=\"90\">3→12→6</text><path d=\"M709 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"726\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"740\" y=\"62\" class=\"diagram-title\">残差筛选候选</text><text x=\"740\" y=\"90\">不是油气层类别</text></svg><div class=\"method-contract\"><span><small>输入是什么</small>同一分钟的6个气测与工况通道</span><span><small>要得到什么</small>通道组合的重构残差</span></div><p class=\"method-reason\">真实记录没有可靠事件类别标签。先学习常见通道组合，再把难以重构的记录列为候选，比直接训练有监督分类更符合现有资料。</p><p class=\"fine\">每次读取同一时刻的通道组合，不把它说成理解了整个气峰；候选还要放回时间曲线解释。 <a href=\"https://scikit-learn.org/stable/modules/outlier_detection.html\" target=\"_blank\" rel=\"noopener noreferrer\">方法依据 ↗</a></p></div>"
+        "html": "<div class=\"method-choice\" data-method=\"gru-forecast\"><div class=\"method-choice-heading\"><span class=\"mini\">TS / 时序分析 · 预测残差</span><h3>GRU 连续气测预测</h3></div><svg class=\"network-diagram method-diagram\" viewBox=\"0 0 960 154\" role=\"img\" aria-label=\"GRU 连续气测预测：之前的连续记录 → GRU顺序传递状态 → 预测下一分钟 → 与实际观测比较\"><defs><marker id=\"method-arrow-m2-real\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"5\" markerHeight=\"5\" orient=\"auto\"><path d=\"M1 1L8 5L1 9\" fill=\"none\" stroke=\"#6e9690\" stroke-width=\"1.5\"/></marker></defs><rect x=\"6\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"20\" y=\"62\" class=\"diagram-title\">之前的连续记录</text><text x=\"20\" y=\"90\">最多12步×6通道</text><path d=\"M229 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"246\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#dbe8df\" stroke=\"#b9c4b2\"/><text x=\"260\" y=\"62\" class=\"diagram-title\">GRU顺序传递状态</text><text x=\"260\" y=\"90\">单向、12维状态</text><path d=\"M469 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"486\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"500\" y=\"62\" class=\"diagram-title\">预测下一分钟</text><text x=\"500\" y=\"90\">当前观测不入输入</text><path d=\"M709 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m2-real)\"/><rect x=\"726\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"740\" y=\"62\" class=\"diagram-title\">与实际观测比较</text><text x=\"740\" y=\"90\">按预测残差筛候选</text></svg><div class=\"method-contract\"><span><small>输入是什么</small>当前时刻之前最多12分钟的6通道记录</span><span><small>要得到什么</small>下一分钟通道预测与观测残差</span></div><p class=\"method-reason\">总览将M2划为时序分析。气峰的升降与持续时间都依赖先后顺序；GRU逐分钟传递状态，用过去预测下一分钟，再找偏离预期的变化。</p><p class=\"fine\">真实资料没有气测事件标签；预测残差大可能来自作业或测量变化，不能直接解释为油气发现。 <a href=\"https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html\" target=\"_blank\" rel=\"noopener noreferrer\">方法依据 ↗</a></p></div>"
       },
       "page": {
         "html": "demo/workflow.html",
@@ -138,7 +138,7 @@
       "html": "demo/identify.html",
       "view": "demo",
       "height": 1040,
-      "intro": "改变迟到假设和候选阈值，沿时间查看同一份原始记录。真实资料用自编码器重构残差提示少见组合；合成资料可运行因果CNN。"
+      "intro": "改变迟到假设和候选阈值，沿时间查看同一份原始记录。GRU按先后顺序读取前12分钟，预测下一分钟；曲线与预测残差共用光标。缺测处断开，合成资料保留因果时序卷积对照。"
     }
   }
 }

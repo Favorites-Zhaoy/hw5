@@ -64,7 +64,8 @@
       "补回位置细节",
       "阈值形成二值掩膜"
     ],
-    "source": "https://arxiv.org/abs/1505.04597"
+    "source": "https://arxiv.org/abs/1505.04597",
+    "domain": "cv"
   },
   "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",

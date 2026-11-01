@@ -84,7 +84,8 @@
       "保留错误与低分",
       "数字逐项有来源"
     ],
-    "source": "https://arxiv.org/abs/1406.1078"
+    "source": "https://arxiv.org/abs/1406.1078",
+    "domain": "nlp"
   },
   "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",

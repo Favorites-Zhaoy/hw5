@@ -49,31 +49,33 @@
     }
   ],
   "methodSelection": {
-    "id": "random-forest",
-    "name": "随机森林回归",
-    "family": "树模型 / 表格回归",
-    "input": "WOB、RPM、扭矩、流量4个字段",
-    "output": "ROP估计与响应残差变化",
-    "why": "当前任务是用四个工况字段估计钻速，输入为表格，拟合组只有794点。随机森林可学习条件分支下的非线性关系，还能直接展开某一条记录的计算路径。",
-    "limit": "学到的是工况与钻速的统计关系；换井后仍可能失效，残差不能直接命名地层。",
+    "id": "lstm-rop",
+    "name": "LSTM 工况序列回归",
+    "family": "时序分析 · 深度序列回归",
+    "input": "按井深排序的最多12条四通道工况记录",
+    "output": "当前ROP估计与沿井深的残差变化",
+    "why": "总览将M4划为时序分析。钻进响应要放回连续井段中比较；LSTM沿井深读取钻压、转速、扭矩和流量，把前段工况状态带入当前钻速估计。",
+    "limit": "深度顺序不等于等间隔时间；超过2 m的缺口断开。跨井回归仍需实测检验，残差不直接命名地层。",
     "stages": [
-      "4个工况字段",
-      "100棵回归树",
-      "平均树的logROP",
+      "有序工况记录",
+      "LSTM传递井段状态",
+      "估计当前logROP",
       "还原ROP与残差"
     ],
     "notes": [
-      "WOB、RPM、扭矩、流量",
-      "有放回采样拟合",
-      "固定树模型前向",
-      "再寻找变化候选"
+      "4通道、最多12条",
+      "单向、12维记忆",
+      "含当前工况、不含ROP",
+      "沿井深寻找变化候选"
     ],
-    "source": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html"
+    "source": "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html",
+    "domain": "ts"
   },
   "syntheticMethod": {
+    "domain": "ts",
     "id": "synthetic-m4-cnn",
-    "name": "扩张卷积 1D CNN（合成对照）",
-    "family": "有监督序列分类 / 合成标签",
+    "name": "扩张时序卷积（1D CNN，合成对照）",
+    "family": "有监督时序分类 · 合成标签",
     "input": "128 m × 5 通道",
     "output": "三类逐米候选与分段",
     "why": "这份合成资料有逐点生成标签，用卷积比较局部曲线形态。它是独立保留的教学对照，不能代替真实资料的主流程。",

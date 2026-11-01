@@ -1,5 +1,5 @@
 {
-  "version": "2.0.1",
+  "version": "2.0.2",
   "kind": "real-and-synthetic-teaching",
   "realDataset": {
     "file": "assets/dataset-v2.js",
@@ -11,8 +11,8 @@
         "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
       }
     ],
-    "sha256": "eede23f1ea36e11ec088cb5b3678ab1306cca96aa8e0a52a1ba37961ccd3d101",
-    "model": "6d51b0fc64adaeb4874f2f487a7ab32ed5bc0e0c559c383a334a4a284af72860"
+    "sha256": "c9bad8ced238eb6509eeeff3fb2208a7af17f085b950cdaa6b5680bc449ee78c",
+    "model": "5de4f171a5bbe5ceb2881812b80a3b38bd81e5f4efa84beb27668712a521ed70"
   },
   "browserModel": {
     "file": "m2.onnx",
@@ -29,13 +29,13 @@
   },
   "execution": {
     "baseline": "L2 browser recomputation",
-    "ai": "Real autoencoder fixed residuals / dynamic threshold; synthetic CNN saved or ONNX/WASM"
+    "ai": "Real GRU exact causal recurrent-cell forward / prediction residual; synthetic temporal CNN saved or ONNX/WASM"
   },
   "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
+  "builderSha256": "87f11f398eaaf0e053803b42ae8221c23e0ab9d4f09d3067ee84576ecd0c3db9",
   "experimentSha256": "476e99b15546b1482b8622701f482c0a973ffee51ef4fb286895a03939db6f94",
   "weightsSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
   "split": {

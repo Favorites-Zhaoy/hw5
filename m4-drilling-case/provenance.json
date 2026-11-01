@@ -1,5 +1,5 @@
 {
-  "version": "2.0.1",
+  "version": "2.0.2",
   "kind": "real-and-synthetic-teaching",
   "realDataset": {
     "file": "assets/dataset-v2.js",
@@ -29,8 +29,8 @@
         "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
       }
     ],
-    "sha256": "a79c3e50b1fc6b52be0a0b63159e256826aa2a9fe771e3febb8cd8209f28a487",
-    "model": "9d4da731e9fd821df671c279176462d28ed9966eadbd7e56eceef41c006b003f"
+    "sha256": "b8f8ecaa0a7016e1d7c14681f81bb72882753d483a9a7ba9b2726225ceea1ce5",
+    "model": "b61b9c48a14ebd6ea4c8527ea55d1f99f381517f7e38787d723f2b15c99437f9"
   },
   "browserModel": {
     "file": "m4.onnx",
@@ -47,13 +47,13 @@
   },
   "execution": {
     "baseline": "L2 browser recomputation",
-    "ai": "Real random forest exact JavaScript tree traversal; synthetic CNN saved or ONNX/WASM"
+    "ai": "Real LSTM exact causal recurrent-cell forward; synthetic temporal CNN saved or ONNX/WASM"
   },
   "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
+  "builderSha256": "87f11f398eaaf0e053803b42ae8221c23e0ab9d4f09d3067ee84576ecd0c3db9",
   "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
   "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
   "split": {
