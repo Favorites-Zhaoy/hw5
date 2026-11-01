@@ -48,6 +48,50 @@
       "boundary": "论文任务是ROP预测；本课CNN做逐米分段，未复现整套混合模型。"
     }
   ],
+  "methodSelection": {
+    "id": "random-forest",
+    "name": "随机森林回归",
+    "family": "树模型 / 表格回归",
+    "input": "WOB、RPM、扭矩、流量4个字段",
+    "output": "ROP估计与响应残差变化",
+    "why": "当前任务是用四个工况字段估计钻速，输入为表格，拟合组只有794点。随机森林可学习条件分支下的非线性关系，还能直接展开某一条记录的计算路径。",
+    "limit": "学到的是工况与钻速的统计关系；换井后仍可能失效，残差不能直接命名地层。",
+    "stages": [
+      "4个工况字段",
+      "100棵回归树",
+      "平均树的logROP",
+      "还原ROP与残差"
+    ],
+    "notes": [
+      "WOB、RPM、扭矩、流量",
+      "有放回采样拟合",
+      "固定树模型前向",
+      "再寻找变化候选"
+    ],
+    "source": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html"
+  },
+  "syntheticMethod": {
+    "id": "synthetic-m4-cnn",
+    "name": "扩张卷积 1D CNN（合成对照）",
+    "family": "有监督序列分类 / 合成标签",
+    "input": "128 m × 5 通道",
+    "output": "三类逐米候选与分段",
+    "why": "这份合成资料有逐点生成标签，用卷积比较局部曲线形态。它是独立保留的教学对照，不能代替真实资料的主流程。",
+    "limit": "仅适用于当前生成器分布；成绩与真实资料分开统计。",
+    "stages": [
+      "五通道井深序列",
+      "扩张卷积1/2/4",
+      "逐米三类得分",
+      "最短段过滤与层界"
+    ],
+    "notes": [
+      "128米×5通道",
+      "29点前后邻域",
+      "三类生成可钻性",
+      "最短段4点"
+    ],
+    "source": "https://pytorch.org/docs/stable/generated/torch.nn.Conv1d.html"
+  },
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
   "data": "本例包含固定来源版本的Volve真实观测与单独的合成教学实验。真实资料无独立事件或地质层界标签；合成资料保留生成器标签。",
   "realData": [
@@ -86,7 +130,7 @@
     "inputDtype": "float32",
     "output": "logits",
     "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
   }
 }

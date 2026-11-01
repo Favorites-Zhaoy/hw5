@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "kind": "real-and-synthetic-teaching",
   "realDataset": {
     "file": "assets/dataset-v2.js",
@@ -24,7 +24,7 @@
     "inputDtype": "float32",
     "output": "logits",
     "architecture": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "ec3b8b7392e4687a80482468fecfb83f1bc84f28bbe1e046e74e3219e9000ef3"
   },
   "execution": {
@@ -35,7 +35,7 @@
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "4cb8d543092ddb09bdfbeb4ce8d2d23c34200ae3b9292d34cb69583721871e73",
+  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
   "experimentSha256": "476e99b15546b1482b8622701f482c0a973ffee51ef4fb286895a03939db6f94",
   "weightsSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
   "split": {

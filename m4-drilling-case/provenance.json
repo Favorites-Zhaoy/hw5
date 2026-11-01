@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "kind": "real-and-synthetic-teaching",
   "realDataset": {
     "file": "assets/dataset-v2.js",
@@ -29,8 +29,8 @@
         "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
       }
     ],
-    "sha256": "06bbfa17ae98a171059aec6c9b8eda3dd85cb050eda1bd70aecd87d4f0a12e6d",
-    "model": "4d401101d506df423a21df9e66bf31d3b910c2eed4946ce5d64eff7f507a5cce"
+    "sha256": "a79c3e50b1fc6b52be0a0b63159e256826aa2a9fe771e3febb8cd8209f28a487",
+    "model": "9d4da731e9fd821df671c279176462d28ed9966eadbd7e56eceef41c006b003f"
   },
   "browserModel": {
     "file": "m4.onnx",
@@ -42,18 +42,18 @@
     "inputDtype": "float32",
     "output": "logits",
     "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
   },
   "execution": {
     "baseline": "L2 browser recomputation",
-    "ai": "Real MLP exact JavaScript forward; synthetic CNN saved or ONNX/WASM"
+    "ai": "Real random forest exact JavaScript tree traversal; synthetic CNN saved or ONNX/WASM"
   },
   "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "4cb8d543092ddb09bdfbeb4ce8d2d23c34200ae3b9292d34cb69583721871e73",
+  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
   "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
   "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
   "split": {

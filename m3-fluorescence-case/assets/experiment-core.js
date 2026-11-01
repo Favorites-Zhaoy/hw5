@@ -1,6 +1,6 @@
 (function(root,factory){'use strict';var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.PetroExperiment=api;}(typeof window==='undefined'?globalThis:window,function(){
  'use strict';
- var VERSION='2.0.0';
+ var VERSION='2.0.1';
  function median(a){a=a.filter(Number.isFinite).slice().sort(function(x,y){return x-y;});return a.length?(a[(a.length-1)>>1]+a[a.length>>1])/2:null;}
  function smooth(a,n){var h=Math.floor(n/2);return a.map(function(v,i){return median(a.slice(Math.max(0,i-h),Math.min(a.length,i+h+1)));});}
  function cleanRuns(a,minimum){a=a.slice();var s=0;for(var i=1;i<=a.length;i++)if(i===a.length||a[i]!==a[s]){if(i-s<minimum&&s>0)for(var j=s;j<i;j++)a[j]=a[s-1];s=i;}return a;}
@@ -17,5 +17,7 @@
  function manifest(caseId,data,params,mode){return {caseId:caseId,datasetVersion:data.version||VERSION,dataKind:data.kind,source_url:data.source_url||null,license:data.license||'Synthetic teaching data, generated in this repository',label_origin:data.label_origin||'Synthetic generator',baseline_version:VERSION,model_version:data.weightsSha256||data.modelSha256||null,inference_mode:mode,parameters:JSON.parse(JSON.stringify(params)),confirmation_status:'待确认',created_at:new Date().toISOString()};}
  function dense(model,features){var a=features.map(function(v,i){return (v-model.mean[i])/model.std[i];});model.layers.forEach(function(l){a=l.weight.map(function(row,i){var x=row.reduce(function(n,w,j){return n+w*a[j];},l.bias[i]);return l.activation==='relu'?Math.max(0,x):x;});});return a;}
  function alignTime(r,lag){return r.time.map(function(t,i){var target=t-lag,j=i;while(j>=0&&r.time[j]>target)j--;if(j<0||target-r.time[j]>1.01)return {depth:null,pump:null,index:null};return {depth:r.depth[j],pump:r.flow[j]>1?1:0,index:j};});}
- return {version:VERSION,median:median,smooth:smooth,cleanRuns:cleanRuns,gas:gas,drill:drill,changes:changes,peaks:peaks,keyword:keyword,facts:facts,conflict:conflict,manifest:manifest,dense:dense,alignTime:alignTime};
+ function treePath(tree,features){var at=0,out=[];for(var depth=0;depth<=tree.length;depth++){var node=tree[at];if(!node)throw Error('Invalid regression tree node');var feature=node[0],left=feature>=0&&Math.fround(features[feature])<=node[1];out.push({node:at,feature:feature,threshold:node[1],goLeft:left,value:node[4]});if(feature<0)return out;at=left?node[2]:node[3];}throw Error('Cyclic regression tree');}
+ function forest(model,features){var sum=0;model.trees.forEach(function(tree){var at=0;while(tree[at][0]>=0){var node=tree[at];at=Math.fround(features[node[0]])<=node[1]?node[2]:node[3];}sum+=tree[at][4];});return Math.exp(sum/model.trees.length);}
+ return {version:VERSION,median:median,smooth:smooth,cleanRuns:cleanRuns,gas:gas,drill:drill,changes:changes,peaks:peaks,keyword:keyword,facts:facts,conflict:conflict,manifest:manifest,dense:dense,alignTime:alignTime,treePath:treePath,forest:forest};
 }));

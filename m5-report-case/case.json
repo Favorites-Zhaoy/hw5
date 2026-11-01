@@ -2,7 +2,7 @@
   "id": "m5-report",
   "sceneId": "m5",
   "title": "录井报告自动生成",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "updated": "2026-11-01",
   "status": "ready",
   "methods": [
@@ -21,8 +21,8 @@
         },
         {
           "label": "核心方法",
-          "value": "字符级 BiGRU",
-          "desc": "BiGRU接替逐条语句归类，利用前后文处理否定和时间关系；事实绑定接替反复抄录字段，再按模板生成摘要。"
+          "value": "BiGRU 分类＋字段模板",
+          "desc": "语句分类要区分否定、转折和前后语境，使用双向GRU；井段与数值由字段抽取和模板处理，不交给分类器自由编写。"
         }
       ],
       "sections": [
@@ -71,7 +71,7 @@
         ],
         [
           "核心算法",
-          "字符级 BiGRU"
+          "BiGRU 分类＋字段模板"
         ],
         [
           "数据",
@@ -124,7 +124,7 @@
       ],
       "metrics": {
         "title": "基础算法与本课实现",
-        "html": "<svg class=\"network-diagram\" viewBox=\"0 0 960 148\" role=\"img\" aria-label=\"字符级 BiGRU从输入到结果的处理路径\"><rect x=\"10\" y=\"35\" width=\"219\" height=\"79\" rx=\"6\" fill=\"#eee5d4\" stroke=\"#b8b9aa\"/><text x=\"26\" y=\"64\" class=\"diagram-title\">字符与字向量</text><text x=\"26\" y=\"87\">本例实际输入形状</text><path d=\"M231 74H246\" fill=\"none\" stroke=\"#6d999e\" stroke-width=\"2.5\" marker-end=\"url(#arrow)\"/><rect x=\"249\" y=\"35\" width=\"219\" height=\"79\" rx=\"6\" fill=\"#dce8df\" stroke=\"#b8b9aa\"/><text x=\"265\" y=\"64\" class=\"diagram-title\">双向GRU读前后文</text><text x=\"265\" y=\"87\">字符级 BiGRU</text><path d=\"M470 74H485\" fill=\"none\" stroke=\"#6d999e\" stroke-width=\"2.5\" marker-end=\"url(#arrow)\"/><rect x=\"488\" y=\"35\" width=\"219\" height=\"79\" rx=\"6\" fill=\"#eee5d4\" stroke=\"#b8b9aa\"/><text x=\"504\" y=\"64\" class=\"diagram-title\">四类事件得分</text><text x=\"504\" y=\"87\">由训练资料拟合</text><path d=\"M709 74H724\" fill=\"none\" stroke=\"#6d999e\" stroke-width=\"2.5\" marker-end=\"url(#arrow)\"/><rect x=\"727\" y=\"35\" width=\"219\" height=\"79\" rx=\"6\" fill=\"#eee5d4\" stroke=\"#b8b9aa\"/><text x=\"743\" y=\"64\" class=\"diagram-title\">事实绑定与模板摘要</text><text x=\"743\" y=\"87\">与原记录逐项对照</text></svg><p>24维字符向量、双向各24维GRU、4类线性输出。词表只从训练句式建立；摘要由明确的字段绑定生成，没有调用LLM。</p>"
+        "html": "<div class=\"method-choice\" data-method=\"bigru-fact-template\"><div class=\"method-choice-heading\"><span class=\"mini\">从任务选择方法 / 语句分类 / 有来源的成文</span><h3>BiGRU 分类＋字段模板</h3></div><svg class=\"network-diagram method-diagram\" viewBox=\"0 0 960 154\" role=\"img\" aria-label=\"BiGRU 分类＋字段模板：原始中文语句 → 双向GRU编码 → 事项类别 → 字段绑定后成文\"><defs><marker id=\"method-arrow-m5-real\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"5\" markerHeight=\"5\" orient=\"auto\"><path d=\"M1 1L8 5L1 9\" fill=\"none\" stroke=\"#6e9690\" stroke-width=\"1.5\"/></marker></defs><rect x=\"6\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"20\" y=\"62\" class=\"diagram-title\">原始中文语句</text><text x=\"20\" y=\"90\">最多96个字符</text><path d=\"M229 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m5-real)\"/><rect x=\"246\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#dbe8df\" stroke=\"#b9c4b2\"/><text x=\"260\" y=\"62\" class=\"diagram-title\">双向GRU编码</text><text x=\"260\" y=\"90\">两方向各24维</text><path d=\"M469 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m5-real)\"/><rect x=\"486\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"500\" y=\"62\" class=\"diagram-title\">事项类别</text><text x=\"500\" y=\"90\">保留错误与低分</text><path d=\"M709 74h15\" stroke=\"#6e9690\" stroke-width=\"2\" marker-end=\"url(#method-arrow-m5-real)\"/><rect x=\"726\" y=\"30\" width=\"222\" height=\"86\" rx=\"8\" fill=\"#ede4d2\" stroke=\"#b9c4b2\"/><text x=\"740\" y=\"62\" class=\"diagram-title\">字段绑定后成文</text><text x=\"740\" y=\"90\">数字逐项有来源</text></svg><div class=\"method-contract\"><span><small>输入是什么</small>中文原句与独立事实字段</span><span><small>要得到什么</small>事项类别与有出处的摘要</span></div><p class=\"method-reason\">语句分类要区分否定、转折和前后语境，使用双向GRU；井段与数值由字段抽取和模板处理，不交给分类器自由编写。</p><p class=\"fine\">BiGRU只适配当前中文教学语句，模板不会补写缺少证据的地质结论。 <a href=\"https://arxiv.org/abs/1406.1078\" target=\"_blank\" rel=\"noopener noreferrer\">方法依据 ↗</a></p></div>"
       },
       "page": {
         "html": "demo/workflow.html",

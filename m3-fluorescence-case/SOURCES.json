@@ -44,6 +44,29 @@
       "boundary": "这是溢油油样研究，成像与岩屑不同；说明标定与任务定义的重要性，不能把本课面积换算为浓度。"
     }
   ],
+  "methodSelection": {
+    "id": "unet",
+    "name": "U-Net 像素分割",
+    "family": "卷积语义分割",
+    "input": "荧光RGB图与逐像素标签",
+    "output": "每个像素的目标概率与掩膜",
+    "why": "这里需要知道亮区在哪里，而不是只给整张图一个类别。U-Net在提取邻域特征后恢复像素位置，适合区域圈定任务。",
+    "limit": "当前标签来自合成生成器，区域面积不直接代表含油饱和度。",
+    "stages": [
+      "校正后的RGB图",
+      "编码与压缩",
+      "跳接与解码",
+      "逐像素目标区域"
+    ],
+    "notes": [
+      "64×64 RGB",
+      "8→16→32通道",
+      "补回位置细节",
+      "阈值形成二值掩膜"
+    ],
+    "source": "https://arxiv.org/abs/1505.04597"
+  },
+  "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
   "data": "本例目前使用合成教学资料及生成器标签。真实岩屑UV图像与独立像素标注尚未取得；不把合成成绩当作现场性能。",
   "realData": null,
@@ -57,7 +80,7 @@
     "inputDtype": "float32",
     "output": "logits",
     "architecture": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "c7d9effe71040438101e4ef80827c4c34b556c0820298e3d9de2c2707063cc5a"
   }
 }

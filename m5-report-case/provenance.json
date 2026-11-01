@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "kind": "synthetic-teaching",
   "realDataset": null,
   "browserModel": {
@@ -12,7 +12,7 @@
     "inputDtype": "int64",
     "output": "probabilities",
     "architecture": "Character embedding 24 → bidirectional GRU 24×2 → linear 4",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "35756b4d662fc8d8cc843be5878a0c24550e438856050a08e713de62c45981f1"
   },
   "execution": {
@@ -23,7 +23,7 @@
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "4cb8d543092ddb09bdfbeb4ce8d2d23c34200ae3b9292d34cb69583721871e73",
+  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
   "experimentSha256": "786ad29c59c9f08c461310292d0c463d36cf8ba3f9c3bb8abfbb97e82b7084a8",
   "weightsSha256": "f7d732abb491dc1b4d56572b593568cb70780ebe9dfa5d0fe482114397892f6a",
   "split": {

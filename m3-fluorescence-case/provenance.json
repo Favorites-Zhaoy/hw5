@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "kind": "synthetic-teaching",
   "realDataset": null,
   "browserModel": {
@@ -12,7 +12,7 @@
     "inputDtype": "float32",
     "output": "logits",
     "architecture": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "c7d9effe71040438101e4ef80827c4c34b556c0820298e3d9de2c2707063cc5a"
   },
   "execution": {
@@ -23,7 +23,7 @@
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "4cb8d543092ddb09bdfbeb4ce8d2d23c34200ae3b9292d34cb69583721871e73",
+  "builderSha256": "7e83a2ff00d2c932a4bbefe28558f122b67bbb5af7332e486a99fd4d49727580",
   "experimentSha256": "ddb309b8fd85b6adbb59959d883d9a69e4b31e2ae5954b3ad1153638d983f367",
   "weightsSha256": "674137131b264d12271bd276f1c7199f421f7389fa2d445dc14a028400fc5d18",
   "split": {

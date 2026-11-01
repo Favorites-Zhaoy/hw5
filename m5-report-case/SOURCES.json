@@ -64,6 +64,29 @@
       "boundary": "这是报告核对研究；本课只做字段ID关联，没有运行其MoE或智能体。"
     }
   ],
+  "methodSelection": {
+    "id": "bigru-fact-template",
+    "name": "BiGRU 分类＋字段模板",
+    "family": "语句分类 / 有来源的成文",
+    "input": "中文原句与独立事实字段",
+    "output": "事项类别与有出处的摘要",
+    "why": "语句分类要区分否定、转折和前后语境，使用双向GRU；井段与数值由字段抽取和模板处理，不交给分类器自由编写。",
+    "limit": "BiGRU只适配当前中文教学语句，模板不会补写缺少证据的地质结论。",
+    "stages": [
+      "原始中文语句",
+      "双向GRU编码",
+      "事项类别",
+      "字段绑定后成文"
+    ],
+    "notes": [
+      "最多96个字符",
+      "两方向各24维",
+      "保留错误与低分",
+      "数字逐项有来源"
+    ],
+    "source": "https://arxiv.org/abs/1406.1078"
+  },
+  "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
   "data": "中文合成语句按模板组划分。BiGRU只做事项分类，摘要按来源字段组装；未适配的英文真实日报不参与该中文模型的性能评价。",
   "realData": null,
@@ -77,7 +100,7 @@
     "inputDtype": "int64",
     "output": "probabilities",
     "architecture": "Character embedding 24 → bidirectional GRU 24×2 → linear 4",
-    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "scope": "synthetic-teaching-only",
     "testOutputChecksum": "35756b4d662fc8d8cc843be5878a0c24550e438856050a08e713de62c45981f1"
   }
 }

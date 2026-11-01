@@ -1,0 +1,9 @@
+'use strict';
+// Choose from the task, input structure and actual available labels.
+module.exports={
+ m1:{id:'resnet18-classifier',name:'ResNet-18 图像分类',family:'卷积图像分类',input:'带整图岩性标签的RGB照片',output:'每张照片的三类候选',why:'任务是比较照片中的纹理与形态，保留卷积特征提取；样本少，冻结骨干，只拟合分类层。',limit:'整图类别不等于每颗岩屑的岩性，留出组失败也要保留。',stages:['统一裁切的照片','固定ResNet-18','三类分类层','沿井深的候选'],notes:['224×224 RGB','边缘、纹理与形态','用拟合组标签训练','保留照片与得分'],source:'https://arxiv.org/abs/1512.03385'},
+ m2:{id:'autoencoder',name:'多通道自编码器',family:'无监督异常检测',input:'同一分钟的6个气测与工况通道',output:'通道组合的重构残差',why:'真实记录没有可靠事件类别标签。先学习常见通道组合，再把难以重构的记录列为候选，比直接训练有监督分类更符合现有资料。',limit:'每次读取同一时刻的通道组合，不把它说成理解了整个气峰；候选还要放回时间曲线解释。',stages:['6个观测通道','压缩到3维','重构6个通道','残差筛选候选'],notes:['TG、流量、WOB等','6→12→3','3→12→6','不是油气层类别'],source:'https://scikit-learn.org/stable/modules/outlier_detection.html'},
+ m3:{id:'unet',name:'U-Net 像素分割',family:'卷积语义分割',input:'荧光RGB图与逐像素标签',output:'每个像素的目标概率与掩膜',why:'这里需要知道亮区在哪里，而不是只给整张图一个类别。U-Net在提取邻域特征后恢复像素位置，适合区域圈定任务。',limit:'当前标签来自合成生成器，区域面积不直接代表含油饱和度。',stages:['校正后的RGB图','编码与压缩','跳接与解码','逐像素目标区域'],notes:['64×64 RGB','8→16→32通道','补回位置细节','阈值形成二值掩膜'],source:'https://arxiv.org/abs/1505.04597'},
+ m4:{id:'random-forest',name:'随机森林回归',family:'树模型 / 表格回归',input:'WOB、RPM、扭矩、流量4个字段',output:'ROP估计与响应残差变化',why:'当前任务是用四个工况字段估计钻速，输入为表格，拟合组只有794点。随机森林可学习条件分支下的非线性关系，还能直接展开某一条记录的计算路径。',limit:'学到的是工况与钻速的统计关系；换井后仍可能失效，残差不能直接命名地层。',stages:['4个工况字段','100棵回归树','平均树的logROP','还原ROP与残差'],notes:['WOB、RPM、扭矩、流量','有放回采样拟合','固定树模型前向','再寻找变化候选'],source:'https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html'},
+ m5:{id:'bigru-fact-template',name:'BiGRU 分类＋字段模板',family:'语句分类 / 有来源的成文',input:'中文原句与独立事实字段',output:'事项类别与有出处的摘要',why:'语句分类要区分否定、转折和前后语境，使用双向GRU；井段与数值由字段抽取和模板处理，不交给分类器自由编写。',limit:'BiGRU只适配当前中文教学语句，模板不会补写缺少证据的地质结论。',stages:['原始中文语句','双向GRU编码','事项类别','字段绑定后成文'],notes:['最多96个字符','两方向各24维','保留错误与低分','数字逐项有来源'],source:'https://arxiv.org/abs/1406.1078'}
+};
