@@ -33,7 +33,7 @@
       "input": "钻压、扭矩、立管压力和钻速等资料",
       "method": "比较RF、XGBoost、SVM与ANN，学习钻进参数到岩性的对应。",
       "output": "实时岩性类别",
-      "boundary": "论文使用真实井岩性资料；本课只解释多通道思路，标签为合成可钻性段。"
+      "boundary": "论文有真实井岩性标签；本课Volve资料没有独立地质标签，仅估计ROP和提示响应变化。"
     },
     {
       "date": "2026.01",
@@ -43,9 +43,9 @@
       "doi": "10.1016/j.engappai.2025.113085",
       "url": "https://doi.org/10.1016/j.engappai.2025.113085",
       "input": "含异常、噪声和不规则采样的钻进数据",
-      "method": "预处理、集成模型与1D-CNN/BiLSTM组合学习钻速。",
+      "method": "预处理后联合局部特征提取与双向时序建模，预测钻速。",
       "output": "钻速预测",
-      "boundary": "论文任务是ROP预测；本课CNN做逐米分段，未复现整套混合模型。"
+      "boundary": "本课使用基础LSTM做工况序列回归，没有复现论文的整套混合结构。"
     }
   ],
   "methodSelection": {
@@ -71,31 +71,9 @@
     "source": "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html",
     "domain": "ts"
   },
-  "syntheticMethod": {
-    "domain": "ts",
-    "id": "synthetic-m4-cnn",
-    "name": "扩张时序卷积（1D CNN，合成对照）",
-    "family": "有监督时序分类 · 合成标签",
-    "input": "128 m × 5 通道",
-    "output": "三类逐米候选与分段",
-    "why": "这份合成资料有逐点生成标签，用卷积比较局部曲线形态。它是独立保留的教学对照，不能代替真实资料的主流程。",
-    "limit": "仅适用于当前生成器分布；成绩与真实资料分开统计。",
-    "stages": [
-      "五通道井深序列",
-      "扩张卷积1/2/4",
-      "逐米三类得分",
-      "最短段过滤与层界"
-    ],
-    "notes": [
-      "128米×5通道",
-      "29点前后邻域",
-      "三类生成可钻性",
-      "最短段4点"
-    ],
-    "source": "https://pytorch.org/docs/stable/generated/torch.nn.Conv1d.html"
-  },
+  "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
-  "data": "本例包含固定来源版本的Volve真实观测与单独的合成教学实验。真实资料无独立事件或地质层界标签；合成资料保留生成器标签。",
+  "data": "本例使用固定来源版本的Volve真实观测，没有独立事件或地质层界标签。",
   "realData": [
     {
       "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/catalog.json",
@@ -122,17 +100,5 @@
       "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
     }
   ],
-  "browserModel": {
-    "file": "m4.onnx",
-    "sha256": "095515971bbf240dbd76f855cb281760b54b0a5c7425ca59fcb32a7331181983",
-    "checkpointSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
-    "bytes": 31547,
-    "testInputs": 6,
-    "maxAbsoluteError": 0.0000057220458984375,
-    "inputDtype": "float32",
-    "output": "logits",
-    "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
-    "scope": "synthetic-teaching-only",
-    "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
-  }
+  "browserModel": null
 }

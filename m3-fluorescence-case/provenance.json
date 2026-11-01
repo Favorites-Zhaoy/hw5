@@ -1,5 +1,5 @@
 {
-  "version": "2.0.2",
+  "version": "2.0.3",
   "kind": "synthetic-teaching",
   "realDataset": null,
   "browserModel": {
@@ -23,7 +23,7 @@
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "87f11f398eaaf0e053803b42ae8221c23e0ab9d4f09d3067ee84576ecd0c3db9",
+  "builderSha256": "17ad4683edb735708beb83d4fcf705e9eb28e7106bb3c7e410eaa8dcdcadec4b",
   "experimentSha256": "ddb309b8fd85b6adbb59959d883d9a69e4b31e2ae5954b3ad1153638d983f367",
   "weightsSha256": "674137131b264d12271bd276f1c7199f421f7389fa2d445dc14a028400fc5d18",
   "split": {

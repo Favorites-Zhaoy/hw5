@@ -1,6 +1,6 @@
 {
-  "version": "2.0.2",
-  "kind": "real-and-synthetic-teaching",
+  "version": "2.0.3",
+  "kind": "real-observation-derived",
   "realDataset": {
     "file": "assets/dataset-v2.js",
     "sourceManifest": [
@@ -14,156 +14,97 @@
     "sha256": "c9bad8ced238eb6509eeeff3fb2208a7af17f085b950cdaa6b5680bc449ee78c",
     "model": "5de4f171a5bbe5ceb2881812b80a3b38bd81e5f4efa84beb27668712a521ed70"
   },
-  "browserModel": {
-    "file": "m2.onnx",
-    "sha256": "7a7b63d90d1a5c0d23e5784dc3d3b52583287cdc5a6a432d03674429b4d25436",
-    "checkpointSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
-    "bytes": 21658,
-    "testInputs": 6,
-    "maxAbsoluteError": 0.000003814697265625,
-    "inputDtype": "float32",
-    "output": "logits",
-    "architecture": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
-    "scope": "synthetic-teaching-only",
-    "testOutputChecksum": "ec3b8b7392e4687a80482468fecfb83f1bc84f28bbe1e046e74e3219e9000ef3"
-  },
   "execution": {
-    "baseline": "L2 browser recomputation",
-    "ai": "Real GRU exact causal recurrent-cell forward / prediction residual; synthetic temporal CNN saved or ONNX/WASM"
+    "baseline": "Browser threshold recomputation",
+    "ai": "Actual browser GRU recurrent-cell forward"
   },
-  "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
-  "created": "2026-11-01",
-  "generator": "tools/mudlogging/prepare-experiments.py",
-  "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "87f11f398eaaf0e053803b42ae8221c23e0ab9d4f09d3067ee84576ecd0c3db9",
-  "experimentSha256": "476e99b15546b1482b8622701f482c0a973ffee51ef4fb286895a03939db6f94",
-  "weightsSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
-  "split": {
-    "train": 20,
-    "validation": 4,
-    "test": 6,
-    "unit": "模拟井",
-    "pointsPerWell": 96
-  },
+  "generator": "tools/mudlogging/prepare-sequence-models.py",
+  "generatorSha256": "f63f554e0e2082d64d1b9384b63f78ce383fc2f4ab20d2f88e1a2ce61ebf3909",
+  "builderSha256": "17ad4683edb735708beb83d4fcf705e9eb28e7106bb3c7e410eaa8dcdcadec4b",
+  "experimentSha256": "c9bad8ced238eb6509eeeff3fb2208a7af17f085b950cdaa6b5680bc449ee78c",
+  "weightsSha256": "5de4f171a5bbe5ceb2881812b80a3b38bd81e5f4efa84beb27668712a521ed70",
+  "parameterCount": 798,
   "method": {
-    "seed": 1702,
-    "epochs": 100,
-    "lr": 0.005,
-    "model": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
-    "baseline": "TG > 2 × first-12-point median; a lag-aligned pump-off in the previous 8 points means connection gas"
+    "id": "gru-forecast",
+    "name": "GRU 连续气测预测",
+    "family": "时序分析 · 预测残差",
+    "input": "当前时刻之前最多12分钟的6通道记录",
+    "output": "下一分钟通道预测与观测残差",
+    "why": "总览将M2划为时序分析。气峰的升降与持续时间都依赖先后顺序；GRU逐分钟传递状态，用过去预测下一分钟，再找偏离预期的变化。",
+    "limit": "真实资料没有气测事件标签；预测残差大可能来自作业或测量变化，不能直接解释为油气发现。",
+    "stages": [
+      "之前的连续记录",
+      "GRU顺序传递状态",
+      "预测下一分钟",
+      "与实际观测比较"
+    ],
+    "notes": [
+      "最多12步×6通道",
+      "单向、12维状态",
+      "当前观测不入输入",
+      "按预测残差筛候选"
+    ],
+    "source": "https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html",
+    "domain": "ts"
   },
-  "parameterCount": 4035,
   "metrics": {
-    "validation": {
-      "baseline": {
-        "count": 384,
-        "correct": 335,
-        "accuracy": 0.8723958333333334,
-        "macroF1": 0.8253322966385456,
-        "matrix": [
-          [
-            231,
-            0,
-            1
-          ],
-          [
-            13,
-            48,
-            0
-          ],
-          [
-            23,
-            12,
-            56
-          ]
-        ]
-      },
-      "prediction": {
-        "count": 384,
-        "correct": 384,
-        "accuracy": 1,
-        "macroF1": 1,
-        "matrix": [
-          [
-            232,
-            0,
-            0
-          ],
-          [
-            0,
-            61,
-            0
-          ],
-          [
-            0,
-            0,
-            91
-          ]
-        ]
-      }
+    "chronological-test": {
+      "count": 351,
+      "meanPredictionRMS": 0.1473282867580907,
+      "meanPersistenceRMS": 0.037486335588852254,
+      "definition": "Mean per-minute six-channel RMS in training-standardized space, not event accuracy."
     },
-    "test": {
-      "baseline": {
-        "count": 576,
-        "correct": 518,
-        "accuracy": 0.8993055555555556,
-        "macroF1": 0.8693973634651601,
-        "matrix": [
-          [
-            343,
-            0,
-            2
-          ],
-          [
-            22,
-            73,
-            0
-          ],
-          [
-            25,
-            9,
-            102
-          ]
-        ]
-      },
-      "prediction": {
-        "count": 576,
-        "correct": 576,
-        "accuracy": 1,
-        "macroF1": 1,
-        "matrix": [
-          [
-            345,
-            0,
-            0
-          ],
-          [
-            0,
-            95,
-            0
-          ],
-          [
-            0,
-            0,
-            136
-          ]
-        ]
-      }
+    "train": {
+      "count": 7007,
+      "meanPredictionRMS": 0.20566773841342836,
+      "meanPersistenceRMS": 0.0989475567036874,
+      "definition": "Mean per-minute six-channel RMS in training-standardized space, not event accuracy."
+    },
+    "validation": {
+      "count": 1421,
+      "meanPredictionRMS": 0.1659814331924345,
+      "meanPersistenceRMS": 0.037297108364044235,
+      "definition": "Mean per-minute six-channel RMS in training-standardized space, not event accuracy."
     }
   },
-  "runtime": {
-    "torch": "2.9.1+cpu",
-    "numpy": "2.2.6",
-    "sklearn": "1.6.1"
-  },
-  "disclosure": "Synthetic generator labels; no field data, no expert-performance or inference-time benchmark. Fixed held-out result replay.",
   "recordIds": [
-    "G-25",
-    "G-26",
-    "G-27",
-    "G-28",
-    "G-29",
-    "G-30"
-  ],
-  "additionalReportFields": null
+    "V-F1C-2013-08-22-1",
+    "V-F1C-2013-08-22-2",
+    "V-F1C-2013-08-22-3",
+    "V-F1C-2013-08-22-4",
+    "V-F1C-2013-08-22-5",
+    "V-F1C-2013-08-22-6",
+    "V-F1C-2013-08-23-1",
+    "V-F1C-2013-08-23-2",
+    "V-F1C-2013-08-23-3",
+    "V-F1C-2013-08-23-4",
+    "V-F1C-2013-08-23-5",
+    "V-F1C-2013-08-23-6",
+    "V-F1C-2013-08-24-1",
+    "V-F1C-2013-08-24-2",
+    "V-F1C-2013-08-24-3",
+    "V-F1C-2013-08-24-4",
+    "V-F1C-2013-08-24-5",
+    "V-F1C-2013-08-24-6",
+    "V-F1C-2013-08-25-1",
+    "V-F1C-2013-08-25-2",
+    "V-F1C-2013-08-25-3",
+    "V-F1C-2013-08-25-4",
+    "V-F1C-2013-08-25-5",
+    "V-F1C-2013-08-25-6",
+    "V-F1C-2013-08-26-1",
+    "V-F1C-2013-08-26-2",
+    "V-F1C-2013-08-26-3",
+    "V-F1C-2013-08-26-4",
+    "V-F1C-2013-08-26-5",
+    "V-F1C-2013-08-26-6",
+    "V-F1C-2013-08-27-1",
+    "V-F1C-2013-08-27-2",
+    "V-F1C-2013-08-27-3",
+    "V-F1C-2013-08-27-4",
+    "V-F1C-2013-08-27-5",
+    "V-F1C-2013-08-27-6",
+    "V-F1C-2013-08-28-1",
+    "V-F1C-2013-08-28-2"
+  ]
 }

@@ -7,7 +7,8 @@ const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 const courses=require(path.join(site,'tools/mudlogging/content.cjs')),M=require(path.join(site,'tools/mudlogging/math.js')),V=require(path.join(site,'tools/mudlogging/lesson-views.js'));
 const list=Object.values(courses),source=id=>json('tools/mudlogging/experiments/'+id+'.json');
 list.forEach(c=>require(path.join(site,'tools/mudlogging/v2-content.cjs')).apply(c));
-function generated(c){const context={window:{}};vm.runInNewContext(read(c.slug+'-case/assets/experiment.js'),context);return plain(context.window.LESSON_DATA);}
+// Archived synthetic fixtures stay independently auditable; they are not loaded by M2/M4 pages.
+function generated(c){if(c.realOnly)return source(c.id);const context={window:{}};vm.runInNewContext(read(c.slug+'-case/assets/experiment.js'),context);return plain(context.window.LESSON_DATA);}
 function close(a,b,tol=1e-10){assert.ok(Math.abs(a-b)<tol,`${a} != ${b}`);}
 function disjoint(a,b){for(const v of a)assert.ok(!new Set(b).has(v),'shared group '+v);}
 const base=read('tests/regression.cjs').split("test('all JavaScript files compile'")[0];
@@ -24,10 +25,12 @@ for(const c of list){
   assert.equal(c.papers.length>=2,true);for(const p of c.papers){assert.ok(background.includes(p.url));assert.ok(p.input&&p.method&&p.output&&p.boundary);assert.ok(p.date.startsWith('2025')||p.date.startsWith('2026'));}
   assert.ok(read(c.slug+'-case/demo/workflow.html').includes(c.scenario));
   const provenance=json(c.slug+'-case/provenance.json'),e=source(c.id);
+  if(c.realOnly){const d=json('tools/mudlogging/real-data/'+(c.id==='m2'?'m2-gru':'m4-lstm')+'.json');assert.equal(provenance.weightsSha256,d.modelSha256);assert.equal(provenance.generatorSha256,d.modelPreparation.scriptSha256);assert.deepEqual(provenance.metrics,d.model.metrics);}else{
   assert.equal(provenance.weightsSha256,hash(fs.readFileSync(path.join(site,'tools/mudlogging/checkpoints/'+c.id+'.pt'))));
   assert.equal(provenance.generatorSha256,hash(fs.readFileSync(path.join(site,'tools/mudlogging/prepare-experiments.py'))));
   assert.equal(provenance.experimentSha256,hash(fs.readFileSync(path.join(site,'tools/mudlogging/experiments/'+c.id+'.json'))));
   assert.deepEqual(provenance.metrics,e.metrics);assert.equal(e.kind,'synthetic-teaching');
+  }
  });
  test(c.id+': three physical entries cannot fall through to the background or a retired whole page',()=>{
   for(const [view,file] of [['background','background'],['workflow','workflow'],['demo','identify']]){
@@ -127,7 +130,7 @@ function app(c,section='demo'){
  const steps=c.steps.map((_,i)=>{const b=new Node();b.dataset.step=String(i);return b;});
  const document={body:Object.assign(new Node(),{dataset:{section},appendChild(){}}),getElementById:get,querySelectorAll:s=>s==='[data-step]'?steps:[],addEventListener:(k,v)=>listeners[k]=v,createElement:()=>new Node()};
  const parent={postMessage:m=>messages.push(plain(m))},ctx={window:null,document,parent,console,Blob,Uint8Array,atob,URL:{createObjectURL:b=>{blobs.push(b);return 'blob:test';},revokeObjectURL(){}},setTimeout:f=>{timers.push(f);return timers.length;},clearTimeout(){},addEventListener:(k,v)=>listeners['window:'+k]=v,scrollTo(){},location:{assign(){}},matchMedia:()=>({matches:true})};ctx.window=ctx;
- vm.createContext(ctx);for(const name of ['math','config','experiment','lesson-views','lesson-client'])vm.runInContext(read(c.slug+'-case/assets/'+name+'.js'),ctx);
+ vm.createContext(ctx);for(const name of ['math','config','experiment','lesson-views','lesson-client']){if(name==='experiment'&&c.realOnly)ctx.LESSON_DATA=source(c.id);else vm.runInContext(read(c.slug+'-case/assets/'+name+'.js'),ctx);}
  const click=(selector,dataset={})=>listeners.click({target:{closest:s=>s===selector?{dataset}:null}});
  return {nodes,listeners,messages,timers,blobs,ctx,click,change:(id,value)=>{get(id).value=value;listeners.change({target:Object.assign(get(id),{id})});},receive:(data,source=parent)=>listeners['window:message']({source,data})};
 }

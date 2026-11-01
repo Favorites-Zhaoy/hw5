@@ -51,9 +51,9 @@
       "doi": "10.1016/j.snb.2026.139825",
       "url": "https://doi.org/10.1016/j.snb.2026.139825",
       "input": "多组分气体的吸收光谱",
-      "method": "CNN 从混合光谱中估计不同轻烃的浓度。",
+      "method": "从多组分混合光谱估计不同轻烃的浓度。",
       "output": "C1—C5 组分估计",
-      "boundary": "这是仪器侧光谱反演；本课CNN处理的是已记录的气测时间序列。"
+      "boundary": "研究属于仪器侧光谱反演；本课读取已记录的气测与工况，不复现浓度反演。"
     }
   ],
   "methodSelection": {
@@ -79,31 +79,9 @@
     "source": "https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html",
     "domain": "ts"
   },
-  "syntheticMethod": {
-    "domain": "ts",
-    "id": "synthetic-m2-cnn",
-    "name": "因果时序卷积（1D CNN，合成对照）",
-    "family": "有监督时序分类 · 合成标签",
-    "input": "96点×6通道：全烃、C2、C3、对齐泵状态、当前排量和钻速",
-    "output": "三类逐点候选",
-    "why": "这份合成资料有逐点生成标签，用卷积比较局部曲线形态。它是独立保留的教学对照，不能代替真实资料的主流程。",
-    "limit": "仅适用于当前生成器分布；成绩与真实资料分开统计。",
-    "stages": [
-      "气测与对应工况",
-      "因果扩张卷积",
-      "逐点三类得分",
-      "连续候选记录"
-    ],
-    "notes": [
-      "96点×6通道",
-      "过去15点的局部窗口",
-      "背景、短峰、持续显示",
-      "保留原始标签对照"
-    ],
-    "source": "https://pytorch.org/docs/stable/generated/torch.nn.Conv1d.html"
-  },
+  "syntheticMethod": null,
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
-  "data": "本例包含固定来源版本的Volve真实观测与单独的合成教学实验。真实资料无独立事件或地质层界标签；合成资料保留生成器标签。",
+  "data": "本例使用固定来源版本的Volve真实观测，没有独立事件或地质层界标签。",
   "realData": [
     {
       "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/Norway-Statoil-NO-15-9-F-1-C/3/drilling.parquet",
@@ -112,17 +90,5 @@
       "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
     }
   ],
-  "browserModel": {
-    "file": "m2.onnx",
-    "sha256": "7a7b63d90d1a5c0d23e5784dc3d3b52583287cdc5a6a432d03674429b4d25436",
-    "checkpointSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
-    "bytes": 21658,
-    "testInputs": 6,
-    "maxAbsoluteError": 0.000003814697265625,
-    "inputDtype": "float32",
-    "output": "logits",
-    "architecture": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
-    "scope": "synthetic-teaching-only",
-    "testOutputChecksum": "ec3b8b7392e4687a80482468fecfb83f1bc84f28bbe1e046e74e3219e9000ef3"
-  }
+  "browserModel": null
 }

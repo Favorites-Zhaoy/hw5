@@ -1,6 +1,6 @@
 {
-  "version": "2.0.2",
-  "kind": "real-and-synthetic-teaching",
+  "version": "2.0.3",
+  "kind": "real-observation-derived",
   "realDataset": {
     "file": "assets/dataset-v2.js",
     "sourceManifest": [
@@ -32,188 +32,71 @@
     "sha256": "b8f8ecaa0a7016e1d7c14681f81bb72882753d483a9a7ba9b2726225ceea1ce5",
     "model": "b61b9c48a14ebd6ea4c8527ea55d1f99f381517f7e38787d723f2b15c99437f9"
   },
-  "browserModel": {
-    "file": "m4.onnx",
-    "sha256": "095515971bbf240dbd76f855cb281760b54b0a5c7425ca59fcb32a7331181983",
-    "checkpointSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
-    "bytes": 31547,
-    "testInputs": 6,
-    "maxAbsoluteError": 0.0000057220458984375,
-    "inputDtype": "float32",
-    "output": "logits",
-    "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
-    "scope": "synthetic-teaching-only",
-    "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
-  },
   "execution": {
-    "baseline": "L2 browser recomputation",
-    "ai": "Real LSTM exact causal recurrent-cell forward; synthetic temporal CNN saved or ONNX/WASM"
+    "baseline": "Browser threshold recomputation",
+    "ai": "Actual browser LSTM recurrent-cell forward"
   },
-  "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
-  "created": "2026-11-01",
-  "generator": "tools/mudlogging/prepare-experiments.py",
-  "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "87f11f398eaaf0e053803b42ae8221c23e0ab9d4f09d3067ee84576ecd0c3db9",
-  "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
-  "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
-  "split": {
-    "train": 20,
-    "validation": 4,
-    "test": 6,
-    "unit": "模拟井",
-    "pointsPerWell": 128
-  },
+  "generator": "tools/mudlogging/prepare-sequence-models.py",
+  "generatorSha256": "f63f554e0e2082d64d1b9384b63f78ce383fc2f4ab20d2f88e1a2ce61ebf3909",
+  "builderSha256": "17ad4683edb735708beb83d4fcf705e9eb28e7106bb3c7e410eaa8dcdcadec4b",
+  "experimentSha256": "b8f8ecaa0a7016e1d7c14681f81bb72882753d483a9a7ba9b2726225ceea1ce5",
+  "weightsSha256": "b61b9c48a14ebd6ea4c8527ea55d1f99f381517f7e38787d723f2b15c99437f9",
+  "parameterCount": 877,
   "method": {
-    "seed": 1704,
-    "epochs": 120,
-    "lr": 0.004,
-    "model": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
-    "baseline": "Drilling-time thresholds 4.1 and 6.7 min/m; both methods use the same four-point minimum-run filter"
+    "id": "lstm-rop",
+    "name": "LSTM 工况序列回归",
+    "family": "时序分析 · 深度序列回归",
+    "input": "按井深排序的最多12条四通道工况记录",
+    "output": "当前ROP估计与沿井深的残差变化",
+    "why": "总览将M4划为时序分析。钻进响应要放回连续井段中比较；LSTM沿井深读取钻压、转速、扭矩和流量，把前段工况状态带入当前钻速估计。",
+    "limit": "深度顺序不等于等间隔时间；超过2 m的缺口断开。跨井回归仍需实测检验，残差不直接命名地层。",
+    "stages": [
+      "有序工况记录",
+      "LSTM传递井段状态",
+      "估计当前logROP",
+      "还原ROP与残差"
+    ],
+    "notes": [
+      "4通道、最多12条",
+      "单向、12维记忆",
+      "含当前工况、不含ROP",
+      "沿井深寻找变化候选"
+    ],
+    "source": "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html",
+    "domain": "ts"
   },
-  "parameterCount": 6507,
   "metrics": {
-    "validation": {
-      "baseline": {
-        "count": 512,
-        "correct": 425,
-        "accuracy": 0.830078125,
-        "macroF1": 0.8225142794461071,
-        "matrix": [
-          [
-            184,
-            38,
-            3
-          ],
-          [
-            6,
-            107,
-            37
-          ],
-          [
-            3,
-            0,
-            134
-          ]
-        ],
-        "boundary": {
-          "matched": 15,
-          "predicted": 24,
-          "reference": 19,
-          "f1": 0.6976744186046512,
-          "toleranceM": 2,
-          "meanErrorM": 0.13333333333333333
-        }
-      },
-      "prediction": {
-        "count": 512,
-        "correct": 508,
-        "accuracy": 0.9921875,
-        "macroF1": 0.9922582783354391,
-        "matrix": [
-          [
-            225,
-            0,
-            0
-          ],
-          [
-            1,
-            149,
-            0
-          ],
-          [
-            3,
-            0,
-            134
-          ]
-        ],
-        "boundary": {
-          "matched": 18,
-          "predicted": 18,
-          "reference": 19,
-          "f1": 0.972972972972973,
-          "toleranceM": 2,
-          "meanErrorM": 0.05555555555555555
-        }
-      }
-    },
     "test": {
-      "baseline": {
-        "count": 768,
-        "correct": 580,
-        "accuracy": 0.7552083333333334,
-        "macroF1": 0.7684918566958752,
-        "matrix": [
-          [
-            155,
-            37,
-            1
-          ],
-          [
-            1,
-            169,
-            149
-          ],
-          [
-            0,
-            0,
-            256
-          ]
-        ],
-        "boundary": {
-          "matched": 22,
-          "predicted": 36,
-          "reference": 29,
-          "f1": 0.676923076923077,
-          "toleranceM": 2,
-          "meanErrorM": 0.09090909090909091
-        }
-      },
-      "prediction": {
-        "count": 768,
-        "correct": 760,
-        "accuracy": 0.9895833333333334,
-        "macroF1": 0.9895656905745002,
-        "matrix": [
-          [
-            192,
-            1,
-            0
-          ],
-          [
-            4,
-            314,
-            1
-          ],
-          [
-            0,
-            2,
-            254
-          ]
-        ],
-        "boundary": {
-          "matched": 29,
-          "predicted": 29,
-          "reference": 29,
-          "f1": 1,
-          "toleranceM": 2,
-          "meanErrorM": 0.27586206896551724
-        }
-      }
+      "count": 823,
+      "mae_mh": 28.59077911329735,
+      "constantTrainMedian_mh": 24.42711639404297,
+      "constantMAE_mh": 26.143455769903245,
+      "definition": "Observed ROP on the same frozen well/depth split, not geological boundary accuracy."
+    },
+    "train": {
+      "count": 794,
+      "mae_mh": 3.11223455743748,
+      "constantTrainMedian_mh": 24.42711639404297,
+      "constantMAE_mh": 6.4587472670025186,
+      "definition": "Observed ROP on the same frozen well/depth split, not geological boundary accuracy."
+    },
+    "validation": {
+      "count": 265,
+      "mae_mh": 7.969615728174465,
+      "constantTrainMedian_mh": 24.42711639404297,
+      "constantMAE_mh": 4.624789177246094,
+      "definition": "Observed ROP on the same frozen well/depth split, not geological boundary accuracy."
     }
   },
-  "runtime": {
-    "torch": "2.9.1+cpu",
-    "numpy": "2.2.6",
-    "sklearn": "1.6.1"
-  },
-  "disclosure": "Synthetic generator labels; no field data, no expert-performance or inference-time benchmark. Fixed held-out result replay.",
   "recordIds": [
-    "D-25",
-    "D-26",
-    "D-27",
-    "D-28",
-    "D-29",
-    "D-30"
-  ],
-  "additionalReportFields": null
+    "15-9-F-5-231",
+    "15-9-F-5-529",
+    "15-9-F-5-805",
+    "15-9-F-5-1157",
+    "15-9-F-1-C-2594",
+    "15-9-F-1-C-2839",
+    "15-9-F-1-C-3080",
+    "15-9-F-1-C-3323",
+    "15-9-F-1-C-3573"
+  ]
 }
