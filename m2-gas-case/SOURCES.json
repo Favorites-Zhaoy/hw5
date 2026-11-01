@@ -4,6 +4,32 @@
     "title": "SLB · 录井原理与接单根气",
     "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
   },
+  "professionalReferences": [
+    [
+      "SLB · 地面录井与气体测量",
+      "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+    ],
+    [
+      "SLB · 背景气",
+      "https://glossary.slb.com/en/terms/b/background_gas"
+    ],
+    [
+      "SLB · 接单根气",
+      "https://glossary.slb.com/en/terms/c/connection_gas"
+    ],
+    [
+      "SLB · 循环气",
+      "https://glossary.slb.com/en/terms/r/recycled_gas"
+    ],
+    [
+      "SLB · 迟到时间",
+      "https://glossary.slb.com/en/terms/l/lag_time"
+    ]
+  ],
+  "teachingReference": {
+    "url": "https://cinger007.github.io/saphirv3/case-001/index.html#bg",
+    "use": "Pedagogical sequence only: field mechanism, measurement, interpretation, then algorithms."
+  },
   "papers": [
     {
       "date": "2026",

@@ -1,4 +1,4 @@
-M3 荧光图像智能判读 · 1.0.0
+M3 荧光图像智能判读 · 1.1.0
 
 打开 demo/background.html、demo/workflow.html、demo/identify.html。请保留完整文件夹；页面共用assets本地资源，可离线运行。也可按原协议导入未内置本案例的课程门户；本站已内置，无需重复导入。
 

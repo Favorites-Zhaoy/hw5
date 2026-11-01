@@ -3,7 +3,7 @@
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "b860df22f6ce3b0738d06abb03adc47cfd05baee0348f70d358534a71eb6774d",
+  "builderSha256": "710c435bc48997ef22d90135b7d2c0c984a9de09a56a62b398b672003d71fd51",
   "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
   "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
   "split": {

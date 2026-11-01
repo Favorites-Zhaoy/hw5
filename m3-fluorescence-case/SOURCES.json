@@ -4,6 +4,20 @@
     "title": "AAPG · Show evaluation",
     "url": "https://wiki.aapg.org/Show_evaluation"
   },
+  "professionalReferences": [
+    [
+      "AAPG · 油气显示与荧光评价",
+      "https://wiki.aapg.org/Show_evaluation"
+    ],
+    [
+      "SLB · 岩屑观察与描述",
+      "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+    ]
+  ],
+  "teachingReference": {
+    "url": "https://cinger007.github.io/saphirv3/case-001/index.html#bg",
+    "use": "Pedagogical sequence only: field mechanism, measurement, interpretation, then algorithms."
+  },
   "papers": [
     {
       "date": "2025.12 · 预印本",

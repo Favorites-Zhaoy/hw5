@@ -4,7 +4,7 @@ const {test}=require('node:test');
 const site=process.env.HW5_PORTAL_ROOT||path.resolve(__dirname,'..');
 const read=n=>fs.readFileSync(path.join(site,n),'utf8'),json=n=>JSON.parse(read(n)),plain=v=>JSON.parse(JSON.stringify(v));
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
-const courses=require(path.join(site,'tools/mudlogging/content.cjs')),M=require(path.join(site,'tools/mudlogging/math.js'));
+const courses=require(path.join(site,'tools/mudlogging/content.cjs')),M=require(path.join(site,'tools/mudlogging/math.js')),V=require(path.join(site,'tools/mudlogging/lesson-views.js'));
 const list=Object.values(courses),source=id=>json('tools/mudlogging/experiments/'+id+'.json');
 function generated(c){const context={window:{}};vm.runInNewContext(read(c.slug+'-case/assets/experiment.js'),context);return plain(context.window.LESSON_DATA);}
 function close(a,b,tol=1e-10){assert.ok(Math.abs(a-b)<tol,`${a} != ${b}`);}
@@ -33,7 +33,7 @@ for(const c of list){
    const html=read(c.slug+'-case/demo/'+file+'.html');assert.ok(html.includes('data-section="'+view+'"'));
    assert.doesNotMatch(html,/<iframe|data-view=|class="masthead"|class="case-tabs"|lesson\.html|demo\/index\.html/);
    if(view!=='background')assert.ok(!html.includes('id="chapter-1"'));
-   for(const m of html.matchAll(/(?:src|href)="\.\.\/assets\/([^"]+)"/g))assert.ok(fs.existsSync(path.join(site,c.slug+'-case/assets',m[1])));
+   for(const m of html.matchAll(/(?:src|href)="\.\.\/assets\/([^"]+)"/g))assert.ok(fs.existsSync(path.join(site,c.slug+'-case/assets',m[1].split('?')[0])));
   }
  });
  test(c.id+': displayed inputs, labels and scores belong to the saved held-out records',()=>{
@@ -87,6 +87,25 @@ test('all classification and boundary metrics recompute from every held-out deci
  }
  const text=source('m5');assert.ok(text.metrics.validation.prediction.macroF1<text.metrics.validation.baseline.macroF1);assert.equal(text.records.filter(r=>r.prediction!==r.truth).length,41);
 });
+test('field background adds three illustrated professional concepts before research, with primary references',()=>{
+ const professional=require(path.join(site,'tools/mudlogging/professional-content.cjs'));
+ for(const c of list){const html=read(c.slug+'-case/demo/background.html'),field=html.split('id="chapter-2"')[0],p=professional[c.id];assert.equal((field.match(/class="professional-concept"/g)||[]).length,3);assert.ok((field.match(/role="img"/g)||[]).length>=4);for(const topic of p.topics){assert.ok(field.includes(topic.title));assert.equal(topic.facts.length,3);for(const f of topic.facts)assert.ok(field.includes(f[0])&&field.includes(f[1]));}for(const ref of p.sources)assert.ok(field.includes(ref[1]));if(c.id==='m5'){assert.ok(field.includes('综合录井图'));assert.ok(!field.includes('归类并关联事实'));}}
+});
+test('visual convolution windows use the actual normalized channels and respect causal versus offline context',()=>{
+ for(const id of ['m2','m4']){const e=source(id),c=courses[id],r=e.records[0],d=V.windowInputs(c,e,r,40);assert.equal(d.start,26);assert.equal(d.end,id==='m2'?40:54);assert.equal(d.values.length,id==='m2'?15:29);const input=id==='m2'?Math.log1p(r.gas[26]):Math.log(r.drillTime[26]);close(d.values[0][0],input);close(d.scaled[0][0],(input-e.normalization.mean[0])/e.normalization.std[0]);assert.ok(d.scaled.every(row=>row.every(Number.isFinite)));}
+});
+test('professional mud-log curves use increasing vertical depth and share the same depth interval',()=>{
+ const drawings=require(path.join(site,'tools/mudlogging/professional-diagrams.cjs')),html=drawings.overview(),tracks=[...html.matchAll(/data-depth-track="true" d="([^"]+)"/g)];assert.equal(tracks.length,2);
+ for(const [,d] of tracks){const points=d.slice(1).split('L').map(p=>p.split(' ').map(Number));assert.equal(points[0][1],85);assert.equal(points.at(-1)[1],260);assert.ok(points.every((p,i)=>!i||p[1]>points[i-1][1]));}
+});
+test('paired charts account for all records and calculate the metric advertised on each row',()=>{
+ for(const c of list){const e=generated(c),state={threshold:.5,tolerance:2},data=V.pairData(c,e,state,M);assert.deepEqual(data.flatMap(row=>row.recordIds).sort(),e.records.map(r=>r.id).sort());for(const row of data){const records=row.recordIds.map(id=>e.records.find(r=>r.id===id));for(const key of ['baseline','prediction']){const expected=c.id==='m3'?M.imageMetrics(records,key,.5).iou:c.id==='m4'?M.boundaryMetrics(records,key,2).f1:c.id==='m5'?M.classify(records,key,e.labels.length).accuracy:M.classify(records,key,e.labels.length).macroF1;close(row[key],expected);}}}
+});
+test('visual error counts expose tradeoffs as well as gains instead of reporting a single winning percentage',()=>{
+ const fluorescence={C:courses.m3,E:generated(courses.m3),M,state:{threshold:.5,tolerance:2}},report={C:courses.m5,E:generated(courses.m5),M,state:{threshold:.5,tolerance:2}};
+ assert.deepEqual(V.errorData(fluorescence),[['正确圈中 / px',4885,7968],['多圈 / px',0,280],['漏圈 / px',3225,142]]);
+ assert.deepEqual(V.errorData(report),[['一致记录',60,119],['分错记录',100,41],['全部记录',160,160]]);
+});
 test('pixel metrics use real masks and interactive thresholds change decisions while preserving fixed results',()=>{
  const e=source('m3'),snapshot=JSON.stringify(e);for(const key of ['baseline','prediction'])assert.deepEqual(M.imageMetrics(e.records,key,.5),e.metrics.test[key]);
  const low=M.imageMetrics(e.records,'prediction',.25),high=M.imageMetrics(e.records,'prediction',.75);assert.notEqual(low.fp,high.fp);assert.notEqual(low.fn,high.fn);assert.equal(JSON.stringify(e),snapshot);
@@ -107,12 +126,12 @@ function app(c,section='demo'){
  const steps=c.steps.map((_,i)=>{const b=new Node();b.dataset.step=String(i);return b;});
  const document={body:Object.assign(new Node(),{dataset:{section},appendChild(){}}),getElementById:get,querySelectorAll:s=>s==='[data-step]'?steps:[],addEventListener:(k,v)=>listeners[k]=v,createElement:()=>new Node()};
  const parent={postMessage:m=>messages.push(plain(m))},ctx={window:null,document,parent,console,Blob,Uint8Array,atob,URL:{createObjectURL:b=>{blobs.push(b);return 'blob:test';},revokeObjectURL(){}},setTimeout:f=>{timers.push(f);return timers.length;},clearTimeout(){},addEventListener:(k,v)=>listeners['window:'+k]=v,scrollTo(){},location:{assign(){}},matchMedia:()=>({matches:true})};ctx.window=ctx;
- vm.createContext(ctx);for(const name of ['math','config','experiment','lesson-client'])vm.runInContext(read(c.slug+'-case/assets/'+name+'.js'),ctx);
+ vm.createContext(ctx);for(const name of ['math','config','experiment','lesson-views','lesson-client'])vm.runInContext(read(c.slug+'-case/assets/'+name+'.js'),ctx);
  const click=(selector,dataset={})=>listeners.click({target:{closest:s=>s===selector?{dataset}:null}});
  return {nodes,listeners,messages,timers,blobs,ctx,click,change:(id,value)=>{get(id).value=value;listeners.change({target:Object.assign(get(id),{id})});},receive:(data,source=parent)=>listeners['window:message']({source,data})};
 }
 test('all six workflow steps render distinct inputs, traditional/AI explanations, outputs and comparisons',()=>{
- for(const c of list){const rt=app(c,'workflow');for(let i=0;i<6;i++){rt.click('[data-step]',{step:String(i)});assert.equal(rt.nodes.get('flow-title').textContent,c.steps[i].name);assert.ok(rt.nodes.get('flow-visual').innerHTML.length>100);if(i===3){assert.ok(rt.nodes.get('flow-visual').innerHTML.includes(c.traditional));assert.ok(rt.nodes.get('flow-visual').innerHTML.includes(c.networkHTML||c.modelName));}if(i===4)assert.ok(rt.nodes.get('flow-visual').innerHTML.includes('留出组'));}assert.equal(rt.nodes.get('flow-next').disabled,true);rt.nodes.get('flow-prev').click();assert.equal(rt.nodes.get('flow-counter').textContent,'5 / 6');}
+ for(const c of list){const rt=app(c,'workflow');for(let i=0;i<6;i++){rt.click('[data-step]',{step:String(i)});assert.equal(rt.nodes.get('flow-title').textContent,c.steps[i].name);assert.ok(rt.nodes.get('flow-visual').innerHTML.length>100);if(i===3){assert.ok(rt.nodes.get('flow-visual').innerHTML.includes(c.traditional));assert.ok(rt.nodes.get('flow-visual').innerHTML.includes('method-lane rule-lane'));assert.ok(rt.nodes.get('flow-visual').innerHTML.includes('method-lane ai-lane'));assert.ok(!rt.nodes.get('flow-visual').innerHTML.split('<details')[0].includes(c.traditional));assert.equal(rt.nodes.get('flow-layout').attrs['data-focus'],'ai');}if(i===4)assert.ok(rt.nodes.get('flow-visual').innerHTML.includes('留出组'));}assert.equal(rt.nodes.get('flow-next').disabled,true);rt.nodes.get('flow-prev').click();assert.equal(rt.nodes.get('flow-counter').textContent,'5 / 6');}
 });
 test('child frames reject unrelated messages, keep the fixed chapter, and share exact sample and experiment controls',()=>{
  for(const c of list){const rt=app(c),e=generated(c),id=e.records.at(-1).id,original=rt.nodes.get('sample-select').value;rt.receive({__lessonSharedState:{recordId:id}},{});assert.equal(rt.nodes.get('sample-select').value,original);rt.receive({__lessonSharedState:{recordId:id,pointIndex:7,threshold:.75,tolerance:0}});assert.equal(rt.nodes.get('sample-select').value,id);assert.equal(rt.ctx.document.body.dataset.section,'demo');rt.change('sample-select',e.records[0].id);assert.equal(rt.messages.at(-1).__lessonStateUpdate.recordId,e.records[0].id);rt.click('[data-go]',{go:'workflow'});assert.equal(rt.messages.at(-1).__lessonNavigate,'workflow');}

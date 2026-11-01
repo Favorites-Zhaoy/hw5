@@ -4,6 +4,28 @@
     "title": "SLB · 录井的多源记录与解释",
     "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
   },
+  "professionalReferences": [
+    [
+      "SLB · 综合录井图的组成",
+      "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+    ],
+    [
+      "AAPG · 显示评价与证据",
+      "https://wiki.aapg.org/Show_evaluation"
+    ],
+    [
+      "SLB · MD定义",
+      "https://glossary.slb.com/en/terms/m/measured_depth"
+    ],
+    [
+      "SLB · TVD定义",
+      "https://glossary.slb.com/en/terms/t/true_vertical_depth"
+    ]
+  ],
+  "teachingReference": {
+    "url": "https://cinger007.github.io/saphirv3/case-001/index.html#bg",
+    "use": "Pedagogical sequence only: field mechanism, measurement, interpretation, then algorithms."
+  },
   "papers": [
     {
       "date": "2026",

@@ -4,6 +4,24 @@
     "title": "SLB · 钻速、录井与地层对照",
     "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
   },
+  "professionalReferences": [
+    [
+      "SLB · 机械钻速定义",
+      "https://glossary.slb.com/en/terms/r/rate_of_penetration"
+    ],
+    [
+      "SLB · 录井曲线与地层",
+      "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+    ],
+    [
+      "SLB · 测量井深",
+      "https://glossary.slb.com/en/terms/m/measured_depth"
+    ]
+  ],
+  "teachingReference": {
+    "url": "https://cinger007.github.io/saphirv3/case-001/index.html#bg",
+    "use": "Pedagogical sequence only: field mechanism, measurement, interpretation, then algorithms."
+  },
   "papers": [
     {
       "date": "2026.04",
