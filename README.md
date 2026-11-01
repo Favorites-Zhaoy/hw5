@@ -20,7 +20,7 @@
 
 ## 案例接入
 
-录井环节（`#/stage/mudlogging`）使用用户提供的现场图解，叠加原生 SVG 流动箭头、信号曲线、图像扫描和荧光动画。选择 CV 放大 m1/m3，TS 放大 m2/m4，NLP 放大 m5；点击图画进入原有场景讲解，已导入的案例仍由注册表自动展示。支持动效暂停、键盘操作和小屏放大图卡。图解是导航与教学示意，五个完整案例仍需各自接入。网页使用 241 KB 的桌面 WebP 与 100 KB 的手机 WebP，保留原始 PNG；提前加载当前尺寸的底图，加载时显示内嵌缩略图，底图就绪后显示动画。
+录井环节（`#/stage/mudlogging`）使用用户提供的现场图解，叠加原生 SVG 流动箭头、信号曲线、图像扫描和荧光动画。选择 CV 放大 m1/m3，TS 放大 m2/m4，NLP 放大 m5；五个图画入口已指向各自的完整案例。支持动效暂停与键盘操作。网页使用压缩 WebP，保留原始 PNG；提前加载底图，加载时显示内嵌缩略图，底图就绪后显示动画。本次仅检查桌面。
 
 保留原门户的案例包协议。点击“添加案例”，选择解压后的案例文件夹，或多选包内文件。上传器支持整页 HTML、JS 模块和复用内置演示三种形式。
 
@@ -44,6 +44,32 @@ M1 网站入口统一为 `#/scene/m1?case=m1-cuttings&tab=bg`。M1 只挂载站�
 
 可编辑源文件在 `tools/m1/`。修改后运行 `node tools/build-m1-case.cjs` 重建页面、清单与门户注册文件。复现实验需 Node.js、Python、NumPy、Pillow、scikit-learn、PyTorch 和 torchvision，运行 `python tools/m1/prepare-resnet.py`；首次从官方地址取得 ResNet-18 权重。实验制作工具不是网页运行依赖。
 
+## 新增 M2—M5 教学案例
+
+沿用 M1 的三部分结构，各自提供五部分专业背景、六步案例流程和结果对照。技术前沿引用2025—2026年的原始研究，逐篇说明输入、AI的作用、输出和适用范围；SSRN文献明确标为预印本。专业机理为原创SVG绘图，数据图直接来自后面使用的同一份示例资料。
+
+| 案例入口 | 实际运行的基础模型 | 主要对照 |
+| --- | --- | --- |
+| [M2 气测异常智能解释](https://favorites-zhaoy.github.io/hw5/#/scene/m2?case=m2-gas&tab=bg) | 因果1D CNN | 同一时间轴的气测曲线、阈值候选和CNN候选；先解释迟到与泵状态对应 |
+| [M3 荧光图像智能判读](https://favorites-zhaoy.github.io/hw5/#/scene/m3?case=m3-fluorescence&tab=bg) | 两级小型U-Net | 同图曝光校正、颜色阈值、网络掩膜与多圈/漏圈；可改变分割阈值 |
+| [M4 钻时曲线地层划分](https://favorites-zhaoy.github.io/hw5/#/scene/m4?case=m4-drilling&tab=bg) | 扩张卷积1D CNN | 同井深轴的钻时、钻压与三种分段；可查看工况校正参考和层界容差 |
+| [M5 录井报告自动生成](https://favorites-zhaoy.github.io/hw5/#/scene/m5?case=m5-report&tab=bg) | 字符级BiGRU | 原始摘录、四类事项、事实表和模板摘要；正文可定位字段来源 |
+
+四例均使用**可复现的合成教学数据**。模型已实际训练并保存权重，网页回放其固定输出，不在浏览器重新训练或运行网络。页面展示检查组及完整留出组，保留错误；M3/M5初始展示一份规则漏判而模型改善的例子，并提供规则错例、模型错例入口。M5检查组的BiGRU表现弱于关键词参照，也保留展示。比较对象是预先固定的计算规则，没有测量人工专家成绩或推理速度。
+
+数据按模拟井、样品盘或句式组隔开，相邻点、同盘图像及同句式的数字变化不跨组。本例气测类别不判定油气水层；荧光面积不换算为含油饱和度；钻时标签是合成可钻性段；报告只生成交班摘要，未部署大语言模型或RAG。详见 [实验与文献说明](docs/M2-M5案例说明.md)。
+
+每例文件夹为 `m2-gas-case/`、`m3-fluorescence-case/`、`m4-drilling-case/`、`m5-report-case/`；对应ZIP在 `submissions/`。各包均有独立的 `demo/background.html`、`demo/workflow.html`、`demo/identify.html`，不嵌套另一套整页导航。站内使用共享选择，切换外层页签回到章节顶部。三个入口也可分别离线打开；向未内置本案例的原协议门户导入时应保留完整文件夹，本站已内置，无需重复导入。
+
+可编辑源文件在 `tools/mudlogging/`，生成器为 `tools/build-mudlogging-cases.cjs`。训练及构建：
+
+```sh
+python tools/mudlogging/prepare-experiments.py
+node tools/build-mudlogging-cases.cjs
+```
+
+核对已保存权重与留出输出，无需重新训练：`python tools/mudlogging/verify-experiments.py`。修改M1后应再运行四例构建器，以保留本次共享脚本的缓存版本。
+
 上传记录保存在当前浏览器的 `localStorage`，不会写回源码目录。换浏览器或电脑时需要重新导入；提交作业时请保留完整案例包。
 
 ## 在线部署
@@ -57,7 +83,7 @@ GitHub Pages从`main`分支根目录发布，`.nojekyll`让HTML、JavaScript和�
 安装 Node.js 后运行：
 
 ```sh
-node --test tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs
+node --test tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs
 ```
 
 测试使用内存存储与 DOM 模拟，覆盖旧包导入、演示挂载、旧存档恢复、场景字段保留、路由行为、河流几何、筛选重排、动效开关与资源清理；不能替代真实浏览器的视觉检查。河流采用原生 SVG 与 CSS 动画，系统偏好减少动态效果时默认暂停。

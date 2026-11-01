@@ -67,7 +67,7 @@ function runtime(seed = {}, options = {}) {
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
   };
-  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/cases/m1-cuttings.case.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
+  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/cases/m1-cuttings.case.js', 'assets/cases/m2-gas.case.js', 'assets/cases/m3-fluorescence.case.js', 'assets/cases/m4-drilling.case.js', 'assets/cases/m5-report.case.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
   let shell = read('assets/core/shell.js').replaceAll('\r', '');
   const marker = '  render();\n\n  // 启动自检';
   assert.ok(shell.includes(marker), 'shell test hook must match exactly');
@@ -343,8 +343,8 @@ test('map search, empty results, clearing and case-only filtering update visible
   input.value = ''; input.listeners.input();
   assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
   click(scopeButtons[1], 'scope');
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '2 个场景');
-  assert.equal(stages.flatMap(s => s.leaves).filter(l => !l.hidden).length, 2);
+  assert.equal(root.querySelector('#atlas-map-count').textContent, '6 个场景');
+  assert.equal(stages.flatMap(s => s.leaves).filter(l => !l.hidden).length, 6);
   click(scopeButtons[0], 'scope');
   assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
 });

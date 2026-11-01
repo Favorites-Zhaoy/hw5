@@ -1,0 +1,169 @@
+{
+  "kind": "synthetic-teaching",
+  "created": "2026-11-01",
+  "generator": "tools/mudlogging/prepare-experiments.py",
+  "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
+  "builderSha256": "b860df22f6ce3b0738d06abb03adc47cfd05baee0348f70d358534a71eb6774d",
+  "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
+  "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
+  "split": {
+    "train": 20,
+    "validation": 4,
+    "test": 6,
+    "unit": "模拟井",
+    "pointsPerWell": 128
+  },
+  "method": {
+    "seed": 1704,
+    "epochs": 120,
+    "lr": 0.004,
+    "model": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
+    "baseline": "Drilling-time thresholds 4.1 and 6.7 min/m; both methods use the same four-point minimum-run filter"
+  },
+  "parameterCount": 6507,
+  "metrics": {
+    "validation": {
+      "baseline": {
+        "count": 512,
+        "correct": 425,
+        "accuracy": 0.830078125,
+        "macroF1": 0.8225142794461071,
+        "matrix": [
+          [
+            184,
+            38,
+            3
+          ],
+          [
+            6,
+            107,
+            37
+          ],
+          [
+            3,
+            0,
+            134
+          ]
+        ],
+        "boundary": {
+          "matched": 15,
+          "predicted": 24,
+          "reference": 19,
+          "f1": 0.6976744186046512,
+          "toleranceM": 2,
+          "meanErrorM": 0.13333333333333333
+        }
+      },
+      "prediction": {
+        "count": 512,
+        "correct": 508,
+        "accuracy": 0.9921875,
+        "macroF1": 0.9922582783354391,
+        "matrix": [
+          [
+            225,
+            0,
+            0
+          ],
+          [
+            1,
+            149,
+            0
+          ],
+          [
+            3,
+            0,
+            134
+          ]
+        ],
+        "boundary": {
+          "matched": 18,
+          "predicted": 18,
+          "reference": 19,
+          "f1": 0.972972972972973,
+          "toleranceM": 2,
+          "meanErrorM": 0.05555555555555555
+        }
+      }
+    },
+    "test": {
+      "baseline": {
+        "count": 768,
+        "correct": 580,
+        "accuracy": 0.7552083333333334,
+        "macroF1": 0.7684918566958752,
+        "matrix": [
+          [
+            155,
+            37,
+            1
+          ],
+          [
+            1,
+            169,
+            149
+          ],
+          [
+            0,
+            0,
+            256
+          ]
+        ],
+        "boundary": {
+          "matched": 22,
+          "predicted": 36,
+          "reference": 29,
+          "f1": 0.676923076923077,
+          "toleranceM": 2,
+          "meanErrorM": 0.09090909090909091
+        }
+      },
+      "prediction": {
+        "count": 768,
+        "correct": 760,
+        "accuracy": 0.9895833333333334,
+        "macroF1": 0.9895656905745002,
+        "matrix": [
+          [
+            192,
+            1,
+            0
+          ],
+          [
+            4,
+            314,
+            1
+          ],
+          [
+            0,
+            2,
+            254
+          ]
+        ],
+        "boundary": {
+          "matched": 29,
+          "predicted": 29,
+          "reference": 29,
+          "f1": 1,
+          "toleranceM": 2,
+          "meanErrorM": 0.27586206896551724
+        }
+      }
+    }
+  },
+  "runtime": {
+    "torch": "2.9.1+cpu",
+    "numpy": "2.2.6",
+    "sklearn": "1.6.1"
+  },
+  "disclosure": "Synthetic generator labels; no field data, no expert-performance or inference-time benchmark. Fixed held-out result replay.",
+  "recordIds": [
+    "D-25",
+    "D-26",
+    "D-27",
+    "D-28",
+    "D-29",
+    "D-30"
+  ],
+  "additionalReportFields": null
+}

@@ -1,0 +1,35 @@
+{
+  "checked": "2026-11-01",
+  "professional": {
+    "title": "SLB · 录井原理与接单根气",
+    "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+  },
+  "papers": [
+    {
+      "date": "2026",
+      "authors": "Silva 等",
+      "title": "Enhancing operational decision-making in hydrocarbon exploration drilling using machine learning for gas data interpretation",
+      "journal": "Scientific Reports",
+      "doi": "10.1038/s41598-026-57038-8",
+      "url": "https://doi.org/10.1038/s41598-026-57038-8",
+      "input": "气测、工况与PVT（压力—体积—温度）资料",
+      "method": "机器学习建立气体代表性与钻头热机械影响的预测曲线。",
+      "output": "沿井深的解释辅助曲线",
+      "boundary": "研究有实验室参考资料；本课没有PVT数据，不复现其流体解释。"
+    },
+    {
+      "date": "2026.09",
+      "authors": "Sy 等",
+      "title": "Wide-range gas analysis of C1–C5 alkanes using a machine learning-enhanced dual-path optical cell",
+      "journal": "Sensors and Actuators B: Chemical",
+      "doi": "10.1016/j.snb.2026.139825",
+      "url": "https://doi.org/10.1016/j.snb.2026.139825",
+      "input": "多组分气体的吸收光谱",
+      "method": "CNN 从混合光谱中估计不同轻烃的浓度。",
+      "output": "C1—C5 组分估计",
+      "boundary": "这是仪器侧光谱反演；本课CNN处理的是已记录的气测时间序列。"
+    }
+  ],
+  "drawings": "Original SVG mechanism drawings, not measured field geometry.",
+  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+}

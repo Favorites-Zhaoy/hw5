@@ -188,6 +188,7 @@
     var t = pkg.tabs || {};
     var files = rec.files || [];
     var cfg = demoCfg(pkg);
+    if (pkg.lessonProtocol === 'mudlogging-v1') cfg.lessonProtocol = pkg.lessonProtocol;
     var tabs = {};
 
     if (t.background) {
@@ -240,7 +241,7 @@
         if (pageHandle) pageHandle.destroy();
         pageHandle = global.CaseDemoHost.create(root, {
           files: files,
-          demo: { mode: 'page', html: page.html, view: page.view, height: page.height },
+          demo: { mode: 'page', html: page.html, view: page.view, height: page.height, lessonProtocol: pkg.lessonProtocol },
           meta: rec.meta
         }, ctx);
       };
@@ -295,6 +296,7 @@
       status: 'ready',
       imported: true,
       packFiles: files.length,
+      lessonProtocol: pkg.lessonProtocol === 'mudlogging-v1' ? 'mudlogging-v1' : undefined,
       tabs: tabs
     };
   }

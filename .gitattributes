@@ -1,0 +1,5 @@
+# Keep provenance hashes stable across Windows and Unix checkouts.
+tools/mudlogging/*.py text eol=lf
+tools/mudlogging/experiments/*.json text eol=lf
+tools/build-mudlogging-cases.cjs text eol=lf
+tools/mudlogging/checkpoints/*.pt binary

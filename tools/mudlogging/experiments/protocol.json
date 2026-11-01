@@ -1,0 +1,30 @@
+{
+  "m2": {
+    "seed": 1702,
+    "epochs": 100,
+    "lr": 0.005,
+    "model": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
+    "baseline": "TG > 2 × first-12-point median; a lag-aligned pump-off in the previous 8 points means connection gas"
+  },
+  "m3": {
+    "seed": 1703,
+    "epochs": 55,
+    "lr": 0.003,
+    "model": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
+    "baseline": "After identical exposure correction: R > .40, G > .45, R > 1.25 × B inside sample ROI"
+  },
+  "m4": {
+    "seed": 1704,
+    "epochs": 120,
+    "lr": 0.004,
+    "model": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
+    "baseline": "Drilling-time thresholds 4.1 and 6.7 min/m; both methods use the same four-point minimum-run filter"
+  },
+  "m5": {
+    "seed": 1705,
+    "epochs": 32,
+    "lr": 0.004,
+    "model": "Character embedding 24 → bidirectional GRU 24×2 → linear 4",
+    "baseline": "Literal keyword order: 接单根/停泵, 全烃升高/气测异常/气测显示, 钻时/钻速, otherwise normal; no negation handling"
+  }
+}

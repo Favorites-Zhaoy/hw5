@@ -349,12 +349,16 @@
   /* =========================================================
      七、场景详情页（案例自动挂载）
      ========================================================= */
+  function isLessonCase(sc, c) {
+    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1');
+  }
+
   function sceneHTML(sc, q) {
     var st = A.index.byStage[sc.stageId];
     var allCases = Cases.bySceneAll(sc.id);
     /* 当前展示哪个案例：?case= 指定，默认第一个 */
     var c = Cases.resolveScene(sc.id, q.case);
-    var isM1Lesson = sc.id === 'm1' && c && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet');
+    var isM1Lesson = isLessonCase(sc, c);
 
     var caseSwitch = '';
     if (!isM1Lesson && allCases.length > 1) {
@@ -508,10 +512,12 @@
     var tabsEl = document.getElementById('tabs');
     if (!tabsEl) return;
 
-    // M1 lesson frames share the current sample and experiment phase.
+    // Course frames share the current sample and experiment controls.
     // Accept messages only from frames mounted in this case.
-    if (sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) {
+    if (isLessonCase(sc, c)) {
       var sharedLessonState = null;
+      var protocol = c.lessonProtocol === 'mudlogging-v1' ? '__lesson' : '__m1';
+      var lessonMessage = function (suffix, value) { var payload = {}; payload[protocol + suffix] = value; return payload; };
       var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
       function lessonFrames() {
         return lessonRoots.map(function (id) { var root = document.getElementById(id); return root && root.querySelector('iframe'); }).filter(Boolean);
@@ -519,18 +525,20 @@
       lessonMessageHandler = function (event) {
         var frames = lessonFrames(), sourceFrame = frames.filter(function (frame) { return frame.contentWindow === event.source; })[0];
         if (!sourceFrame || !event.data || typeof event.data !== 'object') return;
-        if (event.data.__m1StateRequest) {
+        if (event.data[protocol + 'StateRequest']) {
           var sectionNames = ['background', 'workflow', 'demo'];
           var ownerIndex = lessonRoots.findIndex(function (id) { var root = document.getElementById(id); return root && root.querySelector('iframe') === sourceFrame; });
-          event.source.postMessage({ __m1Section: sectionNames[ownerIndex], __m1SharedState: sharedLessonState }, '*');
+          var initial = lessonMessage('SharedState', sharedLessonState);
+          initial[protocol + 'Section'] = sectionNames[ownerIndex];
+          event.source.postMessage(initial, '*');
         }
-        if (event.data.__m1StateUpdate && typeof event.data.__m1StateUpdate === 'object') {
-          sharedLessonState = event.data.__m1StateUpdate;
-          frames.forEach(function (frame) { if (frame !== sourceFrame) frame.contentWindow.postMessage({ __m1SharedState: sharedLessonState }, '*'); });
+        if (event.data[protocol + 'StateUpdate'] && typeof event.data[protocol + 'StateUpdate'] === 'object') {
+          sharedLessonState = event.data[protocol + 'StateUpdate'];
+          frames.forEach(function (frame) { if (frame !== sourceFrame) frame.contentWindow.postMessage(lessonMessage('SharedState', sharedLessonState), '*'); });
         }
-        var target = { background: 'bg', workflow: 'flow', demo: 'demo' }[event.data.__m1Navigate];
+        var target = { background: 'bg', workflow: 'flow', demo: 'demo' }[event.data[protocol + 'Navigate']];
         var button = target && tabsEl.querySelector('[data-tab="' + target + '"]');
-        if (button) { event.source.postMessage({ __m1NavigationAck: event.data.token }, '*'); button.click(); }
+        if (button) { event.source.postMessage(lessonMessage('NavigationAck', event.data.token), '*'); button.click(); }
       };
       global.addEventListener('message', lessonMessageHandler);
     }
@@ -543,10 +551,10 @@
         p.classList.toggle('on', p.dataset.panel === key);
       });
       mountCaseSection(sc, c, key);
-      if (sc.id === 'm1') {
+      if (isLessonCase(sc, c)) {
         var activeRoot = document.getElementById('case-' + key + '-root');
         var activeFrame = activeRoot && activeRoot.querySelector('iframe');
-        if (activeFrame && activeFrame.contentWindow) activeFrame.contentWindow.postMessage({ __m1Section: { bg: 'background', flow: 'workflow', demo: 'demo' }[key] }, '*');
+        if (activeFrame && activeFrame.contentWindow) activeFrame.contentWindow.postMessage(lessonMessage('Section', { bg: 'background', flow: 'workflow', demo: 'demo' }[key]), '*');
       }
       if (scroll) {
         // The tabs are sticky; their screen position no longer represents their

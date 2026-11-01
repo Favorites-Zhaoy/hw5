@@ -176,7 +176,7 @@
       (selectedView ? 'window.__CASE_DEMO_VIEW__=' + JSON.stringify(selectedView) + ';' : '') +
       '(function(){var last=-1;function send(){' +
       'var h=Math.max(document.body?document.body.scrollHeight:0,document.documentElement.scrollHeight);' +
-      'h=Math.min(h,4200);if(Math.abs(h-last)>2){last=h;' +
+      'h=Math.min(h,' + (d.lessonProtocol === 'mudlogging-v1' ? 14000 : 4200) + ');if(Math.abs(h-last)>2){last=h;' +
       'try{parent.postMessage({__caseDemo:"' + token + '",h:h},"*")}catch(e){}}}' +
       'document.addEventListener("DOMContentLoaded",send);window.addEventListener("load",send);' +
       'try{if(window.ResizeObserver){new ResizeObserver(send).observe(document.documentElement)}}catch(e){}' +
@@ -215,7 +215,7 @@
       if (e.source !== frame.contentWindow) return;
       var d = e.data;
       if (!d || d.__caseDemo !== token) return;
-      var h = Math.min(6200, Math.max(minH, Number(d.h) + 2));
+      var h = Math.min(pkg.demo && pkg.demo.lessonProtocol === 'mudlogging-v1' ? 14000 : 6200, Math.max(minH, Number(d.h) + 2));
       frame.style.height = h + 'px';
     }
     global.addEventListener('message', onMsg);

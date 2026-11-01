@@ -1,0 +1,137 @@
+{
+  "kind": "synthetic-teaching",
+  "created": "2026-11-01",
+  "generator": "tools/mudlogging/prepare-experiments.py",
+  "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
+  "builderSha256": "b860df22f6ce3b0738d06abb03adc47cfd05baee0348f70d358534a71eb6774d",
+  "experimentSha256": "476e99b15546b1482b8622701f482c0a973ffee51ef4fb286895a03939db6f94",
+  "weightsSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
+  "split": {
+    "train": 20,
+    "validation": 4,
+    "test": 6,
+    "unit": "模拟井",
+    "pointsPerWell": 96
+  },
+  "method": {
+    "seed": 1702,
+    "epochs": 100,
+    "lr": 0.005,
+    "model": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
+    "baseline": "TG > 2 × first-12-point median; a lag-aligned pump-off in the previous 8 points means connection gas"
+  },
+  "parameterCount": 4035,
+  "metrics": {
+    "validation": {
+      "baseline": {
+        "count": 384,
+        "correct": 335,
+        "accuracy": 0.8723958333333334,
+        "macroF1": 0.8253322966385456,
+        "matrix": [
+          [
+            231,
+            0,
+            1
+          ],
+          [
+            13,
+            48,
+            0
+          ],
+          [
+            23,
+            12,
+            56
+          ]
+        ]
+      },
+      "prediction": {
+        "count": 384,
+        "correct": 384,
+        "accuracy": 1,
+        "macroF1": 1,
+        "matrix": [
+          [
+            232,
+            0,
+            0
+          ],
+          [
+            0,
+            61,
+            0
+          ],
+          [
+            0,
+            0,
+            91
+          ]
+        ]
+      }
+    },
+    "test": {
+      "baseline": {
+        "count": 576,
+        "correct": 518,
+        "accuracy": 0.8993055555555556,
+        "macroF1": 0.8693973634651601,
+        "matrix": [
+          [
+            343,
+            0,
+            2
+          ],
+          [
+            22,
+            73,
+            0
+          ],
+          [
+            25,
+            9,
+            102
+          ]
+        ]
+      },
+      "prediction": {
+        "count": 576,
+        "correct": 576,
+        "accuracy": 1,
+        "macroF1": 1,
+        "matrix": [
+          [
+            345,
+            0,
+            0
+          ],
+          [
+            0,
+            95,
+            0
+          ],
+          [
+            0,
+            0,
+            136
+          ]
+        ]
+      }
+    }
+  },
+  "runtime": {
+    "torch": "2.9.1+cpu",
+    "numpy": "2.2.6",
+    "sklearn": "1.6.1"
+  },
+  "disclosure": "Synthetic generator labels; no field data, no expert-performance or inference-time benchmark. Fixed held-out result replay.",
+  "recordIds": [
+    "G-25",
+    "G-26",
+    "G-27",
+    "G-28",
+    "G-29",
+    "G-30"
+  ],
+  "additionalReportFields": null
+}

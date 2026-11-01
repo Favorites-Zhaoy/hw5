@@ -1,0 +1,47 @@
+{
+  "checked": "2026-11-01",
+  "professional": {
+    "title": "SLB · 录井的多源记录与解释",
+    "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+  },
+  "papers": [
+    {
+      "date": "2026",
+      "authors": "周光元等",
+      "title": "海上油田录井专有大语言模型OffshoreGPT的构建与部署",
+      "journal": "录井工程",
+      "doi": "10.3969/j.issn.1672-9803.2026.01.001",
+      "url": "https://doi.org/10.3969/j.issn.1672-9803.2026.01.001",
+      "input": "录井领域段落与问答资料",
+      "method": "通过领域训练与微调适应专业术语、问答和作业语境。",
+      "output": "专业问答与作业事件提示",
+      "boundary": "本课用小型BiGRU讲清语句归类，不部署或复现OffshoreGPT。"
+    },
+    {
+      "date": "2025.02",
+      "authors": "Li 等",
+      "title": "A Report Generation System for Well Logging Industry Based on Large Language Model and Retrieval Augmented Generation",
+      "journal": "IPTC conference paper",
+      "doi": "10.2523/IPTC-24775-EA",
+      "url": "https://doi.org/10.2523/IPTC-24775-EA",
+      "input": "测井解释知识与报告资料",
+      "method": "检索增强与本地大语言模型结合，组织解释报告章节。",
+      "output": "报告初稿",
+      "boundary": "研究对象是测井解释报告；本课借鉴事实关联，数值由模板绑定。"
+    },
+    {
+      "date": "2026.08",
+      "authors": "Zhang 等",
+      "title": "A Dual-Teacher Distilled MoE Agent for Complex Industrial Document Analysis",
+      "journal": "Applied Sciences",
+      "doi": "10.3390/app16168089",
+      "url": "https://doi.org/10.3390/app16168089",
+      "input": "钻井及录井等跨文档资料",
+      "method": "蒸馏、工具调用与MoE定位原始证据，判断数据一致性。",
+      "output": "证据位置与一致性判断",
+      "boundary": "这是报告核对研究；本课只做字段ID关联，没有运行其MoE或智能体。"
+    }
+  ],
+  "drawings": "Original SVG mechanism drawings, not measured field geometry.",
+  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+}

@@ -1,0 +1,35 @@
+{
+  "checked": "2026-11-01",
+  "professional": {
+    "title": "SLB · 钻速、录井与地层对照",
+    "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-mud-logging"
+  },
+  "papers": [
+    {
+      "date": "2026.04",
+      "authors": "Nguyen、Vu、Nguyen",
+      "title": "Machine Learning-Based Real-Time Lithology Identification From Drilling Data in the Ca Tam Offshore Field",
+      "journal": "Journal of Petroleum Geology",
+      "doi": "10.1111/jpg.70062",
+      "url": "https://doi.org/10.1111/jpg.70062",
+      "input": "钻压、扭矩、立管压力和钻速等资料",
+      "method": "比较RF、XGBoost、SVM与ANN，学习钻进参数到岩性的对应。",
+      "output": "实时岩性类别",
+      "boundary": "论文使用真实井岩性资料；本课只解释多通道思路，标签为合成可钻性段。"
+    },
+    {
+      "date": "2026.01",
+      "authors": "Chen 等",
+      "title": "Prediction of rate of penetration in oil and gas well drilling: A hybrid data-driven approach with multi-stage data preprocessing",
+      "journal": "Engineering Applications of Artificial Intelligence",
+      "doi": "10.1016/j.engappai.2025.113085",
+      "url": "https://doi.org/10.1016/j.engappai.2025.113085",
+      "input": "含异常、噪声和不规则采样的钻进数据",
+      "method": "预处理、集成模型与1D-CNN/BiLSTM组合学习钻速。",
+      "output": "钻速预测",
+      "boundary": "论文任务是ROP预测；本课CNN做逐米分段，未复现整套混合模型。"
+    }
+  ],
+  "drawings": "Original SVG mechanism drawings, not measured field geometry.",
+  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+}

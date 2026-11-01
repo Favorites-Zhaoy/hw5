@@ -13,11 +13,11 @@
     { id: 'nlp', abbr: 'NLP', name: '自然语言处理', note: '把多源证据组织成可追溯的文字。m5 已放大，点击图画进入报告生成讲解。' }
   ];
   var TECH = [
-    { id: 'm1', method: 'cv', title: '岩屑里的地层线索', color: '#f28a24', box: [211, 438, 295, 305], art: [211, 548, 295, 197], input: '清洗、拍照后的岩屑图像', output: '岩性类别与组分比例' },
+    { id: 'm1', method: 'cv', title: '岩屑里的地层线索', color: '#f28a24', box: [211, 438, 295, 305], art: [211, 548, 295, 197], input: '清洗、拍照后的岩屑图像', output: '照片级岩性候选' },
     { id: 'm2', method: 'ts', title: '气测曲线中的异常', color: '#2d9ed8', box: [520, 439, 277, 301], art: [520, 548, 277, 191], input: '全烃、组分与工况序列', output: '异常层段与解释线索' },
-    { id: 'm3', method: 'cv', title: '紫外光下的含油显示', color: '#9262ce', box: [809, 439, 290, 305], art: [809, 548, 290, 195], input: '固定灯源与曝光的荧光图像', output: '荧光区域与级别建议' },
-    { id: 'm4', method: 'ts', title: '钻时变化中的层界', color: '#4b9b68', box: [1115, 439, 322, 307], art: [1115, 551, 322, 195], input: '钻时、钻压、转速等工况', output: '候选层界与交叉验证' },
-    { id: 'm5', method: 'nlp', title: '让每条结论都有出处', color: '#ef7028', box: [1040, 802, 404, 284], art: [1040, 920, 404, 166], input: '分层、油气显示与异常记录', output: '带证据来源的报告初稿' }
+    { id: 'm3', method: 'cv', title: '紫外光下的含油显示', color: '#9262ce', box: [809, 439, 290, 305], art: [809, 548, 290, 195], input: '固定灯源与曝光的荧光图像', output: '目标区域与面积比例' },
+    { id: 'm4', method: 'ts', title: '钻时变化中的层界', color: '#4b9b68', box: [1115, 439, 322, 307], art: [1115, 551, 322, 195], input: '钻时、钻压、转速等工况', output: '可钻性分段与候选层界' },
+    { id: 'm5', method: 'nlp', title: '让每条结论都有出处', color: '#ef7028', box: [1040, 802, 404, 284], art: [1040, 920, 404, 166], input: '分层、油气显示与异常记录', output: '带字段来源的作业摘要' }
   ];
 
   function selected(value) {
@@ -44,7 +44,10 @@
     };
     return '<svg class="ml-tech-effect" viewBox="0 0 ' + t.box[2] + ' ' + t.box[3] + '" aria-hidden="true">' + shapes[t.id] + '</svg>';
   }
-  function sceneHref(id) { return '#/scene/' + id + (id === 'm1' ? '?case=m1-cuttings&amp;tab=bg' : ''); }
+  function sceneHref(id) {
+    var lesson = { m1: 'm1-cuttings', m2: 'm2-gas', m3: 'm3-fluorescence', m4: 'm4-drilling', m5: 'm5-report' }[id];
+    return '#/scene/' + id + (lesson ? '?case=' + lesson + '&amp;tab=bg' : '');
+  }
   function spot(ctx, t, focus) {
     var sc = scene(ctx, t.id), b = t.box, active = focus && focus === t.method, esc = ctx.K.esc;
     return '<a class="ml-spot ml-spot-' + t.id + (active ? ' is-relevant' : focus ? ' is-dim' : '') +

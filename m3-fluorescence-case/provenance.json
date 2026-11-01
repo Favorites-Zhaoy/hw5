@@ -1,0 +1,97 @@
+{
+  "kind": "synthetic-teaching",
+  "created": "2026-11-01",
+  "generator": "tools/mudlogging/prepare-experiments.py",
+  "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
+  "builderSha256": "b860df22f6ce3b0738d06abb03adc47cfd05baee0348f70d358534a71eb6774d",
+  "experimentSha256": "ddb309b8fd85b6adbb59959d883d9a69e4b31e2ae5954b3ad1153638d983f367",
+  "weightsSha256": "674137131b264d12271bd276f1c7199f421f7389fa2d445dc14a028400fc5d18",
+  "split": {
+    "train": 80,
+    "validation": 16,
+    "test": 24,
+    "unit": "图像；按样品盘划分",
+    "trainGroups": 20,
+    "validationGroups": 4,
+    "testGroups": 6
+  },
+  "method": {
+    "seed": 1703,
+    "epochs": 55,
+    "lr": 0.003,
+    "model": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
+    "baseline": "After identical exposure correction: R > .40, G > .45, R > 1.25 × B inside sample ROI"
+  },
+  "parameterCount": 29761,
+  "metrics": {
+    "validation": {
+      "baseline": {
+        "tp": 3944,
+        "fp": 0,
+        "fn": 2061,
+        "iou": 0.6567860116569525,
+        "dice": 0.7928435018594834,
+        "count": 16
+      },
+      "prediction": {
+        "tp": 5910,
+        "fp": 174,
+        "fn": 95,
+        "iou": 0.9564654474834116,
+        "dice": 0.9777483662833981,
+        "count": 16
+      }
+    },
+    "test": {
+      "baseline": {
+        "tp": 4885,
+        "fp": 0,
+        "fn": 3225,
+        "iou": 0.6023427866831073,
+        "dice": 0.7518276260100039,
+        "count": 24
+      },
+      "prediction": {
+        "tp": 7968,
+        "fp": 280,
+        "fn": 142,
+        "iou": 0.9497020262216925,
+        "dice": 0.9742022252109059,
+        "count": 24
+      }
+    }
+  },
+  "runtime": {
+    "torch": "2.9.1+cpu",
+    "numpy": "2.2.6",
+    "sklearn": "1.6.1"
+  },
+  "disclosure": "Synthetic generator labels; no field data, no expert-performance or inference-time benchmark. Fixed held-out result replay.",
+  "recordIds": [
+    "F-25-1",
+    "F-25-2",
+    "F-25-3",
+    "F-25-4",
+    "F-26-1",
+    "F-26-2",
+    "F-26-3",
+    "F-26-4",
+    "F-27-1",
+    "F-27-2",
+    "F-27-3",
+    "F-27-4",
+    "F-28-1",
+    "F-28-2",
+    "F-28-3",
+    "F-28-4",
+    "F-29-1",
+    "F-29-2",
+    "F-29-3",
+    "F-29-4",
+    "F-30-1",
+    "F-30-2",
+    "F-30-3",
+    "F-30-4"
+  ],
+  "additionalReportFields": null
+}

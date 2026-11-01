@@ -1,0 +1,35 @@
+{
+  "checked": "2026-11-01",
+  "professional": {
+    "title": "AAPG · Show evaluation",
+    "url": "https://wiki.aapg.org/Show_evaluation"
+  },
+  "papers": [
+    {
+      "date": "2025.12 · 预印本",
+      "authors": "Yi 等",
+      "title": "A semantic segmentation network of fluorescent detection of drilling cuttings for lithology assessment",
+      "journal": "SSRN preprint",
+      "doi": "10.2139/ssrn.5963110",
+      "url": "https://doi.org/10.2139/ssrn.5963110",
+      "input": "含油岩屑荧光图像",
+      "method": "空间与上下文双分支联合提取特征，细化发光区域分割。",
+      "output": "荧光区域掩膜",
+      "boundary": "所引版本为预印本；本课只运行基础U-Net，不复现论文双分支结构。"
+    },
+    {
+      "date": "2025.07",
+      "authors": "Poudel 等",
+      "title": "Real-time oil spill concentration assessment through fluorescence imaging and deep learning",
+      "journal": "Journal of Hazardous Materials",
+      "doi": "10.1016/j.jhazmat.2025.139374",
+      "url": "https://doi.org/10.1016/j.jhazmat.2025.139374",
+      "input": "实验室油样荧光图像",
+      "method": "CNN提取特征，再回归浓度。",
+      "output": "实验条件下的浓度估计",
+      "boundary": "这是溢油油样研究，成像与岩屑不同；说明标定与任务定义的重要性，不能把本课面积换算为浓度。"
+    }
+  ],
+  "drawings": "Original SVG mechanism drawings, not measured field geometry.",
+  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+}
