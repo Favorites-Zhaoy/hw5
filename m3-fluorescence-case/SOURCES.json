@@ -45,5 +45,19 @@
     }
   ],
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
-  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+  "data": "本例目前使用合成教学资料及生成器标签。真实岩屑UV图像与独立像素标注尚未取得；不把合成成绩当作现场性能。",
+  "realData": null,
+  "browserModel": {
+    "file": "m3.onnx",
+    "sha256": "94725db0fcacda86414837923594f2254e80507d0fc9fcf9c8d37b4c829026d8",
+    "checkpointSha256": "674137131b264d12271bd276f1c7199f421f7389fa2d445dc14a028400fc5d18",
+    "bytes": 124661,
+    "testInputs": 24,
+    "maxAbsoluteError": 0.000026702880859375,
+    "inputDtype": "float32",
+    "output": "logits",
+    "architecture": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
+    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "testOutputChecksum": "c7d9effe71040438101e4ef80827c4c34b556c0820298e3d9de2c2707063cc5a"
+  }
 }

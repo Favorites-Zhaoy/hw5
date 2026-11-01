@@ -1,9 +1,59 @@
 {
-  "kind": "synthetic-teaching",
+  "version": "2.0.0",
+  "kind": "real-and-synthetic-teaching",
+  "realDataset": {
+    "file": "assets/dataset-v2.js",
+    "sourceManifest": [
+      {
+        "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/catalog.json",
+        "sha256": "a5cd8f3449cad6f6b4503f647384dd6c795b90567696a7c61b05adac4245aa6c",
+        "bytes": 210262,
+        "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/DATA-LICENSE.txt",
+        "sha256": "25801b53a6519098f68bc47af620d446d6641353e892d2bb4e72b31ad7b4c566",
+        "bytes": 1061,
+        "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/NA-NA-15-9-F-5/1/depth_drilling.parquet",
+        "sha256": "d0191c7aa86b6c8502d3d64c59c5823462081460cb1b49e2cd1ebb1073ef321f",
+        "bytes": 49780,
+        "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/Norway-Statoil-NO-15-9-F-1-C/3/depth_drilling.parquet",
+        "sha256": "e14b243ffc55a0866a06f7a7ccaec17540e770c5f434402719aae6f125add4c5",
+        "bytes": 66691,
+        "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+      }
+    ],
+    "sha256": "06bbfa17ae98a171059aec6c9b8eda3dd85cb050eda1bd70aecd87d4f0a12e6d",
+    "model": "4d401101d506df423a21df9e66bf31d3b910c2eed4946ce5d64eff7f507a5cce"
+  },
+  "browserModel": {
+    "file": "m4.onnx",
+    "sha256": "095515971bbf240dbd76f855cb281760b54b0a5c7425ca59fcb32a7331181983",
+    "checkpointSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
+    "bytes": 31547,
+    "testInputs": 6,
+    "maxAbsoluteError": 0.0000057220458984375,
+    "inputDtype": "float32",
+    "output": "logits",
+    "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
+    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
+  },
+  "execution": {
+    "baseline": "L2 browser recomputation",
+    "ai": "Real MLP exact JavaScript forward; synthetic CNN saved or ONNX/WASM"
+  },
+  "syntheticMetricsScope": "The metrics below describe original synthetic experiments only.",
   "created": "2026-11-01",
   "generator": "tools/mudlogging/prepare-experiments.py",
   "generatorSha256": "b395383a1f38f504e4546b2fd226e2505b0c2ce3a9b2ec1933764547ad49acb1",
-  "builderSha256": "710c435bc48997ef22d90135b7d2c0c984a9de09a56a62b398b672003d71fd51",
+  "builderSha256": "4cb8d543092ddb09bdfbeb4ce8d2d23c34200ae3b9292d34cb69583721871e73",
   "experimentSha256": "2169f055d5085514bf2b15d5d16f1fe6dc76715b8b11777e805fd47a1d08877d",
   "weightsSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
   "split": {

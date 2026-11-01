@@ -45,7 +45,7 @@ module.exports={
   terms:[['紫外激发 / UV','用紫外光让部分物质发出可见光。','成像条件，而不是类别标签。'],['荧光分布','亮区的位置与覆盖情况。','像素区域与空间形态。'],['干扰荧光','目标之外也可能出现发光。','分割模型需要排除的负例。'],['曝光参照','用相同参照调整明暗。','两种方法共同的预处理。'],['ROI / 样品区域','只在约定的样品范围内统计。','二值统计掩膜。'],['分割标签','每个像素是否属于目标。','监督学习的目标值。'],['编码器 / 解码器','先理解局部特征，再恢复位置。','U-Net的压缩与上采样。'],['跳接 / Skip connection','把浅层位置细节传给后面的层。','跨层特征拼接。'],['分割阈值','多大得分才圈为目标。','对保存得分作后处理。'],['IoU / 交并比','圈中区域与标签重合多少。','交集÷并集，越大越接近标签。']],
   papers:[paper('2025.12 · 预印本','Yi 等','A semantic segmentation network of fluorescent detection of drilling cuttings for lithology assessment','SSRN preprint','10.2139/ssrn.5963110','含油岩屑荧光图像','空间与上下文双分支联合提取特征，细化发光区域分割。','荧光区域掩膜','所引版本为预印本；本课只运行基础U-Net，不复现论文双分支结构。'),paper('2025.07','Poudel 等','Real-time oil spill concentration assessment through fluorescence imaging and deep learning','Journal of Hazardous Materials','10.1016/j.jhazmat.2025.139374','实验室油样荧光图像','CNN提取特征，再回归浓度。','实验条件下的浓度估计','这是溢油油样研究，成像与岩屑不同；说明标定与任务定义的重要性，不能把本课面积换算为浓度。')]
  },
- m4:{id:'m4',slug:'m4-drilling',title:'钻时曲线地层划分',method:'ts',accent:'#588d70',en:'DRILLING TIME / SEQUENCE SEGMENTATION',
+ m4:{id:'m4',slug:'m4-drilling',title:'钻进响应变化候选',method:'ts',accent:'#588d70',en:'DRILLING TIME / SEQUENCE SEGMENTATION',
   heading:'钻得慢了，是岩层变硬，还是工况变了？',lead:'把钻时放回钻压、转速和连续井段中理解。再用多通道卷积区分地层段变化与工况引起的曲线波动。',
   context:['钻时表示钻进单位进尺所需的时间，与钻速互为倒数。相似工况下，它可以反映可钻性变化；钻压、转速、钻头磨损改变时，同一岩层的钻时也会变化。','划层不能只把曲线的每个拐点都当成层界。先对照工况，再与岩屑和测井资料对应，才能解释候选界面。'],
   professionalSource:{title:'SLB · 钻速、录井与地层对照',url:slb},principleTitle:'同一岩层，改变钻压和转速，也能让钻时增大。',principleNote:'本例使用简化可钻性生成关系；不替代工程钻速模型。',

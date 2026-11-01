@@ -1,0 +1,11 @@
+{
+  "name": "petroleum-teaching-atlas",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Buildless static teaching site; npm dependencies are for DOM regression checks only.",
+  "scripts": {
+    "build": "node tools/build-m1-case.cjs && node tools/build-mudlogging-cases.cjs",
+    "test": "node --test tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs tests/v2-experiments.cjs tests/v2-dom.cjs"
+  },
+  "devDependencies": { "jsdom": "26.1.0" }
+}

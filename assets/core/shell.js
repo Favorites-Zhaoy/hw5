@@ -515,7 +515,8 @@
     // Course frames share the current sample and experiment controls.
     // Accept messages only from frames mounted in this case.
     if (isLessonCase(sc, c)) {
-      var sharedLessonState = null;
+      var initialUTC = parseHash().q.utc;
+      var sharedLessonState = initialUTC && /^20\d\d-\d\d-\d\dT/.test(initialUTC) ? { domain: 'real', utc: initialUTC, well: '15/9-F-1-C' } : null;
       var protocol = c.lessonProtocol === 'mudlogging-v1' ? '__lesson' : '__m1';
       var lessonMessage = function (suffix, value) { var payload = {}; payload[protocol + suffix] = value; return payload; };
       var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
@@ -537,6 +538,11 @@
           frames.forEach(function (frame) { if (frame !== sourceFrame) frame.contentWindow.postMessage(lessonMessage('SharedState', sharedLessonState), '*'); });
         }
         var target = { background: 'bg', workflow: 'flow', demo: 'demo' }[event.data[protocol + 'Navigate']];
+        var crossCase = event.data.__lessonCrossCase;
+        if (c.lessonProtocol === 'mudlogging-v1' && crossCase && sc.id === 'm4' && crossCase.scene === 'm2' && crossCase.well === '15/9-F-1-C' && typeof crossCase.utc === 'string' && /^2013-08-2[2-8]T/.test(crossCase.utc)) {
+          location.hash = '#/scene/m2?case=m2-gas&tab=demo&utc=' + encodeURIComponent(crossCase.utc);
+          return;
+        }
         var button = target && tabsEl.querySelector('[data-tab="' + target + '"]');
         if (button) { event.source.postMessage(lessonMessage('NavigationAck', event.data.token), '*'); button.click(); }
       };
@@ -578,8 +584,8 @@
     });
 
     var want = { 1: 'bg', 2: 'flow', 3: 'demo' }[parseHash().q.tab] || parseHash().q.tab;
-    if (sc.id === 'm1' && (want === 'identify' || want === 'identification')) want = 'demo';
-    if (want && tabsEl.querySelector('[data-tab="' + want + '"]')) activate(want, false);
+    want = { identify: 'demo', identification: 'demo', background: 'bg', workflow: 'flow' }[want] || want;
+    if (['bg', 'flow', 'demo'].indexOf(want) >= 0 && tabsEl.querySelector('[data-tab="' + want + '"]')) activate(want, false);
       else if (tabsEl.children.length) activate(tabsEl.children[0].dataset.tab, false);
 
     bindChecklist();

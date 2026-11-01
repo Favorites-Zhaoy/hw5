@@ -57,5 +57,26 @@
     }
   ],
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
-  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+  "data": "本例包含固定来源版本的Volve真实观测与单独的合成教学实验。真实资料无独立事件或地质层界标签；合成资料保留生成器标签。",
+  "realData": [
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/Norway-Statoil-NO-15-9-F-1-C/3/drilling.parquet",
+      "sha256": "f38ac0f882355b6747cabea39f2539ac2cf9054c712f39646d60a1988d47db78",
+      "bytes": 11327588,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    }
+  ],
+  "browserModel": {
+    "file": "m2.onnx",
+    "sha256": "7a7b63d90d1a5c0d23e5784dc3d3b52583287cdc5a6a432d03674429b4d25436",
+    "checkpointSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
+    "bytes": 21658,
+    "testInputs": 6,
+    "maxAbsoluteError": 0.000003814697265625,
+    "inputDtype": "float32",
+    "output": "logits",
+    "architecture": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
+    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "testOutputChecksum": "ec3b8b7392e4687a80482468fecfb83f1bc84f28bbe1e046e74e3219e9000ef3"
+  }
 }

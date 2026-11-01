@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/catalog.json",
+      "sha256": "a5cd8f3449cad6f6b4503f647384dd6c795b90567696a7c61b05adac4245aa6c",
+      "bytes": 210262,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/DATA-LICENSE.txt",
+      "sha256": "25801b53a6519098f68bc47af620d446d6641353e892d2bb4e72b31ad7b4c566",
+      "bytes": 1061,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/NA-NA-15-9-F-5/1/depth_drilling.parquet",
+      "sha256": "d0191c7aa86b6c8502d3d64c59c5823462081460cb1b49e2cd1ebb1073ef321f",
+      "bytes": 49780,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/Norway-Statoil-NO-15-9-F-1-C/3/depth_drilling.parquet",
+      "sha256": "e14b243ffc55a0866a06f7a7ccaec17540e770c5f434402719aae6f125add4c5",
+      "bytes": 66691,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Sky370/DrillDash/76b94b76efe7eb0d66faabc11305906fd50d8ee8/demo/store/Norway-Statoil-NO-15-9-F-1-C/3/drilling.parquet",
+      "sha256": "f38ac0f882355b6747cabea39f2539ac2cf9054c712f39646d60a1988d47db78",
+      "bytes": 11327588,
+      "source_commit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8"
+    }
+  ],
+  "official": "https://www.equinor.com/energy/volve-data-sharing",
+  "mirrorCommit": "76b94b76efe7eb0d66faabc11305906fd50d8ee8",
+  "downloaded": "2026-11-01",
+  "m4Model": "4d401101d506df423a21df9e66bf31d3b910c2eed4946ce5d64eff7f507a5cce",
+  "m2Model": "6d51b0fc64adaeb4874f2f487a7ab32ed5bc0e0c559c383a334a4a284af72860"
+}

@@ -9,7 +9,7 @@ const site = process.env.HW5_PORTAL_ROOT || path.resolve(__dirname, '..');
 const read = (name, root = site) => fs.readFileSync(path.join(root, name), 'utf8');
 const plain = value => JSON.parse(JSON.stringify(value));
 const extras = sc => plain(Object.fromEntries(['data', 'refs', 'datasets', 'cross', 'demo'].map(k => [k, k === 'demo' ? !!sc[k] : sc[k] || []])));
-const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]);
+const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).filter(e=>!['.git','.artifacts','node_modules'].includes(e.name)).flatMap(e => e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]);
 
 class Element {
   constructor(tag = 'div') {

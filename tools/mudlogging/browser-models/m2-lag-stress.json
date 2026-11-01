@@ -1,0 +1,128 @@
+{
+  "kind": "Input alignment stress, not retuned test benchmark",
+  "lags": [
+    0,
+    15
+  ],
+  "results": [
+    {
+      "id": "G-25",
+      "lag": 0,
+      "errorIndices": [
+        31,
+        33,
+        34,
+        66,
+        67,
+        68,
+        69
+      ],
+      "count": 7
+    },
+    {
+      "id": "G-26",
+      "lag": 0,
+      "errorIndices": [
+        26,
+        27,
+        71,
+        72
+      ],
+      "count": 4
+    },
+    {
+      "id": "G-27",
+      "lag": 0,
+      "errorIndices": [
+        30,
+        68,
+        71
+      ],
+      "count": 3
+    },
+    {
+      "id": "G-28",
+      "lag": 0,
+      "errorIndices": [
+        24,
+        25,
+        69,
+        70
+      ],
+      "count": 4
+    },
+    {
+      "id": "G-29",
+      "lag": 0,
+      "errorIndices": [
+        33,
+        34,
+        66,
+        67
+      ],
+      "count": 4
+    },
+    {
+      "id": "G-30",
+      "lag": 0,
+      "errorIndices": [
+        25,
+        65,
+        69,
+        72,
+        73
+      ],
+      "count": 5
+    },
+    {
+      "id": "G-25",
+      "lag": 15,
+      "errorIndices": [
+        34,
+        69
+      ],
+      "count": 2
+    },
+    {
+      "id": "G-26",
+      "lag": 15,
+      "errorIndices": [
+        27,
+        72
+      ],
+      "count": 2
+    },
+    {
+      "id": "G-27",
+      "lag": 15,
+      "errorIndices": [
+        75
+      ],
+      "count": 1
+    },
+    {
+      "id": "G-28",
+      "lag": 15,
+      "errorIndices": [
+        25
+      ],
+      "count": 1
+    },
+    {
+      "id": "G-29",
+      "lag": 15,
+      "errorIndices": [
+        67
+      ],
+      "count": 1
+    },
+    {
+      "id": "G-30",
+      "lag": 15,
+      "errorIndices": [
+        73
+      ],
+      "count": 1
+    }
+  ]
+}

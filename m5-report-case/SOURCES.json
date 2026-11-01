@@ -65,5 +65,19 @@
     }
   ],
   "drawings": "Original SVG mechanism drawings, not measured field geometry.",
-  "data": "Reproducible synthetic teaching data; not sourced from the cited papers."
+  "data": "中文合成语句按模板组划分。BiGRU只做事项分类，摘要按来源字段组装；未适配的英文真实日报不参与该中文模型的性能评价。",
+  "realData": null,
+  "browserModel": {
+    "file": "m5.onnx",
+    "sha256": "2d57fee0fdc5f3696a7de26646aef7adff49e863951f156d221f81bae94ec446",
+    "checkpointSha256": "f7d732abb491dc1b4d56572b593568cb70780ebe9dfa5d0fe482114397892f6a",
+    "bytes": 46339,
+    "testInputs": 160,
+    "maxAbsoluteError": 1.1920928955078125e-7,
+    "inputDtype": "int64",
+    "output": "probabilities",
+    "architecture": "Character embedding 24 → bidirectional GRU 24×2 → linear 4",
+    "scope": "Original synthetic teaching distribution; no field-performance claim.",
+    "testOutputChecksum": "35756b4d662fc8d8cc843be5878a0c24550e438856050a08e713de62c45981f1"
+  }
 }

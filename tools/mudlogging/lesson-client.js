@@ -1,5 +1,6 @@
 (function(){
  'use strict';
+ if(window.PETRO_V2)return;
  var C=window.LESSON_CONFIG,E=window.LESSON_DATA,M=window.MudLessonMath,V=window.MudLessonViews;
  var section=document.body.dataset.section,records=E.records,byId={};records.forEach(function(r){byId[r.id]=r;if(r.image&&window.caseAsset)r.image=window.caseAsset(r.image)||window.caseAsset(r.image.split('/').pop())||r.image;});
  var initial=records[0];

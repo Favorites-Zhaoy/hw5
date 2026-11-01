@@ -1,0 +1,60 @@
+{
+  "version": "2.0.0",
+  "opset": 17,
+  "torch": "2.9.1+cpu",
+  "onnxruntime": "1.24.4",
+  "models": {
+    "m2": {
+      "file": "m2.onnx",
+      "sha256": "7a7b63d90d1a5c0d23e5784dc3d3b52583287cdc5a6a432d03674429b4d25436",
+      "checkpointSha256": "124eb6b076c7b9c1fd6e8324f18a3b0e7ec99a95bbd25bb3578ea5cfb11b535c",
+      "bytes": 21658,
+      "testInputs": 6,
+      "maxAbsoluteError": 3.814697265625e-06,
+      "inputDtype": "float32",
+      "output": "logits",
+      "architecture": "Causal 1D CNN: 6→24→24→24→3; kernel 3, dilations 1/2/4",
+      "scope": "Original synthetic teaching distribution; no field-performance claim.",
+      "testOutputChecksum": "ec3b8b7392e4687a80482468fecfb83f1bc84f28bbe1e046e74e3219e9000ef3"
+    },
+    "m3": {
+      "file": "m3.onnx",
+      "sha256": "94725db0fcacda86414837923594f2254e80507d0fc9fcf9c8d37b4c829026d8",
+      "checkpointSha256": "674137131b264d12271bd276f1c7199f421f7389fa2d445dc14a028400fc5d18",
+      "bytes": 124661,
+      "testInputs": 24,
+      "maxAbsoluteError": 2.6702880859375e-05,
+      "inputDtype": "float32",
+      "output": "logits",
+      "architecture": "Tiny U-Net: 3→8→16→32→16→8→1, two pooling levels, skip concatenations",
+      "scope": "Original synthetic teaching distribution; no field-performance claim.",
+      "testOutputChecksum": "c7d9effe71040438101e4ef80827c4c34b556c0820298e3d9de2c2707063cc5a"
+    },
+    "m4": {
+      "file": "m4.onnx",
+      "sha256": "095515971bbf240dbd76f855cb281760b54b0a5c7425ca59fcb32a7331181983",
+      "checkpointSha256": "b1f7913db5dfe461185baa19a38b27ee530b9fe146a6a21672bfbaa8b5f6923f",
+      "bytes": 31547,
+      "testInputs": 6,
+      "maxAbsoluteError": 5.7220458984375e-06,
+      "inputDtype": "float32",
+      "output": "logits",
+      "architecture": "1D CNN: 5→24→24→24→3; kernel 5, symmetric dilations 1/2/4",
+      "scope": "Original synthetic teaching distribution; no field-performance claim.",
+      "testOutputChecksum": "8637bbf7ec4ce15de8638b7e0f550b1666116c2a49b274471382d994f89d74eb"
+    },
+    "m5": {
+      "file": "m5.onnx",
+      "sha256": "2d57fee0fdc5f3696a7de26646aef7adff49e863951f156d221f81bae94ec446",
+      "checkpointSha256": "f7d732abb491dc1b4d56572b593568cb70780ebe9dfa5d0fe482114397892f6a",
+      "bytes": 46339,
+      "testInputs": 160,
+      "maxAbsoluteError": 1.1920928955078125e-07,
+      "inputDtype": "int64",
+      "output": "probabilities",
+      "architecture": "Character embedding 24 → bidirectional GRU 24×2 → linear 4",
+      "scope": "Original synthetic teaching distribution; no field-performance claim.",
+      "testOutputChecksum": "35756b4d662fc8d8cc843be5878a0c24550e438856050a08e713de62c45981f1"
+    }
+  }
+}

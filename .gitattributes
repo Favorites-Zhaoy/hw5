@@ -3,3 +3,16 @@ tools/mudlogging/*.py text eol=lf
 tools/mudlogging/experiments/*.json text eol=lf
 tools/build-mudlogging-cases.cjs text eol=lf
 tools/mudlogging/checkpoints/*.pt binary
+
+tools/mudlogging/browser-models/*.json text eol=lf
+tools/mudlogging/browser-models/*.onnx binary
+tools/mudlogging/real-data/*.json text eol=lf
+tools/mudlogging/real-data/raw/* -text
+tools/m1/expansion/*.json text eol=lf
+tools/m1/expansion/*.npz binary
+tools/m1/prepare-expansion.py text eol=lf
+assets/vendor/**/*.wasm binary
+assets/vendor/ort-1.31.1/* -text
+assets/vendor/ort-1.31.1/* whitespace=cr-at-eol
+assets/vendor/ort-1.31.1/SOURCE.json text eol=lf
+tools/mudlogging/real-data/raw/* whitespace=cr-at-eol

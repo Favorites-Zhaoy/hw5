@@ -6,6 +6,7 @@ const read=n=>fs.readFileSync(path.join(site,n),'utf8'),json=n=>JSON.parse(read(
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 const courses=require(path.join(site,'tools/mudlogging/content.cjs')),M=require(path.join(site,'tools/mudlogging/math.js')),V=require(path.join(site,'tools/mudlogging/lesson-views.js'));
 const list=Object.values(courses),source=id=>json('tools/mudlogging/experiments/'+id+'.json');
+list.forEach(c=>require(path.join(site,'tools/mudlogging/v2-content.cjs')).apply(c));
 function generated(c){const context={window:{}};vm.runInNewContext(read(c.slug+'-case/assets/experiment.js'),context);return plain(context.window.LESSON_DATA);}
 function close(a,b,tol=1e-10){assert.ok(Math.abs(a-b)<tol,`${a} != ${b}`);}
 function disjoint(a,b){for(const v of a)assert.ok(!new Set(b).has(v),'shared group '+v);}
