@@ -1,0 +1,11 @@
+/* Only the fitted drilling figures extend the unmodified M2 lesson template. */
+.drl-mechanism,.drl-plot,.drl-residual,.drl-trajectory{display:block;width:100%;height:auto}
+.drl-mechanism{margin:16px 0 8px}.drl-mechanism text{fill:#805e48;font-size:17px}.technical-board .drl-mechanism{max-height:370px}
+.professional-svg.drl-concept-mini{display:block;width:100%;height:auto;background:#faf4e9}.drl-concept-mini text{fill:#805f47;stroke:none;font-size:12px}.drl-concept-mini .ink{stroke:#b95739;stroke-width:3}.drl-concept-mini .light{stroke:#c9b194;stroke-dasharray:5 4}.drl-concept-mini rect{stroke:#bca38b}
+.drl-method text{fill:#805d45;font-size:14px}.drl-method .drl-svg-title{font-size:17px;font-weight:600}.drl-contract>span{line-height:1.9}
+.drl-plot,.drl-residual,.drl-trajectory{padding:12px;border:1px solid #e2cdb9;background:#fffbf4;border-radius:6px;margin:17px 0}.drl-plot text,.drl-residual text,.drl-trajectory text{fill:#8e6e56;font-size:11px}.drl-plot .drl-svg-title{font-size:13px;font-weight:600}.drl-trajectory text{font-size:14px}
+.drl-why-grid>.data-table-wrap{margin-top:20px}.drl-pair>svg{margin:0;min-width:0}.drl-pair>article{min-width:0}.drl-pair h3{font-size:17px}.drl-pair .drl-route{margin:15px 0}
+.data-table-wrap{overflow-x:auto;margin:18px 0}.data-table-wrap .data-fields{min-width:0}.drl-table th{width:29%}.drl-table td{overflow-wrap:anywhere}.drl-table tbody tr:nth-child(even){background:#f8efe2}
+.drl-trajectory-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}.drl-trajectory-grid .guide-metric-grid{grid-template-columns:1fr}.drl-trajectory-grid .guide-metric{padding:13px 17px}.drl-trajectory-grid .guide-metric>b{font-size:20px;margin:4px 0}
+.flow-stage .guide-contract{grid-template-columns:1fr 18px 1fr;gap:10px}.flow-stage .guide-contract>span{font-size:11px}.flow-stage .drl-mechanism text{font-size:17px}.flow-stage .fine{margin-bottom:0}.flow-layout[data-focus=ordinary] .flow-stage .drl-mechanism{margin:0}.flow-stage .guide-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.flow-nav button>b{line-height:1.7}.flow-nav button>small{line-height:1.7}.guide-records .data-fields{margin-top:15px}.drl-controls{margin-top:22px}.professional-bridge{font-size:13px;line-height:2}

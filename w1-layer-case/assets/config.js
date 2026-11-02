@@ -1,0 +1,1 @@
+window.WELLLOG_PAGE_CONFIG={"sceneId":"w1","caseId":"welllog-layer","title":"测井曲线智能分层","version":"2.0.0","lessonProtocol":"field-pages-v2","assetBase":"../../assets/welllog/","template":"m2-gas-case/assets/lesson.css","dataKind":"synthetic-teaching","modelSha256":"7679fb8d456bca9a82909ef4d165729e9de1fc05d9dc91cca8207225a0b05bee"};

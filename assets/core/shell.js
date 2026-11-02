@@ -337,7 +337,7 @@
      七、场景详情页（案例自动挂载）
      ========================================================= */
   function isLessonCase(sc, c) {
-    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'geology-v1' || c.lessonProtocol === 'field-v1');
+    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'geology-v1' || c.lessonProtocol === 'field-v1' || c.lessonProtocol === 'field-pages-v2');
   }
 
   function sceneHTML(sc, q) {
@@ -505,7 +505,7 @@
     if (isFrameLesson) {
       var initialUTC = parseHash().q.utc;
       var sharedLessonState = initialUTC && /^20\d\d-\d\d-\d\dT/.test(initialUTC) ? { domain: 'real', utc: initialUTC, well: '15/9-F-1-C' } : null;
-      var protocol = c.lessonProtocol === 'mudlogging-v1' ? '__lesson' : '__m1';
+      var protocol = (c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'field-pages-v2') ? '__lesson' : '__m1';
       var lessonMessage = function (suffix, value) { var payload = {}; payload[protocol + suffix] = value; return payload; };
       var lessonRoots = ['case-bg-root', 'case-flow-root', 'case-demo-root'];
       function lessonFrames() {
@@ -559,7 +559,7 @@
         window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
         var root = document.getElementById('case-' + key + '-root');
         var frame = root && root.querySelector('iframe');
-        if (frame && frame.contentWindow) frame.contentWindow.postMessage({ __m1ScrollToTop: true }, '*');
+        if (frame && frame.contentWindow) frame.contentWindow.postMessage({ __m1ScrollToTop: true, __lessonScrollToTop: true }, '*');
       }
     }
 

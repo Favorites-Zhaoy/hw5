@@ -1,0 +1,17 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "drilling-d3",
+  "sceneId": "d3",
+  "title": "井眼轨迹智能控制",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

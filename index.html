@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="course-release" content="20261102-field-lessons1">
+<meta name="course-release" content="20261102-field-templates2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>石油勘探开发的智能化可能性地图</title>
 <meta name="description" content="按石油作业链条逐环节展示可被深度学习改造的候选场景，标注 AI 介入点、数据条件与难度等级；带可运行的案例示范。">
@@ -26,8 +26,8 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <link rel="stylesheet" href="assets/core/mudlogging.css?v=20261102-wide-warm1">
 <link rel="stylesheet" href="assets/geology/geology.css?v=20261102-wide-warm1">
 <link rel="stylesheet" href="assets/geology/reference.css?v=20261102-wide-warm1">
-<link rel="stylesheet" href="assets/drilling/drilling.css?v=20261102-field-lessons1">
-<link rel="stylesheet" href="assets/welllog/welllog.css?v=20261102-field-lessons1">
+<link rel="stylesheet" href="assets/drilling/stage-map.css?v=20261102-field-templates2">
+<link rel="stylesheet" href="assets/welllog/stage-map.css?v=20261102-field-templates2">
 <link rel="icon" href="assets/images/favicon.svg?v=20261102-wide-warm1" type="image/svg+xml">
 </head>
 <body>
@@ -59,7 +59,7 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
      10. mudlogging.js  录井环节交互图解
      11. shell.js       外壳，必须最后
      ========================================================= -->
-<script src="assets/data.js?v=20261102-field-lessons1"></script>
+<script src="assets/data.js?v=20261102-field-templates2"></script>
 <script src="assets/core/registry.js?v=20261102-wide-warm1"></script>
 <script src="assets/core/kit.js?v=20261102-wide-warm1"></script>
 
@@ -78,20 +78,20 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <script src="assets/geology/lessons.js?v=20261102-wide-warm1"></script>
 <script src="assets/cases/geology.case.js?v=20261102-wide-warm1"></script>
 
-<!-- 钻井与测井原生课程：同一份资料贯穿三个页签；w1沿用welllog-layer案例ID。 -->
-<script src="assets/drilling/content.js?v=20261102-field-lessons1"></script>
-<script src="assets/drilling/engine.js?v=20261102-field-lessons1"></script>
-<script src="assets/drilling/data.js?v=20261102-field-lessons1"></script>
-<script src="assets/drilling/stage.js?v=20261102-field-lessons1"></script>
-<script src="assets/drilling/lessons.js?v=20261102-field-lessons1"></script>
-<script src="assets/cases/drilling.case.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/content.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/data.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/models.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/core.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/stage.js?v=20261102-field-lessons1"></script>
-<script src="assets/welllog/lessons.js?v=20261102-field-lessons1"></script>
-<script src="assets/cases/welllog.case.js?v=20261102-field-lessons1"></script>
+<!-- 钻井与测井：录井图解模板首页，十个独立案例包的三个章节文件。 -->
+<script src="assets/drilling/content.js?v=20261102-field-templates2"></script>
+<script src="assets/drilling/engine.js?v=20261102-field-templates2"></script>
+<script src="assets/drilling/data.js?v=20261102-field-templates2"></script>
+<script src="assets/drilling/stage.js?v=20261102-field-templates2"></script>
+<script src="assets/drilling/lessons.js?v=20261102-field-templates2"></script>
+<script src="assets/cases/drilling.case.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/content.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/data.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/models.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/core.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/stage.js?v=20261102-field-templates2"></script>
+<script src="assets/welllog/lessons.js?v=20261102-field-templates2"></script>
+<script src="assets/cases/welllog.case.js?v=20261102-field-templates2"></script>
 
 <!-- 上传的案例包（localStorage）在这里恢复注册，必须在 shell.js 之前 -->
 <script src="assets/core/case-demo-host.js?v=20261102-wide-warm1"></script>
@@ -103,7 +103,7 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <script src="assets/core/course-outline.js?v=20261102-arrow-center1"></script>
 <script src="assets/core/home.js?v=20261102-wide-warm1"></script>
 <script src="assets/core/mudlogging.js?v=20261102-wide-warm1"></script>
-<script src="assets/core/shell.js?v=20261102-field-lessons1"></script>
+<script src="assets/core/shell.js?v=20261102-field-templates2"></script>
 
 </body>
 </html>

@@ -14,7 +14,7 @@ test('five field lessons retain their task domains, five chapters and paired ste
  const a=app();try{
   assert.equal(a.w.WELLLOG_CONTENT.length,5);
   for(const [i,c] of a.w.WELLLOG_CONTENT.entries()){
-   const def=a.w.Cases.get(c.caseId);assert.equal(def.sceneId,'w'+(i+1));assert.equal(def.lessonProtocol,'field-v1');
+   const def=a.w.Cases.get(c.caseId);assert.equal(def.sceneId,'w'+(i+1));assert.equal(def.lessonProtocol,'field-pages-v2');
    assert.deepEqual(plain(c.methods),[['ts'],['ts','opt'],['cv'],['ts'],['ts']][i]);
    assert.equal(def.tabs.background.sections.length,5);assert.deepEqual(plain(def.tabs.workflow.steps.map(v=>v.number)),['01','02','03','03','04','05']);
    assert.ok(c.papers.length>=2);assert.ok(c.terms.length>=10);assert.ok(c.difficulty.length>30);
@@ -110,12 +110,6 @@ test('w3 why uses the actual local neighborhood while effects show full-image co
   assert.equal(el.querySelectorAll('[data-wl-effect] .wl-three .wl-image').length,3);un();
  }finally{a.close();}
 });
-test('welllog overview is one continuous diagram with complementary, domain-specific entrances',()=>{
- const a=app();try{
-  const root=a.doc.getElementById('root');root.innerHTML=a.w.WelllogStage.html({});const binding=a.w.WelllogStage.mount(root,{});
-  assert.equal(root.querySelectorAll('.wl-stage-map>svg').length,1);assert.equal(root.querySelectorAll('[data-wl-card]').length,5);
-  root.querySelector('[data-wl-method="cv"]').click();assert.deepEqual([...root.querySelectorAll('[data-wl-card]')].filter(v=>!v.hidden).map(v=>v.dataset.wlCard),['w3']);
-  root.querySelector('[data-wl-method="ts"]').click();assert.equal([...root.querySelectorAll('[data-wl-card]')].filter(v=>!v.hidden).length,4);
-  binding.destroy();
- }finally{a.close();}
+test('welllog homepage reuses the mudlogging illustration map and highlights case pictures by method',()=>{
+ const a=app();try{const w=a.w;w.eval(read('assets/data.js'));w.eval(read('assets/core/kit.js'));w.HTMLElement.prototype.scrollIntoView=function(){};const root=a.doc.getElementById('root'),ctx={stage:w.ATLAS.index.byStage.welllog,atlas:w.ATLAS,cases:w.Cases,K:w.K,query:{}};root.innerHTML=w.WelllogStage.render(ctx);assert.ok(!root.innerHTML.includes('undefined'),'every image hotspot has its own overlay');const host=root.querySelector('[data-welllog-stage]'),binding=w.WelllogStage.bind(host,ctx);assert.equal(host.querySelectorAll('.wmap-base').length,1);assert.match(host.querySelector('.wmap-base').getAttribute('src'),/welllog-process.webp$/);assert.equal(host.querySelectorAll('[data-wmap-spot]').length,5);host.querySelector('[data-wmap-method-button="cv"]').click();assert.deepEqual([...host.querySelectorAll('.wmap-spot.is-relevant')].map(v=>v.dataset.wmapSpot),['w3']);host.querySelector('[data-wmap-method-button="ts"]').click();assert.equal(host.querySelectorAll('.wmap-spot.is-relevant').length,4);binding.destroy();}finally{a.close();}
 });

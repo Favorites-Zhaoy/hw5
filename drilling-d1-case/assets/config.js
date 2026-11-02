@@ -1,0 +1,18 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "drilling-d1",
+  "sceneId": "d1",
+  "title": "钻速预测与参数优化",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "ts",
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

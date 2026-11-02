@@ -86,7 +86,7 @@ node tools/build-mudlogging-cases.cjs
 
 上传记录保存在当前浏览器的 `localStorage`，不会写回源码目录。换浏览器或电脑时需要重新导入；提交作业时请保留完整案例包。
 
-## 钻井与测井：十个原生教学案例
+## 钻井与测井：两个图解首页与十个独立案例包
 
 入口为 [钻井](https://favorites-zhaoy.github.io/hw5/#/stage/drilling) 与 [测井](https://favorites-zhaoy.github.io/hw5/#/stage/welllog)。每例提供五章专业背景、最多六张流程卡，以及“方法—为什么有效—处理效果”三部分演示。传统与智能处理同属步骤03，使用不同底色；三个页签共享当前记录与参数，切换后回到页签顶部。
 
@@ -105,7 +105,9 @@ node tools/build-mudlogging-cases.cjs
 
 十例使用明确标注的合成教学资料，权重由独立训练脚本实际拟合，浏览器执行前向计算和候选搜索。归一化、模型及门槛只使用拟合组；模拟器参考响应不参与动作选择，遮挡GR不进入修复输入。所有记录和失败结果都保留：响应更准不保证轨迹终点更好，重建也不在所有井段胜过插值。此处指标不代表现场性能，也没有测量人工效率。
 
-页面与原生SVG分别在 `assets/drilling/`、`assets/welllog/`，独立来源核验见 [文献与专业背景备忘录](tools/field-reference-notes.md)。`npm run build` 只校验已生成的字段模型，不重新训练；显式重训命令为：
+两个首页直接从录井首页模板生成：独立作业底图加动效、图片放大和点击入口。原始PNG及WebP在assets/images，完整提示词见[配图记录](tools/field-art/prompts.md)。十个案例分别位于drilling-d1-case至drilling-d5-case，以及w1-layer-case、w2-porosity-case、w3-fracture-case、w4-lithology-case、w5-repair-case。每个文件夹有自己的demo/background.html、workflow.html、identify.html，沿用录井的章节、流程和演示模板，由外层三个页签分别挂载。
+
+计算组件在assets/drilling与assets/welllog；来源核验见[文献备忘录](tools/field-reference-notes.md)。npm run build校验已保存模型并生成首页及章节文件，不重新训练。显式重训命令为：
 
 ```sh
 node tools/drilling/prepare-models.cjs

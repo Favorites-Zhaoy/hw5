@@ -1,0 +1,1 @@
+window.WELLLOG_PAGE_CONFIG={"sceneId":"w2","caseId":"welllog-w2","title":"储层参数智能解释","version":"2.0.0","lessonProtocol":"field-pages-v2","assetBase":"../../assets/welllog/","template":"m2-gas-case/assets/lesson.css","dataKind":"synthetic-teaching","modelSha256":"7679fb8d456bca9a82909ef4d165729e9de1fc05d9dc91cca8207225a0b05bee"};
