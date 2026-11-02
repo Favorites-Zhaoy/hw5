@@ -1,4 +1,4 @@
-M5 录井报告自动生成 · 2.0.3
+M5 录井报告自动生成 · 2.1.0
 
 打开 demo/background.html、demo/workflow.html、demo/identify.html。请保留完整文件夹；页面共用assets本地资源；固定回放和L2规则可离线查看。L3模型推理请使用静态HTTP站点，需要按需载入公共ONNX/WASM组件。也可按原协议导入未内置本案例的课程门户；本站已内置，无需重复导入。
 

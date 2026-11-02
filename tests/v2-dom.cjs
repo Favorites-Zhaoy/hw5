@@ -47,3 +47,39 @@ test('M1 DOM: RGB reweighting and rejection recompute all decisions while frozen
 test('standalone fragments restore known sample and parameters with bounded values',()=>{
  const source=json('tools/mudlogging/experiments/m2.json'),saved={domain:'synthetic',recordId:source.records[2].id,pointIndex:40,lag:999,gasFactor:-4},f=fixture('m2-gas','identify','#experiment='+encodeURIComponent(JSON.stringify(saved)));try{assert.notEqual(f.q('#sample-select').value,saved.recordId);assert.equal(f.w.PetroLesson.state.domain,'real');assert.doesNotMatch(f.w.document.body.textContent,/CNN|合成对照/);assert.equal(f.w.PetroLesson.state.pointIndex,40);assert.equal(f.w.PetroLesson.state.lag,15);assert.equal(f.w.PetroLesson.state.gasFactor,1.1);assert.deepEqual(f.errors,[]);}finally{f.close();}
 });
+
+test('four guided demos present method, reason and effect while preserving actual assigned algorithms',()=>{
+ for(const [slug,name] of [['m2-gas','GRU'],['m3-fluorescence','U-Net'],['m4-drilling','LSTM'],['m5-report','BiGRU']]){
+  const f=fixture(slug);try{
+   for(const id of ['method','why','effect'])assert.ok(f.q('#guide-'+id+'-title'));
+   assert.ok(f.q('#guide-method-title').textContent.includes(name));assert.ok(f.q('#guide-method svg[role="img"]'));
+   assert.ok(f.q('#guide-why-visual').querySelector('svg,canvas,.guide-sentence'));
+   if(slug==='m3-fluorescence')assert.ok(f.q('#guide-effect-summary').textContent.includes('IoU'));
+   else assert.ok(f.q('#guide-effect-summary').textContent.length>30);
+   assert.equal(f.q('.guide-records').open,false);
+   assert.deepEqual(f.errors,[]);
+  }finally{f.close();}
+  const bg=fixture(slug,'background');try{assert.equal(bg.q('.guide-before-after').children.length,2);assert.equal(bg.q('.guide-before-after').querySelectorAll('svg').length,2);assert.ok(bg.q('.guide-efficiency'));assert.deepEqual(bg.errors,[]);}finally{bg.close();}
+ }
+});
+
+test('guided TS comparison updates actual forecasts when history or WOB changes and leaves source data intact',()=>{
+ for(const slug of ['m2-gas','m4-drilling']){const f=fixture(slug);try{
+  f.input('[data-point-range]',40);const before=f.w.PetroLesson.snapshot(),visual=f.q('#guide-why-visual').innerHTML;
+  f.input('#lab-historyLength',1);assert.notEqual(f.q('#guide-why-visual').innerHTML,visual);
+  const after=f.w.PetroLesson.snapshot();assert.deepEqual(plain(after.original_record),plain(before.original_record));
+  f.q('[data-guide-example]').click();assert.ok(f.q('#guide-effect-summary').textContent.length>30);
+  if(slug==='m4-drilling'){assert.equal(f.w.PetroLesson.current().well,'15/9-F-1-C');const a=f.q('#guide-why-visual').innerHTML;f.input('#lab-wobFactor',1.3);assert.notEqual(f.q('#guide-why-visual').innerHTML,a);}
+  assert.deepEqual(f.errors,[]);
+ }finally{f.close();}}
+});
+
+test('guided BiGRU contrast selects a genuine rule error and edited text never retains old scores',()=>{
+ const f=fixture('m5-report');try{
+  f.q('[data-guide-example]').click();const q=f.w.PetroLesson.snapshot(),r=q.original_record;
+  assert.notEqual(q.classification.keyword,r.truth);assert.equal(q.classification.bigru,r.truth);
+  assert.ok(f.q('#guide-why-visual').textContent.includes(r.note));assert.ok(f.q('.guide-probabilities'));
+  f.input('#lab-note','接单根后恢复钻进。');assert.ok(f.q('#guide-why-visual').textContent.includes('接单根后恢复钻进。'));
+  assert.equal(f.q('.guide-probabilities'),null);assert.ok(f.q('#guide-effect-summary').textContent.includes('编辑后不报告准确率'));assert.deepEqual(f.errors,[]);
+ }finally{f.close();}
+});

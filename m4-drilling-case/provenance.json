@@ -1,5 +1,5 @@
 {
-  "version": "2.0.3",
+  "version": "2.1.0",
   "kind": "real-observation-derived",
   "realDataset": {
     "file": "assets/dataset-v2.js",
@@ -38,7 +38,7 @@
   },
   "generator": "tools/mudlogging/prepare-sequence-models.py",
   "generatorSha256": "f63f554e0e2082d64d1b9384b63f78ce383fc2f4ab20d2f88e1a2ce61ebf3909",
-  "builderSha256": "17ad4683edb735708beb83d4fcf705e9eb28e7106bb3c7e410eaa8dcdcadec4b",
+  "builderSha256": "c65891d77006d50a71d838f2130507812763267c7817c6bfed3fb5933b2e57e2",
   "experimentSha256": "b8f8ecaa0a7016e1d7c14681f81bb72882753d483a9a7ba9b2726225ceea1ce5",
   "weightsSha256": "b61b9c48a14ebd6ea4c8527ea55d1f99f381517f7e38787d723f2b15c99437f9",
   "parameterCount": 877,
