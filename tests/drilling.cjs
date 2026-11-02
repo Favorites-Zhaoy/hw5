@@ -1,0 +1,42 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto'),{JSDOM}=require('jsdom');
+const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8'),U=require('../assets/drilling/engine.js'),box={window:{}};vm.createContext(box);vm.runInContext(read('assets/drilling/data.js'),box);const copy=x=>JSON.parse(JSON.stringify(x)),D=copy(box.window.DRILLING_DATA);
+const defaults={record:0,point:70,step:0,wobLimit:130,rpmLimit:200,torqueLimit:15,threshold:1,steerLimit:1,turnLimit:2,smooth:.2,rulLimit:30,temperature:65,targetPV:24,doseLimit:2.7,lossLimit:18};
+function app(){const dom=new JSDOM('<!doctype html><body></body>',{url:'https://drilling-course.test/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;w.Cases={list:[],register(c){this.list.push(c);}};w.URL.createObjectURL=()=> 'blob:drilling-test';w.URL.revokeObjectURL=()=>{};w.HTMLAnchorElement.prototype.click=function(){};for(const file of ['content.js','engine.js','data.js','stage.js','lessons.js'])w.eval(read('assets/drilling/'+file));w.eval(read('assets/cases/drilling.case.js'));return {w,close:()=>dom.window.close()};}
+function rootFor(w){const el=w.document.createElement('div');w.document.body.append(el);return el;}
+test('five actual fitted models, deterministic source hashes, and separate fit/test groups',()=>{
+ assert.equal(D.kind,'synthetic-teaching');assert.equal(D.seed,20261102);
+ const sha=p=>crypto.createHash('sha256').update(read(p)).digest('hex');assert.equal(D.provenance.generatorSha256,sha(D.provenance.generator));assert.equal(D.provenance.engineSha256,sha('assets/drilling/engine.js'));
+ for(const id of ['d1','d2','d3','d4','d5']){assert.equal(D[id].records.length,3);assert.ok(D[id].trainGroups.every(g=>!D[id].testGroups.includes(g)));assert.ok(D.models[id].fitCount>400);}
+ const y=D.d1.validation.X.map(x=>U.mlp(D.models.d1,x));assert.ok(Math.abs(U.mae(D.d1.validation.y,y)-D.d1.audit.mae)<1e-10);assert.ok(D.d1.audit.mae>0);assert.ok(D.d1.audit.mae<2);
+});
+test('drill-rate and fluid searches use fitted prediction, not held-out simulator response',()=>{
+ const r=D.d1.records[0],changed=copy(r);changed.formation+=30;const a=U.ropSearch(D,r,defaults),b=U.ropSearch(D,changed,defaults);assert.deepEqual(a.best,b.best);assert.ok(Math.abs((b.actual-a.actual)-30)<1e-10);assert.equal(U.ropSearch(D,r,{...defaults,torqueLimit:0}).best,null);
+ const f=D.d5.records[0],f2=copy(f);f2.bias+=5;const c=U.fluidSearch(D,f,defaults),d=U.fluidSearch(D,f2,defaults);assert.deepEqual(c.best,d.best);assert.ok(Math.abs(d.actual-c.actual-5)<1e-10);assert.equal(U.fluidSearch(D,f,{...defaults,lossLimit:0}).best,null);assert.ok(c.candidates.every(x=>x.dose<=defaults.doseLimit&&x.filtration<=defaults.lossLimit));assert.notEqual(c.best.prediction,c.actual);
+});
+test('PCA windows read current and past only; truth labels never enter detection',()=>{
+ const r=D.d2.records[0],changed=copy(r),i=42;for(let j=i+1;j<changed.rows.length;j++)for(const key of ['torque','pressure','balance','vibration'])changed.rows[j][key]+=1000;changed.rows.forEach(x=>x.truth=!x.truth);
+ assert.deepEqual(U.warningFeatures(r.rows,i),U.warningFeatures(changed.rows,i));const a=U.warning(D,r,defaults),b=U.warning(D,changed,defaults);assert.deepEqual(a.prediction.slice(0,i+1),b.prediction.slice(0,i+1));assert.deepEqual(a.features.slice(0,i+1),b.features.slice(0,i+1));
+ const high=U.warning(D,r,{...defaults,threshold:3});assert.ok(high.prediction.filter(Boolean).length<a.prediction.filter(Boolean).length);assert.ok(a.metrics.fp>0);assert.ok(a.metrics.f1<1);
+});
+test('RUL features exclude failure time, reference target, and future observations',()=>{
+ const r=D.d4.records[0],changed=copy(r),i=42;changed.life=9999;changed.rows.forEach((x,j)=>{x.rul=9999;if(j>i){x.vibration+=100;x.torque+=100;}});assert.deepEqual(U.rulFeatures(r.rows,i),U.rulFeatures(changed.rows,i));assert.deepEqual(U.rul(D,r,defaults).prediction.slice(0,i+1),U.rul(D,changed,defaults).prediction.slice(0,i+1));
+ const other=U.rul(D,D.d4.records[1],defaults);assert.ok(other.mae>other.baselineMAE,'retain a case where the baseline wins');
+});
+test('trajectory response is learned; candidate selection precedes simulated response',()=>{
+ const r=D.d3.records[0],changed=copy(r);changed.bias+=.2;const a=U.trajectory(D,r,defaults,true),b=U.trajectory(D,changed,defaults,true);assert.equal(a.decisions[0].u,b.decisions[0].u);assert.notEqual(a.decisions[0].actualDelta,b.decisions[0].actualDelta);assert.ok(a.path.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.inc)));assert.equal(a.path.length,36);assert.ok(a.decisions.every(p=>Math.abs(p.u)<=defaults.steerLimit&&Math.abs(p.predictedDelta)<=defaults.turnLimit));
+ const actions=Array.from({length:21},(_,i)=>-1+i*.1),truth=actions.map(u=>U.response(u,r.startInclination,r.hardness,r.bias)),fixed=actions.map(u=>u*1.3),learned=actions.map(u=>U.linear(D.models.d3,[u,r.startInclination,r.hardness,u*r.hardness]));assert.ok(U.mae(truth,learned)<U.mae(truth,fixed));
+});
+test('all five native lessons mount three visual tabs and all six workflow cards',()=>{
+ const f=app(),w=f.w;try{assert.equal(w.Cases.list.length,5);for(const c of w.DRILLING_CONTENT){const registry=w.Cases.list.find(x=>x.sceneId===c.id);assert.equal(registry.lessonProtocol,'field-v1');assert.equal(registry.tabs.background.sections.length,5);assert.deepEqual(Array.from(registry.tabs.workflow.steps,x=>x.number),['01','02','03','03','04','05']);assert.ok(c.papers.length>=2);
+ for(const part of ['background','workflow','demo']){const root=rootFor(w),cleanup=w.DrillingLessons.mount(c,part,root);assert.ok(root.querySelector('svg'),c.id+' '+part);assert.ok(!/NaN|undefined|Infinity/.test(root.innerHTML),c.id+' '+part+' invalid value');if(part==='background'){assert.equal(root.querySelectorAll('.drl-chapter').length,5);assert.equal(root.querySelectorAll('.drl-concept-mini').length,3);}if(part==='workflow'){assert.equal(root.querySelectorAll('[data-drl-step]').length,6);for(let n=0;n<6;n++){root.querySelector('[data-drl-step="'+n+'"]').click();assert.ok(root.querySelector('[data-drl-render="step-visual"]').innerHTML.length>100);}}if(part==='demo'){assert.equal(root.querySelectorAll('.drl-demo-chapter').length,3);for(const section of root.querySelectorAll('.drl-demo-chapter'))assert.ok(section.querySelector('svg')||section.querySelector('.drl-bars'));}cleanup();assert.equal(root.childElementCount,0);root.remove();}
+ }}finally{f.close();}
+});
+test('drag control nodes persist and record/parameter state synchronizes across mounted tabs',()=>{
+ const f=app(),w=f.w;try{for(const c of w.DRILLING_CONTENT){const a=rootFor(w),b=rootFor(w),ca=w.DrillingLessons.mount(c,'workflow',a),cb=w.DrillingLessons.mount(c,'demo',b),input=a.querySelector('[data-drl-control]'),key=input.dataset.drlControl;input.focus();input.value=Number(input.min);input.dispatchEvent(new w.Event('input',{bubbles:true}));assert.strictEqual(a.querySelector('[data-drl-control]'),input);assert.strictEqual(w.document.activeElement,input);assert.equal(w.DrillingLessons.sessions[c.id].state[key],Number(input.min));assert.equal(Number(b.querySelector('[data-drl-control="'+key+'"]').value),Number(input.min));
+ const select=b.querySelector('[data-drl-record]');select.value='2';select.dispatchEvent(new w.Event('change',{bubbles:true}));assert.equal(a.querySelector('[data-drl-record]').value,'2');const snapshot=w.DrillingLessons.snapshot(c,w.DrillingLessons.sessions[c.id].state);assert.equal(snapshot.record.id,D[c.id].records[2].id);assert.equal(snapshot.dataKind,'synthetic-teaching');assert.ok(snapshot.model);ca();cb();assert.equal(w.DrillingLessons.sessions[c.id].state.record,2);a.remove();b.remove();}
+ }finally{f.close();}
+});
+test('theme SVG has five business task links, method focus and pausable motion',()=>{
+ const f=app(),w=f.w;try{const root=rootFor(w);root.innerHTML=w.DrillingStage.render({q:{}});const cleanup=w.DrillingStage.bind(root,{});assert.equal(root.querySelectorAll('[data-drl-task]').length,5);root.querySelector('[data-drl-focus="opt"]').click();assert.equal(root.querySelector('[data-drilling-stage]').dataset.focus,'opt');assert.equal(root.querySelectorAll('.drl-stage-task.is-focused').length,3);root.querySelector('[data-drl-motion]').click();assert.ok(root.querySelector('[data-drilling-stage]').classList.contains('is-paused'));cleanup.destroy();}finally{f.close();}
+});

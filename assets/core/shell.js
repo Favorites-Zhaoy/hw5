@@ -176,6 +176,12 @@
      五、环节页
      ========================================================= */
   function stageHTML(st, q) {
+    if (st.id === 'drilling' && global.DrillingStage) {
+      return global.DrillingStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
+    if (st.id === 'welllog' && global.WelllogStage) {
+      return global.WelllogStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
     if (st.id === 'geology' && global.GeologyStage) {
       return global.GeologyStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
     }
@@ -331,7 +337,7 @@
      七、场景详情页（案例自动挂载）
      ========================================================= */
   function isLessonCase(sc, c) {
-    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'geology-v1');
+    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'geology-v1' || c.lessonProtocol === 'field-v1');
   }
 
   function sceneHTML(sc, q) {
@@ -492,10 +498,11 @@
   function bindTabs(sc, c) {
     var tabsEl = document.getElementById('tabs');
     if (!tabsEl) return;
+    var isFrameLesson = isLessonCase(sc, c) && c.lessonProtocol !== 'field-v1';
 
     // Course frames share the current sample and experiment controls.
     // Accept messages only from frames mounted in this case.
-    if (isLessonCase(sc, c)) {
+    if (isFrameLesson) {
       var initialUTC = parseHash().q.utc;
       var sharedLessonState = initialUTC && /^20\d\d-\d\d-\d\dT/.test(initialUTC) ? { domain: 'real', utc: initialUTC, well: '15/9-F-1-C' } : null;
       var protocol = c.lessonProtocol === 'mudlogging-v1' ? '__lesson' : '__m1';
@@ -538,7 +545,7 @@
         p.classList.toggle('on', p.dataset.panel === key);
       });
       mountCaseSection(sc, c, key);
-      if (isLessonCase(sc, c)) {
+      if (isFrameLesson) {
         var activeRoot = document.getElementById('case-' + key + '-root');
         var activeFrame = activeRoot && activeRoot.querySelector('iframe');
         if (activeFrame && activeFrame.contentWindow) activeFrame.contentWindow.postMessage(lessonMessage('Section', { bg: 'background', flow: 'workflow', demo: 'demo' }[key]), '*');
@@ -1009,7 +1016,11 @@
 
     // 页面级交互
     if (p[0] === 'stage') {
-      if (p[1] === 'geology' && global.GeologyStage) {
+      if (p[1] === 'drilling' && global.DrillingStage) {
+        stageHandle = global.DrillingStage.bind(view.querySelector('[data-drilling-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else if (p[1] === 'welllog' && global.WelllogStage) {
+        stageHandle = global.WelllogStage.bind(view.querySelector('[data-welllog-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else if (p[1] === 'geology' && global.GeologyStage) {
         stageHandle = global.GeologyStage.bind(view.querySelector('[data-geo-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
       } else if (p[1] === 'mudlogging' && global.MudloggingStage) {
         stageHandle = global.MudloggingStage.bind(view.querySelector('[data-ml-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });

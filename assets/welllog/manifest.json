@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-11-02",
+  "cases": [
+    {
+      "sceneId": "w1",
+      "caseId": "welllog-layer",
+      "algorithm": "窗口MLP边界评分＋最短层厚约束",
+      "methods": [
+        "ts"
+      ]
+    },
+    {
+      "sceneId": "w2",
+      "caseId": "welllog-w2",
+      "algorithm": "多曲线MLP孔隙度回归",
+      "methods": [
+        "ts",
+        "opt"
+      ]
+    },
+    {
+      "sceneId": "w3",
+      "caseId": "welllog-w3",
+      "algorithm": "浅层全卷积网络（FCN）像素分割",
+      "methods": [
+        "cv"
+      ]
+    },
+    {
+      "sceneId": "w4",
+      "caseId": "welllog-w4",
+      "algorithm": "多曲线MLP岩性分类",
+      "methods": [
+        "ts"
+      ]
+    },
+    {
+      "sceneId": "w5",
+      "caseId": "welllog-w5",
+      "algorithm": "掩码去噪自动编码器",
+      "methods": [
+        "ts"
+      ]
+    }
+  ],
+  "dataType": "synthetic-teaching",
+  "seed": 20261102,
+  "modelSha256": "7679fb8d456bca9a82909ef4d165729e9de1fc05d9dc91cca8207225a0b05bee",
+  "retrain": "python tools/welllog/prepare.py",
+  "scripts": [
+    "assets/welllog/content.js",
+    "assets/welllog/data.js",
+    "assets/welllog/models.js",
+    "assets/welllog/core.js",
+    "assets/welllog/stage.js",
+    "assets/welllog/lessons.js"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "kind": "synthetic-teaching",
+  "seed": 20261102,
+  "trainingWells": [
+    "WL-101",
+    "WL-102",
+    "WL-103",
+    "WL-104",
+    "WL-105",
+    "WL-106",
+    "WL-107",
+    "WL-108",
+    "WL-109",
+    "WL-110",
+    "WL-111",
+    "WL-112"
+  ],
+  "validationWells": [
+    "WL-113",
+    "WL-114"
+  ],
+  "testWells": [
+    "WL-115",
+    "WL-116"
+  ],
+  "trainingImages": [
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    216,
+    217,
+    218,
+    219,
+    220,
+    221,
+    222,
+    223,
+    224,
+    225,
+    226,
+    227,
+    228,
+    229,
+    230,
+    231,
+    232,
+    233,
+    234,
+    235,
+    236,
+    237,
+    238,
+    239
+  ],
+  "testImages": [
+    301,
+    302
+  ],
+  "modelSha256": "7679fb8d456bca9a82909ef4d165729e9de1fc05d9dc91cca8207225a0b05bee",
+  "generatorSha256": "37552271e44720c202bb5601dc6361201d4e98e12e541bce6f3270583deed943",
+  "metrics": {
+    "w2": {
+      "baselineMAE": 0.06399456220060715,
+      "modelMAE": 0.005665807918330818,
+      "count": 360
+    },
+    "w4": {
+      "baselineAccuracy": 0.9583333333333334,
+      "modelAccuracy": 1.0,
+      "count": 360
+    }
+  },
+  "claim": "Synthetic teaching only. Models fitted without test wells/images; not field validation."
+}

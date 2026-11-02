@@ -1,0 +1,171 @@
+{
+  "version": "1.0.0",
+  "seed": 20261102,
+  "scope": "All records and reference responses are deterministic teaching simulations. No field performance or drilling control is validated.",
+  "provenance": {
+    "generator": "tools/drilling/prepare-models.cjs",
+    "generatorSha256": "2d91036eba2b4e8e6367b77b8b93605cd76b2ed984d2bdf506f5dd849e94fd42",
+    "engineSha256": "6a0bbe99a0f9a78c953823253c94c55cb442c8826c50de3921d23d05cf8beb6b",
+    "modelTraining": "Actual deterministic fitting: tanh MLP stochastic gradients; PCA normal-window covariance; ridge least squares. Held-out groups excluded from all fitting and thresholds.",
+    "featureBoundary": "No truth label, future sensor row, tool failure time or held-out response enters model features or candidate scoring."
+  },
+  "models": {
+    "d1": {
+      "trainGroups": [
+        "ROP-W1",
+        "ROP-W2",
+        "ROP-W3",
+        "ROP-W4",
+        "ROP-W5",
+        "ROP-W6",
+        "ROP-W7",
+        "ROP-W8"
+      ],
+      "testGroups": [
+        "ROP-W9",
+        "ROP-W10",
+        "ROP-W11"
+      ],
+      "audit": {
+        "fitRows": 520,
+        "testRows": 195,
+        "mae": 0.7457877098387902,
+        "target": "ROP / m/h",
+        "scope": "Independent synthetic wells; group offsets absent from features."
+      }
+    },
+    "d2": {
+      "trainGroups": [
+        "WARN-W1",
+        "WARN-W2",
+        "WARN-W3",
+        "WARN-W4",
+        "WARN-W5",
+        "WARN-W6",
+        "WARN-W7",
+        "WARN-W8",
+        "WARN-W9"
+      ],
+      "testGroups": [
+        "WARN-W10",
+        "WARN-W11",
+        "WARN-W12"
+      ],
+      "audit": {
+        "fitRows": 1287,
+        "thresholdSource": "98.5th percentile of training-normal reconstruction RMS",
+        "scope": "Synthetic disturbance labels; no incident type classification.",
+        "examples": [
+          {
+            "id": "WARN-W10",
+            "tp": 30,
+            "fp": 19,
+            "fn": 0,
+            "tn": 101,
+            "precision": 0.6122448979591837,
+            "recall": 1,
+            "f1": 0.759493670886076
+          },
+          {
+            "id": "WARN-W11",
+            "tp": 30,
+            "fp": 20,
+            "fn": 0,
+            "tn": 100,
+            "precision": 0.6,
+            "recall": 1,
+            "f1": 0.75
+          },
+          {
+            "id": "WARN-W12",
+            "tp": 30,
+            "fp": 43,
+            "fn": 0,
+            "tn": 77,
+            "precision": 0.410958904109589,
+            "recall": 1,
+            "f1": 0.5825242718446602
+          }
+        ]
+      }
+    },
+    "d3": {
+      "trainGroups": [
+        "STEER-W1",
+        "STEER-W2",
+        "STEER-W3",
+        "STEER-W4",
+        "STEER-W5",
+        "STEER-W6"
+      ],
+      "testGroups": [
+        "STEER-W7",
+        "STEER-W8",
+        "STEER-W9"
+      ],
+      "audit": {
+        "fitRows": 510,
+        "scope": "Two-dimensional teaching trajectory. Candidate scoring uses learned response only; simulator response is used after choosing a command."
+      }
+    },
+    "d4": {
+      "trainGroups": [
+        "TOOL-1",
+        "TOOL-2",
+        "TOOL-3",
+        "TOOL-4",
+        "TOOL-5",
+        "TOOL-6",
+        "TOOL-7",
+        "TOOL-8"
+      ],
+      "testGroups": [
+        "TOOL-9",
+        "TOOL-10",
+        "TOOL-11"
+      ],
+      "audit": {
+        "fitRows": 824,
+        "scope": "Synthetic tool-to-tool fatigue progression; only current/past sensor summaries and service hours enter features.",
+        "examples": [
+          {
+            "id": "TOOL-9",
+            "mae": 2.276167501018729,
+            "baselineMAE": 21.203109480906278
+          },
+          {
+            "id": "TOOL-10",
+            "mae": 3.3165504905477476,
+            "baselineMAE": 1.4204622046090662
+          },
+          {
+            "id": "TOOL-11",
+            "mae": 7.929028344342076,
+            "baselineMAE": 30.730224097613245
+          }
+        ]
+      }
+    },
+    "d5": {
+      "trainGroups": [
+        "MUD-B1",
+        "MUD-B2",
+        "MUD-B3",
+        "MUD-B4",
+        "MUD-B5",
+        "MUD-B6",
+        "MUD-B7",
+        "MUD-B8"
+      ],
+      "testGroups": [
+        "MUD-B9",
+        "MUD-B10",
+        "MUD-B11"
+      ],
+      "audit": {
+        "fitRows": 600,
+        "scope": "Empirical teaching response after a mixing interval; simulated PV and filtration constraints are not a field dosing formula."
+      }
+    }
+  }
+}

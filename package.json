@@ -4,8 +4,8 @@
   "version": "2.0.3",
   "description": "Buildless static teaching site; npm dependencies are for DOM regression checks only.",
   "scripts": {
-    "build": "node tools/build-m1-case.cjs && node tools/build-mudlogging-cases.cjs",
-    "test": "node --test tests/course-outline.cjs tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs tests/v2-experiments.cjs tests/v2-dom.cjs"
+    "build": "node tools/build-m1-case.cjs && node tools/build-mudlogging-cases.cjs && node tools/build-drilling-lessons.cjs && node tools/build-welllog.cjs",
+    "test": "node --test tests/course-outline.cjs tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs tests/v2-experiments.cjs tests/v2-dom.cjs tests/geology.cjs tests/drilling.cjs tests/welllog.cjs tests/field-integration.cjs"
   },
   "devDependencies": { "jsdom": "26.1.0" }
 }
