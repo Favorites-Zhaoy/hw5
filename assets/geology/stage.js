@@ -19,6 +19,10 @@
     {id:'g4',method:'cv',methods:['cv'],title:'露头裂缝的二维几何',color:'#4b9b68',box:[1088,326,343,353],art:[1088,442,343,237],input:'带尺度的正射露头照片',output:'线迹、面内方向与密度'}
   ];
   function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
+  function lessonIntro(t,sc){
+    var lesson=(global.GEOLOGY_CONTENT||[]).find(function(c){return c.id===t.id;});
+    return lesson ? lesson.intro : sc.point;
+  }
   function selected(value) {
     return METHODS.some(function (m) { return m.id === value; }) ? value : '';
   }
@@ -83,7 +87,7 @@
       var sc = scene(ctx, t.id), count = ctx.cases.bySceneAll(t.id).length;
       return '<a class="ml-read-card" href="' + sceneHref(t.id) + '" style="--tech:' + t.color + '">' +
         '<span class="ml-read-art">' + crop(t.art) + '<span class="ml-read-id">' + t.id.toUpperCase() + ' · ' + t.methods.map(function(k){return method(k).abbr;}).join(' + ') + '</span></span>' +
-        '<div class="ml-read-text"><h3>' + esc(sc.name) + '</h3><p>' + esc(sc.point) + '</p>' +
+        '<div class="ml-read-text"><h3>' + esc(sc.name) + '</h3><p>' + esc(lessonIntro(t,sc)) + '</p>' +
         '<dl><div><dt>输入</dt><dd>' + esc(t.input) + '</dd></div><div><dt>输出</dt><dd>' + esc(t.output) + '</dd></div></dl>' +
         '<span class="ml-read-link">' + (count ? '查看讲解与案例 · ' + count + ' 个已接入' : '查看场景讲解') + '<b>↗</b></span></div></a>';
     }).join('');

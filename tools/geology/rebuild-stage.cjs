@@ -16,7 +16,11 @@ span('var METHODS = [','function selected',`var METHODS = [
     {id:'g3',method:'cv',methods:['cv','nlp'],title:'从像素到有语义的要素',color:'#9262ce',box:[733,326,342,353],art:[733,442,342,237],input:'扫描地质图与图例原文',output:'断层折线、字符与岩性属性'},
     {id:'g4',method:'cv',methods:['cv'],title:'露头裂缝的二维几何',color:'#4b9b68',box:[1088,326,343,353],art:[1088,442,343,237],input:'带尺度的正射露头照片',output:'线迹、面内方向与密度'}
   ];
-  function relevant(t,focus){return t.methods.indexOf(focus)>=0;}`);
+  function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
+  function lessonIntro(t,sc){
+    var lesson=(global.GEOLOGY_CONTENT||[]).find(function(c){return c.id===t.id;});
+    return lesson ? lesson.intro : sc.point;
+  }`);
 span('function effect(t) {','function sceneHref',`function effect(t) {
     var shapes={
       g1:'<path class="ml-trace ml-trace-vision" d="M174 138h142v93H174z"/><path class="ml-monitor-scan" d="M174 138v93"/><path class="ml-crosshair" d="M228 179h25m-12-12v24"/>',
@@ -49,6 +53,7 @@ source=source.replace("' data-ml-tech-method=\"' + t.method", "' data-ml-tech-me
 source=source.replace("'\" data-ml-tech-method=\"' + t.method", "'\" data-ml-tech-method=\"' + t.methods.join(' ')");
 source=source.replace(/method\(t\.method\)\.abbr/g,"t.methods.map(function(k){return method(k).abbr;}).join(' + ')");
 source=source.replace(/method\(t\.method\)\.name/g,"t.methods.map(function(k){return method(k).name;}).join('与')");
+source=source.replace('esc(sc.point)','esc(lessonIntro(t,sc))');
 source=source.replace('data-ml-stage data-ml-method','data-geo-stage data-ml-stage data-ml-method').replace('class="ml-page"','class="ml-page gl-stage"');
 source=source.replace(/#\/stage\/mudlogging/g,'#/stage/geology').replace('global.MudloggingStage = { render: render, bind: bind };',`global.GeologyStage = { render:render, bind:bind, art:function(name,alt){return '<img src="assets/images/geology/'+name+'.webp" width="1536" height="1024" alt="'+global.GeologyMath.esc(alt)+'" decoding="async">';} };`);
 source=source.replaceAll('更多录井场景','更多地质勘察场景').replaceAll('04 / 13','01 / 13').replaceAll('MUD LOGGING · 录井','GEOLOGICAL SURVEY · 地质勘察').replaceAll('<span class="cur">录井</span>','<span class="cur">地质勘察</span>').replaceAll('看见地下，读懂每一米','从地表线索，拼出地质底图').replaceAll('跟着岩屑与气体回到地面，看看智能方法在哪里发挥作用。','跟着影像、采样、图件与露头，看看智能方法在哪里发挥作用。').replaceAll('录井现场交互总览','地质勘察现场交互总览').replaceAll('录井流程：钻头破岩，钻井液携带岩屑与气体返回地面，经过岩性、气测、荧光、钻时分析，统一深度并汇总报告。','地质勘察流程：区域调查获取影像、样品、图件与露头照片，遥感解译、化探聚类、图件语义提取与裂缝统计汇入地质底图。').replaceAll('井底取样','区域调查').replaceAll('地面分析','多源识别').replaceAll('深度对齐','坐标对应').replaceAll('证据汇总','交叉核查').replaceAll('岩屑与气测需做迟到校正；钻时还需结合钻压、转速等工况解读。','影像、采样点与图件需核对坐标和尺度；每一条候选都要保留来源与复核记录。');
