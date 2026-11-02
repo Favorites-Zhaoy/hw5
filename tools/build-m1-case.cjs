@@ -14,14 +14,16 @@ const well='<svg viewBox="0 0 720 300" role="img" aria-label="钻头破岩、岩
 const split='<svg viewBox="0 0 700 215" role="img" aria-label="按20米井段分组的开发组与留出组类别数量">'+data.classes.map((c,i)=>{const ref=data.samples.filter(s=>s.classId===c.id&&s.split==='reference').length,tst=data.samples.filter(s=>s.classId===c.id&&s.split==='test').length;return '<text x="0" y="'+(32+i*65)+'" fill="#687f85" font-size="13">'+c.name+'</text><rect x="125" y="'+(10+i*65)+'" width="'+ref*15+'" height="31" rx="4" fill="#90aab3"/><rect x="'+(125+ref*15)+'" y="'+(10+i*65)+'" width="'+tst*15+'" height="31" rx="4" fill="#d4a06a"/><text x="'+(140+(ref+tst)*15)+'" y="'+(31+i*65)+'" fill="#999b87" font-size="12">'+ref+' 开发 / '+tst+' 留出</text>';}).join('')+'</svg>';
 const workflow='<svg viewBox="0 0 1050 180" role="img" aria-label="从同一批照片到CNN候选记录的六步流程">'+flowContent.map((s,i)=>{const x=i*175;return '<g transform="translate('+x+',12)"><rect width="165" height="146" rx="10" fill="#fff9ee" stroke="#e4d6c0"/><text x="13" y="33" font-size="21" fill="#c59562">0'+(i+1)+'</text><text x="13" y="68" font-size="12" fill="#365261">'+s.name+'</text><text x="13" y="99" font-size="11" fill="#869084">'+['井 2 的批次场景','裁切与标签对应','42 / 24 成组划分','传统观察与 CNN','两组实际结果','沿井深导出结果'][i]+'</text></g>';}).join('')+'</svg>';
 const feature='<svg viewBox="0 0 720 130" role="img" aria-label="辅助识别使用固定 ResNet-18 图像特征和三类分类层"><text x="0" y="20" fill="#8d866c" font-size="13">整理完成的照片，进入辅助识别</text>'+['224×224 照片','固定 ResNet-18','三类分类得分','井深上的岩性对照'].map((label,i)=>'<g transform="translate('+(i*180)+',42)"><rect width="164" height="55" rx="8" fill="'+['#ead8bb','#c9dadd','#dcd9c0','#d3dfd0'][i]+'"/><text x="12" y="32" fill="#365261" font-size="12">'+label+'</text></g>').join('')+'</svg>';
-const definition={id:'m1-cuttings',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'3.1.2',updated:'2026-11-01',status:'ready',tabs:{
+const definition={id:'m1-cuttings',sceneId:'m1',title:'岩屑岩性辅助识别',methods:['cv'],version:'3.2.0',updated:'2026-11-02',status:'ready',tabs:{
 background:null,
 workflow:{label:'案例流程',title:'同一批岩屑，传统怎样判断，AI 改变哪一步？',lead:[teaching.scenario.setting,'六步完成批次任务，重点讲 CNN 如何接替重复的图像比较，并对照两组实际结果。'],stats:[['真实照片','66 张'],['案例流程','6 步'],['井段分组','17 组']],steps:flowContent.map(s=>({name:s.name,role:s.role,do:s.process,effect:s.output,trap:s.trap})),metrics:{title:'从场景到 CNN 分类与井深记录',html:style+'<div class="m1c">'+workflow+'</div>'+flowContent.map((s,i)=>'<h4>0'+(i+1)+' · '+s.name+'</h4><p><b>输入：</b>'+s.input+'</p><p><b>处理：</b>'+s.process+'</p><p><b>原因：</b>'+s.why+'</p><p><b>输出：</b>'+s.output+'</p>').join('')},fails:[{name:'照片与井深错位',why:'没有取样与迟到记录，无法保证照片对应正确井段。'},{name:'标签含义不清',why:'整图标签不能直接当作每颗岩屑的标签。'},{name:'相邻照片分散到不同用途',why:'相似成像条件和相邻井段会让数据代表性被高估。'}]},
 demo:{mode:'page',html:'demo/identify.html',label:'可运行示范',intro:'同一批照片，对照普通查看方式与 AI 的批量分类记录；再沿井深比较原始记录、常规颜色参照与 CNN 结果。示范回放固定实验输出，不重新训练或推理。',height:1040}
 }};
 // Retain the same teaching points in original-protocol HTML for older portals.
 
-definition.tabs.background=require('./m1/background-metadata.cjs')({style,well,feature,split});
+const backgroundOutcomes=require('./m1/background-outcomes.cjs')(data);
+const outcomesCSS=fs.readFileSync(path.join(__dirname,'m1/background-outcomes.css'),'utf8');
+definition.tabs.background=require('./m1/background-metadata.cjs')({style,well,feature,split,outcomes:'<style>'+outcomesCSS+'</style>'+backgroundOutcomes});
 definition.tabs.background.page={html:'demo/background.html',view:'background',height:1040};
 definition.tabs.workflow.page={html:'demo/workflow.html',view:'workflow',height:1040};
 definition.tabs.demo.view='demo';
@@ -38,12 +40,12 @@ css=css.replace(/(\.(?:hero-art|well-art|scene-art|art-vision|art-review|art-lab
 // Both styles travel with body-only HTML previews as well as the complete page.
 css+='\n.art-sheet{display:block;aspect-ratio:1;background-image:var(--m1-art-sheet);background-size:100% 100%;background-repeat:no-repeat;pointer-events:none}\n';
 const artworkCSS=':root{--m1-art-sheet:url("'+artwork+'")}';
-const workflowCSS=fs.readFileSync(path.join(__dirname,'m1/workflow.template.css'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'m1/demo.template.css'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'m1/teaching.template.css'),'utf8');
+const workflowCSS=fs.readFileSync(path.join(__dirname,'m1/workflow.template.css'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'m1/demo.template.css'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'m1/teaching.template.css'),'utf8')+'\n'+outcomesCSS;
 const appSource=fs.readFileSync(path.join(__dirname,'m1/app.template.js'),'utf8').replace('/* M1_FLOW_TEXT */ []',()=>JSON.stringify(flowContent)).replace('/* M1_TEACHING_CONTENT */ {}',()=>JSON.stringify(teaching)).replace('/* M1_COLOR_SCRIPT */',()=>fs.readFileSync(path.join(__dirname,'m1/color-lab.template.js'),'utf8')).replace('/* M1_TEACHING_SCRIPT */',()=>fs.readFileSync(path.join(__dirname,'m1/teaching.template.js'),'utf8')).replace('/* M1_WORKFLOW_SCRIPT */',()=>fs.readFileSync(path.join(__dirname,'m1/workflow.template.js'),'utf8')).replace('/* M1_BACKGROUND_VISUALS */',()=>fs.readFileSync(path.join(__dirname,'m1/background-visuals.template.js'),'utf8'));
 let html=fs.readFileSync(path.join(__dirname,'m1/index.template.html'),'utf8');
 html=html.replace('<!-- M1_DEMO -->',()=>fs.readFileSync(path.join(__dirname,'m1/demo.template.html'),'utf8'));
 html=html.replace('<!-- M1_WORKFLOW -->',()=>fs.readFileSync(path.join(__dirname,'m1/workflow.template.html'),'utf8').replace('<!-- M1_WORKFLOW_NAV -->',()=>flowContent.map((s,i)=>'<button data-step="'+i+'" class="'+(s.ai?'is-ai-step':'')+'" type="button" aria-pressed="'+String(i===0)+'"><span class="journey-step-number">0'+(i+1)+'</span><strong>'+['设定场景','准备图像','井段划分','CNN 分类','结果对照','井深记录'][i]+'</strong><span class="journey-card-visual" id="flow-viz-'+i+'"><span class="journey-loading">准备中…</span></span><small>'+['同一批照片的任务','裁切与标签对应','开发组与留出组','重点 · 传统与 AI','重点 · 两种方法','输出整批结果'][i]+'</small></button>').join('')));
-html=html.replace('<!-- M1_BACKGROUND -->',()=>fs.readFileSync(path.join(__dirname,'m1/background.template.html'),'utf8').replace('<!-- M1_OBSERVATIONS -->',()=>paperFigures.full()));
+html=html.replace('<!-- M1_BACKGROUND -->',()=>fs.readFileSync(path.join(__dirname,'m1/background.template.html'),'utf8').replace('<!-- M1_OBSERVATIONS -->',()=>paperFigures.full()).replace('<!-- M1_OUTCOMES -->',()=>backgroundOutcomes));
 html=html.replace('<link rel="stylesheet" href="demo.css">',()=>'<style data-m1-style="theme">'+css.replace(/<\/style/gi,'<\\/style')+'</style>\n<style data-m1-style="workflow">'+workflowCSS+'</style>\n<style data-m1-style="artwork">'+artworkCSS+'</style>');
 html=html.replace(/<img\b[^>]*\bsrc="\.\.\/assets\/m1-dioramas\.webp"[^>]*>/g,tag=>{
   const alt=/\balt="([^"]*)"/.exec(tag);
@@ -74,7 +76,7 @@ scripts.forEach(([name,label,source])=>{html=html.replace('<script src="'+name+'
 const assetDir=path.join(pack,'assets');fs.mkdirSync(assetDir,{recursive:true});
 let sectionHTML=html.replace(/<nav class="case-tabs"[\s\S]*?<\/nav>/,'').replace(/<header class="masthead">[\s\S]*?<\/header>/,'<div class="section-controls"><button id="motion-toggle" class="quiet-button" type="button" aria-pressed="false">暂停动效</button></div>');
 sectionHTML=sectionHTML.replace(/<script data-m1="(dataset|results|app)">([\s\S]*?)<\/script>/g,(_,name,source)=>{fs.writeFileSync(path.join(assetDir,name+'.js'),source);return '<script src="../assets/'+name+'.js?v='+definition.version+'"></script>';});
-sectionHTML=sectionHTML.replace(/<style data-m1-style="([^"]+)">([\s\S]*?)<\/style>/g,(_,name,source)=>{fs.writeFileSync(path.join(assetDir,name+'.css'),source);return '<link rel="stylesheet" href="../assets/'+name+'.css">';});
+sectionHTML=sectionHTML.replace(/<style data-m1-style="([^"]+)">([\s\S]*?)<\/style>/g,(_,name,source)=>{fs.writeFileSync(path.join(assetDir,name+'.css'),source);return '<link rel="stylesheet" href="../assets/'+name+'.css?v='+definition.version+'">';});
 for(const f of paperFigures.manifest.assets){const bytes=fs.readFileSync(path.join(runtime,'paper-figures',f.file));fs.writeFileSync(path.join(assetDir,f.file),bytes);sectionHTML=sectionHTML.split('data:image/webp;base64,'+bytes.toString('base64')).join('../assets/'+f.file);}
 function sectionRange(text,name){const start=text.indexOf('<section class="case-panel" id="panel-'+name+'"');const tags=/<\/?section\b[^>]*>/g;tags.lastIndex=start;let depth=0,match;while((match=tags.exec(text))){depth+=match[0].startsWith('</')?-1:1;if(depth===0)return [start,tags.lastIndex];}throw new Error('Missing section '+name);}
 for(const [section,file] of [['background','background'],['workflow','workflow'],['demo','identify']]){
@@ -97,9 +99,6 @@ tab.unmount=function(){global.removeEventListener('message',resize);if(frame)fra
 // One canonical case identity for the site and the current standalone package.
 definition.id='m1-cuttings';global.Cases.register(definition);}(window));\n`;
 fs.writeFileSync(path.join(root,'assets/cases/m1-cuttings.case.js'),wrapper);
-const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261101-m1-shortcut');
-indexText=indexText.replace(/(assets\/data\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-m1-data2');
-['registry','case-demo-host','case-upload','shell','home','mudlogging'].forEach(name=>{indexText=indexText.replace(new RegExp('(assets/core/'+name+'\\.js\\?v=)[^"\\s]+'), (_,prefix)=>prefix+'20261030-routes9');});
-indexText=indexText.replace(/(assets\/core\/mudlogging\.css\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261030-ml2');
+const index=path.join(root,'index.html');let indexText=fs.readFileSync(index,'utf8').replace(/(assets\/cases\/m1-cuttings\.case\.js\?v=)[^"\s]+/,(_,prefix)=>prefix+'20261102-m1-outcomes');
 fs.writeFileSync(index,indexText);
 console.log(JSON.stringify({id:definition.id,manifestBytes:Buffer.byteLength(JSON.stringify(definition)),samples:data.samples.length,reference:42,test:24}));
