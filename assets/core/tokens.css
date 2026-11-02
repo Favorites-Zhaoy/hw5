@@ -5,45 +5,50 @@
    ========================================================= */
 
 :root{
+  --accent: #B95739;
+  --accent-deep: #923F2C;
+  --accent-rgb: 185, 87, 57;
+  --accent-soft: #F7E7DF;
+
   /* ---------- 画布 ---------- */
-  --paper:      #fbfaf6;   /* 主背景，暖白 */
-  --paper-2:    #f5f2ea;   /* 次级底板 */
-  --paper-3:    #efece1;   /* 三级底板 */
-  --card:       #ffffff;   /* 卡片 */
-  --card-soft:  #fdfcf9;   /* 卡片内嵌区 */
+  --paper: #FBF7F2;   /* 主背景，暖白 */
+  --paper-2: #F3E9E0;   /* 次级底板 */
+  --paper-3: #EBDDD1;   /* 三级底板 */
+  --card: #FFFDFA;   /* 卡片 */
+  --card-soft: #FFF9F2;   /* 卡片内嵌区 */
 
   /* ---------- 描边 ---------- */
-  --line:       #e9e4d8;
-  --line-2:     #ddd7c8;
-  --line-3:     #c9c2b0;
+  --line: #EADDD3;
+  --line-2: #DBC9BB;
+  --line-3: #C9AF9D;
 
   /* ---------- 墨色（文字） ---------- */
-  --ink:        #242b2e;
-  --ink-2:      #4d565b;
-  --ink-3:      #79828a;
-  --ink-4:      #9ba3a9;
-  --ink-inv:    #fdfcf9;
+  --ink: #392A25;
+  --ink-2: #6D554B;
+  --ink-3: #8A7064;
+  --ink-4: #A38A7C;
+  --ink-inv: #FFFDFA;
 
   /* ---------- 主强调 ---------- */
-  --jade:       #2f7d6b;
-  --jade-d:     #235f51;
-  --jade-l:     #e6f1ec;
-  --clay:       #b26a39;
-  --clay-d:     #8e5229;
-  --clay-l:     #f8ecdf;
+  --jade: var(--accent);
+  --jade-d: var(--accent-deep);
+  --jade-l: #F7E7DF;
+  --clay: #C87858;
+  --clay-d: #A34D37;
+  --clay-l: #F8ECE2;
 
   /* ---------- 五类方法色（中饱和，白底可读） ---------- */
-  --c-cv:       #2f7d6b;   /* 计算机视觉 */
-  --c-ts:       #b26a39;   /* 时序预测 */
-  --c-nlp:      #7e5a8d;   /* 自然语言处理 */
-  --c-opt:      #41699b;   /* 优化算法 */
-  --c-kg:       #767a2e;   /* 知识图谱 */
+  --c-cv: #B95739;   /* 计算机视觉 */
+  --c-ts: #637F88;   /* 时序预测 */
+  --c-nlp: #92777E;   /* 自然语言处理 */
+  --c-opt: #AD7D48;   /* 优化算法 */
+  --c-kg: #6F8773;   /* 知识图谱 */
 
-  --bg-cv:      #e6f1ec;
-  --bg-ts:      #f8ecdf;
-  --bg-nlp:     #efe9f4;
-  --bg-opt:     #e7eef9;
-  --bg-kg:      #f1f1dd;
+  --bg-cv: #F7E7DF;
+  --bg-ts: #EEF2F1;
+  --bg-nlp: #F3ECEE;
+  --bg-opt: #F8EDDF;
+  --bg-kg: #EFF3EC;
 
   /* ---------- 语义色 ---------- */
   --ok:         #3f8560;
@@ -118,7 +123,7 @@ a{color:inherit;text-decoration:none}
 button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:inherit}
 img,svg{max-width:100%}
-::selection{background:rgba(47,125,107,.20);color:var(--ink)}
+::selection{background:rgba(185,87,57,.20);color:var(--ink)}
 
 ::-webkit-scrollbar{width:11px;height:11px}
 ::-webkit-scrollbar-track{background:var(--paper-2)}

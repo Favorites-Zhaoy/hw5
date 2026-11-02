@@ -1,0 +1,172 @@
+{
+  "checked": "2026-11-01",
+  "referenceTemplate": "https://favorites-zhaoy.github.io/hw5/?v=46320ee#/stage/mudlogging",
+  "references": [
+    {
+      "doi": "10.1109/JSTARS.2024.3372138",
+      "title": "An Evaluation of Convolutional Neural Networks for Lithological Mapping Based on Hyperspectral Images",
+      "journal": "IEEE JSTARS",
+      "authors": [
+        "Ziye Wang",
+        "Renguang Zuo"
+      ],
+      "date": [
+        [
+          2024
+        ]
+      ],
+      "url": "https://doi.org/10.1109/JSTARS.2024.3372138",
+      "verifiedBy": "Crossref primary DOI registry",
+      "scene": "g1",
+      "publicationLabel": "2024.03",
+      "teachingUse": {
+        "input": "高分五号高光谱影像与岩性标签",
+        "method": "比较光谱、空间及两者联合的卷积特征。",
+        "output": "逐像元岩性分类图",
+        "boundary": "研究使用高光谱CNN；本例输入六个模拟波段，实际运行随机森林，只演示图像分类与分组评价。"
+      }
+    },
+    {
+      "doi": "10.3390/rs17030387",
+      "scene": "g1",
+      "title": "MSIMRS: Multi-Scale Superpixel Segmentation Integrating Multi-Source Remote Sensing Data for Lithology Identification in Semi-Arid Area",
+      "journal": "Remote Sensing · 17(3), 387",
+      "authors": "Lu 等",
+      "publicationLabel": "2025.01",
+      "url": "https://doi.org/10.3390/rs17030387",
+      "verifiedBy": "Publisher citation record, https://www.mdpi.com/2072-4292/17/3/387",
+      "registryAttemptError": "Remote end closed connection without response",
+      "teachingUse": {
+        "input": "多源遥感影像和不同尺度的图像单元",
+        "method": "将超像元分割与SVM结合，并与像元级RF等方法比较。",
+        "output": "较连贯的岩性单元图",
+        "boundary": "该研究说明空间单元和特征选择同样重要；本课未实现其超像元模型，也不使用论文成绩替代本例。"
+      }
+    },
+    {
+      "doi": "10.1016/j.gexplo.2024.107393",
+      "title": "Intelligent mapping of geochemical anomalies: Adaptation of DBSCAN and mean-shift clustering approaches",
+      "journal": "Journal of Geochemical Exploration",
+      "authors": [
+        "Mahsa Hajihosseinlou",
+        "Abbas Maghsoudi",
+        "Reza Ghezelbash"
+      ],
+      "date": [
+        [
+          2024,
+          3
+        ]
+      ],
+      "url": "https://doi.org/10.1016/j.gexplo.2024.107393",
+      "verifiedBy": "Crossref primary DOI registry",
+      "scene": "g2",
+      "publicationLabel": "2024.03",
+      "teachingUse": {
+        "input": "河流沉积物多变量地球化学样品",
+        "method": "利用DBSCAN与Mean-shift寻找密度结构，无需先指定簇数。",
+        "output": "地球化学异常模式与样品组",
+        "boundary": "研究对象为矿产地球化学；本课借鉴空间聚类过程，不把其结果视为油气验证。"
+      }
+    },
+    {
+      "doi": "10.1007/s12145-024-01611-0",
+      "title": "How does dimensionality influence outlier detection effectiveness in multivariate geochemical data? insights from LOF and IF methods",
+      "journal": "Earth Science Informatics",
+      "authors": [
+        "Shahed Shahrestani",
+        "Ioan Sanislav"
+      ],
+      "date": [
+        [
+          2024,
+          12,
+          11
+        ]
+      ],
+      "url": "https://doi.org/10.1007/s12145-024-01611-0",
+      "verifiedBy": "Crossref primary DOI registry",
+      "scene": "g2",
+      "publicationLabel": "2024在线 / 2025卷期",
+      "teachingUse": {
+        "input": "不同维数的多变量地球化学资料",
+        "method": "比较IF、LOF及降维方法对异常检出的影响。",
+        "output": "变量选择与异常检出的差异",
+        "boundary": "本课使用三项浓度和两个比值；该论文说明输入变量会影响异常结构，不是本教学数据的精度来源。"
+      }
+    },
+    {
+      "scene": "g3",
+      "doi": "10.48550/arXiv.2506.16006",
+      "title": "DIGMAPPER: A Modular System for Automated Geologic Map Digitization",
+      "journal": "arXiv:2506.16006",
+      "authors": "Duan 等",
+      "publicationLabel": "2025.06 · 预印本",
+      "url": "https://arxiv.org/abs/2506.16006",
+      "verifiedBy": "Primary arXiv record, https://arxiv.org/abs/2506.16006",
+      "teachingUse": {
+        "input": "历史地质地图、图例和复杂图面要素",
+        "method": "把版面分析、特征提取、配准与语言模型辅助模块串成流程。",
+        "output": "可用于分析的地理空间数据",
+        "boundary": "所引版本为预印本；本课只实现受限CV、三词模板OCR与TF-IDF分类，不复现其Transformer或大语言模型。"
+      }
+    },
+    {
+      "doi": "10.1016/j.ijrmms.2025.106038",
+      "title": "Automatic extraction and quantitative analysis of characteristics from complex fractures on rock surfaces via deep learning",
+      "journal": "International Journal of Rock Mechanics and Mining Sciences",
+      "authors": [
+        "Mingze Li",
+        "Ming Chen",
+        "Wenbo Lu",
+        "Peng Yan",
+        "Zhanzhi Tan"
+      ],
+      "date": [
+        [
+          2025,
+          3
+        ]
+      ],
+      "url": "https://doi.org/10.1016/j.ijrmms.2025.106038",
+      "verifiedBy": "Crossref primary DOI registry",
+      "scene": "g4",
+      "publicationLabel": "2025.03",
+      "teachingUse": {
+        "input": "自然与爆破形成的岩面裂缝图像",
+        "method": "CRFSegNet分割复杂裂缝，并结合特征计算进行量化。",
+        "output": "裂缝区域和几何特征",
+        "boundary": "本课使用Canny与Hough建立可解释的CV基线，没有运行CRFSegNet，不借用论文精度。"
+      }
+    },
+    {
+      "doi": "10.5194/se-14-1005-2023",
+      "title": "Natural fracture patterns at Swift Reservoir anticline, NW Montana: the influence of structural position and lithology from multiple observation scales",
+      "journal": "Solid Earth",
+      "authors": [
+        "Adam J. Cawood",
+        "Hannah Watkins",
+        "Clare E. Bond",
+        "Marian J. Warren",
+        "Mark A. Cooper"
+      ],
+      "date": [
+        [
+          2023,
+          9,
+          12
+        ]
+      ],
+      "url": "https://doi.org/10.5194/se-14-1005-2023",
+      "verifiedBy": "Crossref primary DOI registry",
+      "scene": "g4",
+      "publicationLabel": "2023.09 · 现场方法",
+      "teachingUse": {
+        "input": "多尺度现场照片、无人机资料及地质位置",
+        "method": "在不同观察尺度上测量裂缝，并检查结构位置和岩性的影响。",
+        "output": "多尺度裂缝模式",
+        "boundary": "该工作支持尺度、取样与几何条件的教学说明；本课只输出校准照片的面内方向，不恢复三维产状。"
+      }
+    }
+  ]
+}

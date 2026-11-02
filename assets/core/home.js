@@ -1,7 +1,7 @@
 /* Homepage explorer. Uses the existing scene data and case registry; no new case format. */
 (function (global) {
   'use strict';
-  var A, C, K;
+  var A, C, K, outlineQuery = {};
   var methodKey = '', matrixMode = 'scenes';
   var arrow = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var plus = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
@@ -25,10 +25,10 @@
       '<div class="atlas-cover-content atlas-width"><div class="atlas-cover-kicker"><span class="atlas-live-dot"></span> PETRO × AI ATLAS <span class="atlas-kicker-line"></span> 从现场出发</div>' +
       '<h1 id="cover-title">石油勘探开发的<br><span>智能化可能性地图</span></h1>' +
       '<p class="atlas-cover-desc">从石油现场的问题出发，理解专业背景与数据。<br>跟着案例看方法，再动手检查结果。</p>' +
-      '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/scene/m1?case=m1-cuttings&amp;tab=bg">从岩屑案例开始 ' + arrow + '</a>' +
-      '<button class="atlas-cover-secondary atlas-cover-map" data-home-jump="stage-map">浏览场景地图 <span>↓</span></button></div>' +
+      '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/chain">探索五阶段课程大纲 ' + arrow + '</a>' +
+      '<button class="atlas-cover-secondary atlas-cover-map" data-home-jump="stage-map">浏览课程大纲 <span>↓</span></button></div>' +
       '<div class="atlas-cover-index"><span>EXPLORATION</span><i></i><span>INTELLIGENCE</span></div></div>' +
-      '<div class="atlas-cover-bottom atlas-width"><span>从地质勘察，一直走到加工。</span><button data-home-jump="stage-map" aria-label="向下浏览场景地图">向下探索 <span>↓</span></button></div></section>' +
+      '<div class="atlas-cover-bottom atlas-width"><span>从地质勘察，一直走到加工。</span><button data-home-jump="stage-map" aria-label="向下浏览课程大纲">向下探索 <span>↓</span></button></div></section>' +
       '<div class="atlas-stats atlas-width" aria-label="网站收录概况">' +
       [[A.stages.length, '作业环节', 'CONNECTED STAGES'], [A.allScenes.length, '候选场景', 'POSSIBILITIES'], [Object.keys(A.methods).length, '智能方法类别', 'AI APPROACHES'], [countReady(), '可运行案例', 'HANDS-ON CASES']].map(function (it) {
         return '<div class="atlas-stat"><strong>' + it[0] + '</strong><div><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>';
@@ -38,28 +38,8 @@
     return '<section class="atlas-first-lesson atlas-width" aria-labelledby="first-lesson-title"><div class="atlas-first-intro"><span class="atlas-mini-label">从一个具体问题开始 / 录井 · M1</span><h2 id="first-lesson-title">一张岩屑照片，能告诉我们什么？</h2><p>跟随一份真实样品，了解它从哪里来，整理照片、井深和标签，再对照岩性沿井深的变化。</p><a href="#/scene/m1?case=m1-cuttings&amp;tab=bg">进入岩屑案例 ' + arrow + '</a></div>' +
       '<ol class="atlas-first-steps"><li><span>01</span><b>认识现场</b><small>岩屑怎样成为井深记录？</small></li><li><span>02</span><b>传统与 CNN</b><small>AI 接替了哪一段判断？</small></li><li><span>03</span><b>结果对照</b><small>同一批照片，分类后有什么变化？</small></li></ol></section>';
   }
-  function sceneLeaf(sc, st) {
-    var ready = C.bySceneAll(sc.id).length;
-    var search = [st.name, sc.name, sc.id, sc.point].concat((sc.methods || []).map(function (m) { return m + ' ' + (A.methods[m] ? A.methods[m].name : ''); })).join(' ').toLowerCase();
-    return '<a class="atlas-leaf' + (ready ? ' has-case' : '') + '" href="#/scene/' + esc(sc.id) + '" data-home-leaf data-search="' + esc(search) + '" data-ready="' + (ready ? '1' : '0') + '">' +
-      '<span class="atlas-leaf-marker" aria-hidden="true"></span><span class="atlas-leaf-name">' + esc(sc.name) + '</span>' +
-      (ready ? '<span class="atlas-leaf-status">有案例</span>' : '<span class="atlas-leaf-code">' + esc(sc.id.toUpperCase()) + '</span>') + '<span class="atlas-leaf-arrow">↗</span></a>';
-  }
-  function stageMap() {
-    var tree = A.stages.map(function (st) {
-      return '<div class="atlas-map-stage" data-home-stage><div class="atlas-river-island"><a class="atlas-stage-label" href="#/stage/' + esc(st.id) + '"><span class="atlas-stage-no">STAGE ' + pad(st.idx) + ' / ' + pad(A.stages.length) + '</span><h3>' + esc(st.name) + '</h3><span class="atlas-stage-en">' + esc(st.en) + '</span><span class="atlas-stage-count">' + st.scenes.length + ' 个场景 ' + arrow + '</span></a>' +
-        '<div class="atlas-map-leaves">' + st.scenes.map(function (sc) { return sceneLeaf(sc, st); }).join('') + '</div></div>' +
-        '<a class="atlas-stage-junction" href="#/stage/' + esc(st.id) + '" data-river-node="' + esc(st.id) + '" aria-label="探索第 ' + st.idx + ' 阶段：' + esc(st.name) + '"><span class="atlas-node-orbit" aria-hidden="true"></span><b>' + pad(st.idx) + '</b></a></div>';
-    }).join('');
-    return '<section class="atlas-section atlas-map-section" id="stage-map"><div class="atlas-width">' +
-      sectionHead('01', 'BY STAGE · FOLLOW THE CURRENT', '从作业链，<em>找到具体问题。</em>', '沿着 ' + A.stages.length + ' 个作业环节浏览场景；标有“有案例”的节点可以继续学习和操作。') +
-      '<div class="atlas-map-toolbar"><div class="atlas-segment" role="group" aria-label="地图场景范围"><button class="is-active" data-home-scope="all" aria-pressed="true">全部场景 <span>' + A.allScenes.length + '</span></button><button data-home-scope="ready" aria-pressed="false">已有案例 <span>' + C.stats().coveredScenes + '</span></button></div>' +
-      '<label class="atlas-search"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6"/></svg><input id="atlas-map-search" type="search" placeholder="搜索环节、场景或方法" aria-label="搜索场景地图"></label></div>' +
-      '<div class="atlas-map-caption"><span><i></i> THE CURRENT / 石油勘探开发</span><span id="atlas-map-count" role="status">' + A.allScenes.length + ' 个场景</span></div>' +
-      '<div class="atlas-map-tree atlas-river-tree" data-river-map><div class="atlas-river-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>' + global.AtlasRiver.initial(A.stages) +
-      '<div class="atlas-river-topbar"><div><span class="atlas-current-dot"></span> KNOWLEDGE IN MOTION <small>顺着光，发现下一种可能</small></div><button data-river-motion aria-pressed="true"><span class="atlas-motion-symbol" aria-hidden="true"></span><span data-river-motion-label>暂停动效</span></button></div>' +
-      '<div class="atlas-river-stages">' + tree + '</div><div class="atlas-river-outro"><span>↓</span> THE EXPLORATION CONTINUES</div></div><div class="atlas-map-empty" id="atlas-map-empty" hidden>没有找到匹配的场景。试试更短的关键词，或切换到全部场景。</div>' +
-      '<div class="atlas-map-end"><span></span><p>一张持续生长的地图。<b>下一个案例，可以由你补上。</b></p><button class="atlas-text-link" data-import>添加你的案例 ' + plus + '</button></div></div></section>';
+  function stageMap(ctx) {
+    return '<section class="course-home-section" id="stage-map"><div class="atlas-width"><div class="course-home-heading"><div><span class="course-eyebrow">01 / THE COURSE AT A GLANCE</span><h2>一张图，<em>读懂石油全流程。</em></h2><p>从勘探发现到炼化加工，沿着五个阶段认识现场，再进入具体环节与案例。</p></div><a href="#/chain">打开完整作业链 ↗</a></div>' + global.CourseOutline.render(ctx) + '</div></section>';
   }
   function methodPanel(key) {
     var m = A.methods[key];
@@ -120,35 +100,14 @@
   }
   function render(ctx) {
     A = ctx.atlas; C = ctx.cases; K = ctx.K;
-    return '<main class="atlas-home">' + cover() + firstLesson() + stageMap() + methods() + matrix() + learning() + '</main>';
+    outlineQuery = ctx.query || {};
+    return '<main class="atlas-home">' + cover() + stageMap(ctx) + firstLesson() + methods() + matrix() + learning() + '</main>';
   }
   function bind(root) {
-    var scope = 'all';
-    var search = root.querySelector('#atlas-map-search');
-    var river = global.AtlasRiver.mount(root.querySelector('[data-river-map]'));
-    function filterMap() {
-      var query = (search.value || '').trim().toLowerCase(), count = 0;
-      [].forEach.call(root.querySelectorAll('[data-home-stage]'), function (stage) {
-        var visible = 0;
-        [].forEach.call(stage.querySelectorAll('[data-home-leaf]'), function (leaf) {
-          var show = (!query || leaf.dataset.search.indexOf(query) >= 0) && (scope !== 'ready' || leaf.dataset.ready === '1');
-          leaf.hidden = !show; if (show) { visible++; count++; }
-        });
-        stage.hidden = !visible;
-      });
-      root.querySelector('#atlas-map-count').textContent = count + ' 个场景';
-      root.querySelector('#atlas-map-empty').hidden = !!count;
-      river.refresh();
-    }
+    var outline = global.CourseOutline.bind(root.querySelector('[data-course-outline]'), { atlas: A, cases: C, K: K, query: outlineQuery, route: '#/' });
     root.addEventListener('click', function (e) {
       var jump = e.target.closest('[data-home-jump]');
       if (jump) { var section = document.getElementById(jump.dataset.homeJump); if (section) section.scrollIntoView({ behavior: global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
-      var filter = e.target.closest('[data-home-scope]');
-      if (filter) {
-        scope = filter.dataset.homeScope;
-        [].forEach.call(root.querySelectorAll('[data-home-scope]'), function (b) { var on = b === filter; b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on); });
-        filterMap();
-      }
       var method = e.target.closest('[data-home-method]');
       if (method) activateMethod(method);
       var matrixButton = e.target.closest('[data-home-matrix]');
@@ -177,8 +136,7 @@
       if (e.key === 'Home') i = 0; else if (e.key === 'End') i = n - 1; else i = (i + (e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1) + n) % n;
       activateMethod(buttons[i]); buttons[i].focus();
     });
-    if (search) search.addEventListener('input', filterMap);
-    return river;
+    return outline;
   }
   global.AtlasHome = { render: render, bind: bind, footer: footer };
 })(window);

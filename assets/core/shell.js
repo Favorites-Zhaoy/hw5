@@ -134,7 +134,7 @@
      三、首页
      ========================================================= */
   function homeHTML() {
-    return global.AtlasHome.render({ atlas: A, cases: Cases, K: K });
+    return global.AtlasHome.render({ atlas: A, cases: Cases, K: K, query: parseHash().q });
   }
 
   function matrixHTML() {
@@ -167,37 +167,18 @@
      四、链条总览页
      ========================================================= */
   function chainHTML() {
-    var rows = A.stages.map(function (st) {
-      var top = st.scenes.slice(0, 5).map(function (s) { return s.name; }).join('、');
-      return '<a class="scene-row" href="#/stage/' + st.id + '" style="grid-template-columns:52px 1fr auto">' +
-        '<div class="sr-n" style="padding-top:9px">' + pad(st.idx) + '</div>' +
-        '<div><div class="sr-name">' + esc(st.name) +
-        '<span class="mono" style="font-size:9.5px;color:var(--ink-4);letter-spacing:.14em">' + esc(st.en).toUpperCase() + '</span>' +
-        '<span class="arrow">→</span></div>' +
-        '<div class="sr-point">' + esc(st.blurb) + '</div>' +
-        '<div class="sr-meta">' + st.scenes.slice(0, 3).map(function (s) { return methodChip(s.methods[0]); }).join('') +
-        '<span class="tag" style="margin-left:4px">' + esc(top) + (st.scenes.length > 5 ? '…' : '') + '</span></div></div>' +
-        '<div class="sr-right"><span class="mono" style="font-size:19px;color:var(--ink-2)">' + st.scenes.length + '</span>' +
-        '<span class="small muted">场景</span></div></a>';
-    }).join('');
-
-    return '<main class="wrap">' +
-      crumb([['#/', '总览'], ['#/chain', '作业链']]) +
-      '<div class="page-head"><div class="ph-top"><div>' +
-      '<div class="ph-idx">CHAIN · ' + A.stages.length + ' 个环节</div>' +
-      '<h1>从地质勘察到加工的全链条</h1>' +
-      '<p class="blurb">上游到下游按作业顺序排列。每个环节标注可智能化的场景数量与方法构成，点进去看清单。</p>' +
-      '</div><div class="ph-stat">' +
-      '<div><div class="n">' + A.stages.length + '</div><div class="l">环节</div></div>' +
-      '<div><div class="n">' + A.allScenes.length + '</div><div class="l">场景</div></div>' +
-      '</div></div></div>' +
-      '<div class="scenes">' + rows + '</div></main>';
+    return '<main class="course-chain">' + crumb([['#/', '总览'], ['#/chain', '作业链']]) +
+      '<header class="course-chain-head"><div><span class="course-eyebrow">PETROLEUM / THE COMPLETE JOURNEY</span><h1>从资源发现，到油气成为产品。</h1><p>以五个阶段串起课程大纲。在原图上跟随流程动效，点击图画进入环节，再跟着案例认识问题、方法与结果。</p></div><span class="course-chain-count">05 CHAPTERS / ' + A.stages.length + ' STAGES</span></header>' +
+      global.CourseOutline.render({ atlas: A, cases: Cases, K: K, query: parseHash().q }) + '</main>';
   }
 
   /* =========================================================
      五、环节页
      ========================================================= */
   function stageHTML(st, q) {
+    if (st.id === 'geology' && global.GeologyStage) {
+      return global.GeologyStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
     if (st.id === 'mudlogging' && global.MudloggingStage) {
       return global.MudloggingStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
     }
@@ -350,7 +331,7 @@
      七、场景详情页（案例自动挂载）
      ========================================================= */
   function isLessonCase(sc, c) {
-    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1');
+    return !!c && ((sc.id === 'm1' && (c.id === 'm1-cuttings' || c.id === 'm1-cuttings-resnet')) || c.lessonProtocol === 'mudlogging-v1' || c.lessonProtocol === 'geology-v1');
   }
 
   function sceneHTML(sc, q) {
@@ -1024,9 +1005,13 @@
 
     if (!p.length && global.AtlasHome) homeHandle = global.AtlasHome.bind(view.querySelector('.atlas-home'));
 
+    if (p[0] === 'chain') stageHandle = global.CourseOutline.bind(view.querySelector('[data-course-outline]'), { atlas: A, cases: Cases, K: K, query: r.q, route: '#/chain' });
+
     // 页面级交互
     if (p[0] === 'stage') {
-      if (p[1] === 'mudlogging' && global.MudloggingStage) {
+      if (p[1] === 'geology' && global.GeologyStage) {
+        stageHandle = global.GeologyStage.bind(view.querySelector('[data-geo-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else if (p[1] === 'mudlogging' && global.MudloggingStage) {
         stageHandle = global.MudloggingStage.bind(view.querySelector('[data-ml-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
       } else bindFilters(view);
     }

@@ -5,11 +5,11 @@
 .ml-eyebrow{display:flex;align-items:center;gap:12px;font:10px var(--mono);letter-spacing:.13em;color:#9b6263}
 .ml-eyebrow>span{padding:5px 8px;border-radius:5px;background:#ffeaeb;color:#d62d3d;letter-spacing:.06em}
 .ml-head h1{font-size:clamp(27px,3.2vw,45px);line-height:1.25;letter-spacing:-.04em;margin:14px 0 10px;font-weight:750}
-.ml-head h1>span{color:#f13b44}
+.ml-head h1>span{color:#B95739}
 .ml-head p{color:var(--ink-3);font-size:14px;line-height:1.7}
 .ml-head-note{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.6;flex-shrink:0;padding-bottom:4px}
 .ml-head-note small{display:block;color:var(--ink-3);font-size:11px;margin-top:3px}
-.ml-live-dot{display:inline-block;flex-shrink:0;width:7px;height:7px;margin-top:6px;border-radius:50%;background:#f13b44;box-shadow:0 0 0 4px #f13b4413;animation:ml-live 2.6s ease-in-out infinite}
+.ml-live-dot{display:inline-block;flex-shrink:0;width:7px;height:7px;margin-top:6px;border-radius:50%;background:#B95739;box-shadow:0 0 0 4px #B9573913;animation:ml-live 2.6s ease-in-out infinite}
 .ml-lab{border:1px solid #eadfdb;background:#fffdf9;border-radius:22px;box-shadow:0 12px 50px -35px #8f594d70;isolation:isolate}
 .ml-toolbar{position:sticky;top:var(--nav-h);z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;border-bottom:1px solid #f0e6df;border-radius:22px 22px 0 0;background:#fffdf9}
 .ml-methods{display:flex;gap:5px;align-items:center}
@@ -17,12 +17,12 @@
 .ml-methods button b{font:650 11px var(--mono);letter-spacing:.03em}
 .ml-methods button span{font-size:12px}
 .ml-methods button:hover{background:#f8eeea;color:#563438}
-.ml-methods button[aria-pressed="true"]{background:#f13b44;color:white;border-color:#eb3040;box-shadow:0 4px 14px -6px #f13b4480}
-.ml-methods button[data-ml-method-button="cv"][aria-pressed="true"]{background:#9a48b9;border-color:#9141ae;box-shadow:0 4px 14px -6px #9141ae80}
-.ml-methods button[data-ml-method-button="ts"][aria-pressed="true"]{background:#167fb1;border-color:#1675a7;box-shadow:0 4px 14px -6px #1675a780}
-.ml-methods button[data-ml-method-button="nlp"][aria-pressed="true"]{background:#e97928;border-color:#e27223;box-shadow:0 4px 14px -6px #e2722380}
+.ml-methods button[aria-pressed="true"]{background:#B95739;color:white;border-color:#A64A32;box-shadow:0 4px 14px -6px #B9573980}
+.ml-methods button[data-ml-method-button="cv"][aria-pressed="true"]{background:var(--c-cv);border-color:var(--accent-deep);box-shadow:0 4px 14px -6px #B9573980}
+.ml-methods button[data-ml-method-button="ts"][aria-pressed="true"]{background:var(--c-ts);border-color:var(--c-ts);box-shadow:0 4px 14px -6px #637F8880}
+.ml-methods button[data-ml-method-button="nlp"][aria-pressed="true"]{background:var(--c-nlp);border-color:var(--c-nlp);box-shadow:0 4px 14px -6px #92777E80}
 .ml-motion{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #e9ded6;background:white;color:#756361;border-radius:9px;padding:8px 12px;font-size:11px;cursor:pointer;white-space:nowrap}
-.ml-motion:hover{border-color:#f13b44;color:#e23343}
+.ml-motion:hover{border-color:#B95739;color:#923F2C}
 .ml-motion>span:first-child{font-size:10px;width:11px;text-align:center}
 .ml-status{position:relative;z-index:19;display:flex;align-items:center;gap:9px;min-height:43px;padding:10px 23px;background:#fff9f3;color:#8a6b5e;border-bottom:1px solid #f0e6df;font-size:11px;line-height:1.65}
 .ml-status-icon{color:#e67538;font-size:17px;line-height:1}
@@ -119,12 +119,12 @@
 .ml-extra h2{font-size:18px;margin-bottom:15px}
 .ml-extra a{display:grid;grid-template-columns:minmax(150px,1fr) 2fr auto;align-items:center;gap:20px;border-top:1px solid var(--line);padding:18px 0;font-size:12px}
 .ml-extra a>span{color:var(--ink-3)}
-.ml-extra a>i{font-style:normal;color:#f13b44}
-.ml-page button:focus-visible,.ml-read-card:focus-visible,.ml-extra a:focus-visible{outline:3px solid #f13b44;outline-offset:4px}
+.ml-extra a>i{font-style:normal;color:#B95739}
+.ml-page button:focus-visible,.ml-read-card:focus-visible,.ml-extra a:focus-visible{outline:3px solid #B95739;outline-offset:4px}
 .ml-page.is-paused *{animation-play-state:paused!important}
 .ml-page.is-paused .ml-live-dot{box-shadow:none;opacity:.55}
 .ml-page.is-paused .ml-flow-current{stroke-dasharray:3 15;opacity:.6}
-@keyframes ml-live{50%{opacity:.5;box-shadow:0 0 0 6px #f13b4406}}
+@keyframes ml-live{50%{opacity:.5;box-shadow:0 0 0 6px #B9573906}}
 @keyframes ml-current{to{stroke-dashoffset:-72}}
 @keyframes ml-steam{0%{transform:translate(0,8px) scale(.5);opacity:0}20%{opacity:.5}100%{transform:translate(10px,-44px) scale(1.7);opacity:0}}
 @keyframes ml-depth{0%,100%{transform:translateY(0);opacity:.15}50%{transform:translateY(144px);opacity:.6}}

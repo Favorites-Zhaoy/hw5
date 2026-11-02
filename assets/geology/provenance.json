@@ -1,0 +1,27 @@
+{
+  "seed": 20261101,
+  "dataType": "synthetic-teaching",
+  "generator": "tools/geology/prepare-experiments.py",
+  "illustrationsUsedForEvaluation": false,
+  "models": {
+    "g1": "scikit-learn RandomForestClassifier: 80 trees, depth 12, leaf 5",
+    "g2": "scikit-learn IsolationForest: 160 trees, max_samples 256",
+    "g3": "CV图例颜色与骨架追踪 + 限定字库模板OCR + NLP字符TF-IDF分类",
+    "g4": "Canny + HoughLinesP + 平行边缘去重"
+  },
+  "splits": {
+    "g1": {
+      "train": 8,
+      "validation": 2,
+      "test": 3,
+      "pixelsPerTile": 1536
+    },
+    "g2": {
+      "train": 5,
+      "validation": 1,
+      "test": 3,
+      "pointsPerBlock": 252
+    }
+  },
+  "sha256": "ad0d8510b94d688134075f1cd31f4453dcdeccecca566b9d2eaf0e882e0db5a6"
+}

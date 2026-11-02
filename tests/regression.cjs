@@ -67,7 +67,7 @@ function runtime(seed = {}, options = {}) {
     if (name.endsWith('case-upload.js')) source = source.replace('  global.CaseImport = {', '  global.__importTest = {checkAll, toCase, state:S, stripRoot, loadFiles, reset, commit};\n  global.CaseImport = {');
     vm.runInContext(source, ctx, { filename: name, timeout: 5000 });
   };
-  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/cases/m1-cuttings.case.js', 'assets/cases/m2-gas.case.js', 'assets/cases/m3-fluorescence.case.js', 'assets/cases/m4-drilling.case.js', 'assets/cases/m5-report.case.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
+  ['assets/data.js', 'assets/core/registry.js', 'assets/core/kit.js', 'assets/cases/welllog-layer.case.js', 'assets/cases/welllog-layer.demo.js', 'assets/cases/m1-cuttings.case.js', 'assets/cases/m2-gas.case.js', 'assets/cases/m3-fluorescence.case.js', 'assets/cases/m4-drilling.case.js', 'assets/cases/m5-report.case.js', 'assets/core/case-demo-host.js', 'assets/core/case-upload.js', 'assets/core/admin.js', 'assets/core/river.js', 'assets/core/course-outline.js', 'assets/core/home.js', 'assets/core/mudlogging.js'].forEach(run);
   let shell = read('assets/core/shell.js').replaceAll('\r', '');
   const marker = '  render();\n\n  // 启动自检';
   assert.ok(shell.includes(marker), 'shell test hook must match exactly');
@@ -296,58 +296,31 @@ test('all 83 page combinations generate HTML without exceptions', () => {
 
 test('homepage contains all stage branches, valid scene links, and local cover assets', () => {
   const rt = runtime(); const html = rt.ctx.__shellTest.homeHTML();
-  assert.equal((html.match(/data-home-stage>/g)||[]).length, 13);
-  assert.equal((html.match(/data-home-leaf /g)||[]).length, 61);
+  assert.equal((html.match(/data-course-stage>/g)||[]).length, 13);
+  assert.equal((html.match(/data-course-scene /g)||[]).length, 61);
   assert.match(html, /assets\/images\/oilfield-cover.png/);
   assert.ok(fs.existsSync(path.join(site, 'assets/images/oilfield-cover.png')));
   for(const match of html.matchAll(/href="#\/scene\/([^"?]+)(?:[^"]*)"/g)) assert.ok(rt.ctx.ATLAS.index.byScene[match[1]],match[1]);
   assert.match(html, /data-home-matrix="coverage"/);
-  assert.match(html, /data-home-scope="ready"/);
-  assert.ok(html.indexOf('id="first-lesson-title"') < html.indexOf('id="stage-map"'));
+  assert.match(html, /data-course-scope="ready"/);
+  assert.ok(html.indexOf('id="stage-map"') < html.indexOf('id="first-lesson-title"'));
   assert.match(html, /href="#\/scene\/m1\?case=m1-cuttings&amp;tab=bg"/);
   assert.doesNotMatch(html, /DATA LAYER|SHELL|atlas@example.com/);
 });
 
 function homeControls(rt) {
   const html = rt.ctx.__shellTest.homeHTML(), root = new Element();
-  const stages = html.split('<div class="atlas-map-stage" data-home-stage>').slice(1).map(part => {
-    const stage = new Element();
-    stage.leaves = [...part.matchAll(/data-home-leaf data-search="([^"]*)" data-ready="([01])"/g)].map(m => {
-      const leaf = new Element(); leaf.dataset.search = m[1]; leaf.dataset.ready = m[2]; return leaf;
-    });
-    stage.querySelectorAll = selector => selector === '[data-home-leaf]' ? stage.leaves : [];
-    return stage;
-  });
   const methodButtons = [...html.matchAll(/data-home-method="([^"]*)"/g)].map(m => {
     const b = new Element('button'); b.dataset.homeMethod = m[1]; b.id = 'method-tab-' + m[1]; return b;
   });
-  const scopeButtons = ['all', 'ready'].map(value => { const b = new Element('button'); b.dataset.homeScope = value; return b; });
   const matrixButtons = ['scenes', 'coverage'].map(value => { const b = new Element('button'); b.dataset.homeMatrix = value; return b; });
-  const lists = { '[data-home-stage]': stages, '[data-home-method]': methodButtons, '[data-home-scope]': scopeButtons, '[data-home-matrix]': matrixButtons };
+  const lists = { '[data-home-method]': methodButtons, '[data-home-matrix]': matrixButtons };
   root.querySelectorAll = sel => lists[sel] || [];
   const legend = root.querySelector('.atlas-heat-legend'); legend.firstElementChild = new Element(); legend.lastElementChild = new Element();
   rt.ctx.AtlasHome.bind(root);
   const click = (button, attr) => root.listeners.click({ target: { closest: selector => selector === '[data-home-' + attr + ']' ? button : null } });
-  return { root, stages, methodButtons, scopeButtons, matrixButtons, click };
+  return { root, methodButtons, matrixButtons, click };
 }
-
-test('map search, empty results, clearing and case-only filtering update visible branches', () => {
-  const rt = runtime(), { root, stages, scopeButtons, click } = homeControls(rt);
-  const input = root.querySelector('#atlas-map-search');
-  input.value = 's3'; input.listeners.input();
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '1 个场景');
-  assert.equal(stages.filter(s => !s.hidden).length, 1);
-  input.value = 'unmatched-query-987'; input.listeners.input();
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '0 个场景');
-  assert.equal(root.querySelector('#atlas-map-empty').hidden, false);
-  input.value = ''; input.listeners.input();
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
-  click(scopeButtons[1], 'scope');
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '6 个场景');
-  assert.equal(stages.flatMap(s => s.leaves).filter(l => !l.hidden).length, 6);
-  click(scopeButtons[0], 'scope');
-  assert.equal(root.querySelector('#atlas-map-count').textContent, '61 个场景');
-});
 
 test('method choices update linked examples and support keyboard navigation', () => {
   const rt = runtime(), { root, methodButtons, click } = homeControls(rt);
@@ -397,13 +370,16 @@ test('river geometry follows ordered nodes and keeps original input intact', () 
   }
 });
 
-test('river markup includes native particles, thirteen tributaries and accessible stage links', () => {
-  const rt = runtime(), html = rt.ctx.__shellTest.homeHTML();
-  assert.equal((html.match(/data-river-node=/g) || []).length, 13);
-  assert.equal((html.match(/data-river-branch=/g) || []).length, 13);
-  assert.ok((html.match(/<animateMotion /g) || []).length >= 30);
-  assert.match(html, /data-river-motion aria-pressed="true"/);
-  for (const stage of rt.ctx.ATLAS.stages) assert.ok(html.includes('data-river-node="' + stage.id + '"'));
+test('homepage and chain share the supplied five-phase course outline', () => {
+  const rt = runtime(), home = rt.ctx.__shellTest.homeHTML(), chain = rt.ctx.__shellTest.chainHTML();
+  for (const html of [home, chain]) {
+    assert.equal((html.match(/data-course-tab /g) || []).length, 6);
+    assert.ok(!html.includes('class="course-zoom"') && !html.includes('class="course-detail"'));
+    assert.equal((html.match(/data-course-stage>/g) || []).length, 13);
+    assert.ok(html.includes('assets/images/course-outline-wide.png'));
+    assert.ok(!html.includes('data-river-map'));
+    for (const stage of rt.ctx.ATLAS.stages) assert.ok(html.includes('href="#/stage/' + stage.id + '"'));
+  }
 });
 
 function measuredRiver(rt, reduced = false) {
@@ -537,6 +513,8 @@ test('mud logging pauses both native SVG and CSS motion, observes system prefere
   assert.equal(root.classList.contains('is-paused'), true);
   rt.ctx.location.hash = '#/chain'; rt.ctx.__shellTest.render();
   assert.equal(root.listeners.click, undefined); assert.equal(root.listeners.keydown, undefined);
+  assert.equal(stats.mediaListeners.size, 1, 'chain owns its course motion listener');
+  rt.ctx.__shellTest.unmountCurrent();
   assert.equal(stats.mediaListeners.size, 0);
 });
 

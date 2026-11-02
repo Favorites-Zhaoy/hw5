@@ -1,0 +1,45 @@
+(function(g){
+ 'use strict';
+ var T={
+ g1:{family:'CV / 多光谱图像分类',methodSteps:['六波段像元','波段比值与特征','80棵分类树','类别得分与复核掩膜'],difficulty:'样本的空间分组、阴影与覆盖物比网络名称更关键。跨图幅、不同成像条件和地面核查决定图面是否可信。',papers:[
+ {date:'2024.03',journal:'IEEE JSTARS',title:'An Evaluation of Convolutional Neural Networks for Lithological Mapping Based on Hyperspectral Images',authors:'Wang 与 Zuo',doi:'10.1109/JSTARS.2024.3372138',input:'高分五号高光谱影像与岩性标签',method:'比较光谱、空间及两者联合的卷积特征。',output:'逐像元岩性分类图',boundary:'研究使用高光谱CNN；本例输入六个模拟波段，实际运行随机森林，只演示图像分类与分组评价。'},
+ {date:'2025.01',journal:'Remote Sensing · 17(3), 387',title:'MSIMRS: Multi-Scale Superpixel Segmentation Integrating Multi-Source Remote Sensing Data for Lithology Identification in Semi-Arid Area',authors:'Lu 等',doi:'10.3390/rs17030387',input:'多源遥感影像和不同尺度的图像单元',method:'将超像元分割与SVM结合，并与像元级RF等方法比较。',output:'较连贯的岩性单元图',boundary:'该研究说明空间单元和特征选择同样重要；本课未实现其超像元模型，也不使用论文成绩替代本例。'}],concepts:[
+ ['一幅图的六个波段，是同一位置的六次观测','反射率曲线来自当前教学像元，波段名称借用常用编号。',[['空间对应','每个像元在六个波段中共用位置，先配准再比较。'],['光谱差异','可见光外观相近时，近红外和短波红外可能提供额外线索。'],['覆盖影响','植被和阴影改变响应，不能把覆盖区直接解释成下伏岩性。']]],
+ ['接受区更准，不等于整幅图更好','门槛上升减少接受范围；全图结果必须同时保留。',[['全图正确率','以全部像元为分母，不因提高门槛而改变。'],['接受区正确率','只在达到当前得分门槛的像元中计算。'],['覆盖率','表示还有多少区域可自动接受，必须与正确率一起读。']]],
+ ['相邻像元不能拆成独立的验证证据','8幅训练、2幅检查、3幅留出，整幅图隔离。',[['图幅分组','同幅图的纹理、光照和几何高度相似。'],['独立检查','把整幅资料留出，才会暴露成像差异。'],['野外核对','合成标签只供教学，不替代样品和露头验证。']]]]},
+ g2:{family:'OPT / 异常检测与空间密度聚类',methodSteps:['多指标浓度','Isolation Forest','训练分位数门槛','DBSCAN异常簇'],difficulty:'背景分布、采样介质、环境污染和空间自相关共同影响结果。异常分数不是油气概率，阈值和聚类参数应保留给复核。',papers:[
+ {date:'2024.03',journal:'Journal of Geochemical Exploration',title:'Intelligent mapping of geochemical anomalies: Adaptation of DBSCAN and mean-shift clustering approaches',authors:'Hajihosseinlou 等',doi:'10.1016/j.gexplo.2024.107393',input:'河流沉积物多变量地球化学样品',method:'利用DBSCAN与Mean-shift寻找密度结构，无需先指定簇数。',output:'地球化学异常模式与样品组',boundary:'研究对象为矿产地球化学；本课借鉴空间聚类过程，不把其结果视为油气验证。'},
+ {date:'2024在线 / 2025卷期',journal:'Earth Science Informatics',title:'How does dimensionality influence outlier detection effectiveness in multivariate geochemical data? insights from LOF and IF methods',authors:'Shahrestani 与 Sanislav',doi:'10.1007/s12145-024-01611-0',input:'不同维数的多变量地球化学资料',method:'比较IF、LOF及降维方法对异常检出的影响。',output:'变量选择与异常检出的差异',boundary:'本课使用三项浓度和两个比值；该论文说明输入变量会影响异常结构，不是本教学数据的精度来源。'}],concepts:[
+ ['单个高值，与一组指标共同异常不同','圆点和浓度来自本例采样网格，位置使用局部米坐标。',[['单指标','C1高值能提供线索，也可能受道路或取样条件影响。'],['组合特征','C2/C1和C3/C1等关系帮助观察不同响应模式。'],['单位一致','各项浓度保留本例定义，跨方法与介质不可直接混比。']]],
+ ['密度聚类区分核心点、边界点和孤立点','DBSCAN在145 m邻域内检查异常点密度。',[['核心点','含自身的邻域点数达到MinPts。'],['边界点','邻点不足也可能被邻近核心点接纳。'],['噪声点','不被任何核心簇接纳的孤立候选需另外核查。']]],
+ ['道路排除来自记录，不能归功于模型','道路掩膜与模型异常分数是两种不同的证据。',[['环境记录','取样时记录道路、污染和介质等背景。'],['公平对照','C1参照与多指标方法使用同一空间与道路规则。'],['复采输出','候选形成核查清单，不直接形成资源量或成藏结论。']]]]},
+ g3:{family:'CV + NLP / 图面识别与文本语义',methodSteps:['扫描图与图例','颜色分割＋骨架','限定字库OCR','TF-IDF文本分类'],difficulty:'图例跨年代不一致、断线和交点的拓扑、OCR字形变化与混合岩性语义都会出错。几何、字符和语义应分开检查。',papers:[
+ {date:'2025.06 · 预印本',journal:'arXiv:2506.16006',title:'DIGMAPPER: A Modular System for Automated Geologic Map Digitization',authors:'Duan 等',doi:'10.48550/arXiv.2506.16006',url:'https://arxiv.org/abs/2506.16006',input:'历史地质地图、图例和复杂图面要素',method:'把版面分析、特征提取、配准与语言模型辅助模块串成流程。',output:'可用于分析的地理空间数据',boundary:'所引版本为预印本；本课只实现受限CV、三词模板OCR与TF-IDF分类，不复现其Transformer或大语言模型。'}],concepts:[
+ ['图面几何、字符、语义是三个输出层次','同一原图上的断层线、地层代号与图例正文分别保留。',[['CV几何','把墨迹提取为掩膜，再追踪折线。'],['OCR字符','在已知词形内匹配字符及位置。'],['NLP语义','读取图例原文，给出可核对的岩性属性候选。']]],
+ ['补上缺口，也可能产生错误的连通','当前半径仅修补图像墨迹，不证明真实地质相接。',[['颜色约束','按这张图的图例识别红色断层墨迹。'],['闭运算','连接小缺口，过大的半径也可能误连。'],['骨架追踪','交点处分枝、碎段仍需人工复核。']]],
+ ['读到一个代号，不等于理解地层','图例原文进入实际训练的文本分类器。',[['原文关联','代号通过该图图例关联说明文字。'],['文本推断','字符TF-IDF与逻辑回归输出三类岩性候选。'],['语义边界','混合岩性、否定和词表外表达可能误判，不推断地层年代。']]]]},
+ g4:{family:'CV / 边缘检测与几何提取',methodSteps:['尺度与观察窗','Canny边缘','概率Hough线段','方向与P21统计'],difficulty:'层理、阴影与裂缝都形成边缘；透视和尺度也会影响几何。线段数不是裂缝数，照片角度不是三维地质产状。',papers:[
+ {date:'2025.03',journal:'International Journal of Rock Mechanics and Mining Sciences',title:'Automatic extraction and quantitative analysis of characteristics from complex fractures on rock surfaces via deep learning',authors:'Li 等',doi:'10.1016/j.ijrmms.2025.106038',input:'自然与爆破形成的岩面裂缝图像',method:'CRFSegNet分割复杂裂缝，并结合特征计算进行量化。',output:'裂缝区域和几何特征',boundary:'本课使用Canny与Hough建立可解释的CV基线，没有运行CRFSegNet，不借用论文精度。'},
+ {date:'2023.09 · 现场方法',journal:'Solid Earth',title:'Natural fracture patterns at Swift Reservoir anticline, NW Montana: the influence of structural position and lithology from multiple observation scales',authors:'Cawood 等',doi:'10.5194/se-14-1005-2023',input:'多尺度现场照片、无人机资料及地质位置',method:'在不同观察尺度上测量裂缝，并检查结构位置和岩性的影响。',output:'多尺度裂缝模式',boundary:'该工作支持尺度、取样与几何条件的教学说明；本课只输出校准照片的面内方向，不恢复三维产状。'}],concepts:[
+ ['先标定尺度，再把像素变成米','默认100 px/m，观察窗固定为480×320像素。',[['尺度','每米对应多少像素，直接影响长度换算。'],['长度','像素长度除以px/m得到米。'],['面积','像素面积除以尺度平方，再用于计算P21。']]],
+ ['图面方向与地质走向不是同一个量','横轴0°、逆时针0—180°，只表示照片平面。',[['图面方向','是当前二维图中的线段角度。'],['三维约束','真实走向和倾角还需要相机、表面或现场产状。'],['正射条件','本例假定统一尺度，未经校正的透视照片不能直接照搬。']]],
+ ['边缘检测也会把阴影和层理圈进来','青色候选必须叠回同一幅原始露头图检查。',[['边缘','表示亮度梯度，不等于地质裂缝。'],['线段','同一裂缝可能被拆段，平行重复边也可能残留。'],['线迹密度','候选长度之和除以观察面积，误检和漏检都会影响结果。']]]]}
+ };
+ var U=g.GeologyMath,esc=U.esc;
+ function svg(label,body){return '<svg class="geo-professional-svg" viewBox="0 0 700 285" role="img" aria-label="'+esc(label)+'">'+body+'</svg>';}
+ function box(x,y,w,h,title,fill){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="5" fill="'+(fill||'#e6e5d6')+'" stroke="#c4c9b5"/><text x="'+(x+15)+'" y="'+(y+28)+'" class="geo-diagram-title">'+esc(title)+'</text>';}
+ function diagram(c,k,r,s){var b='';
+  if(c.id==='g1'&&k===0){b=box(10,18,680,240,'同一像元 / 六波段反射率');var bands=r.bands[s.pixel];bands.forEach(function(v,i){var h=v*200;b+='<rect x="'+(65+i*98)+'" y="'+(217-h)+'" width="42" height="'+h+'" fill="'+(i<3?'#bba477':'#77a394')+'"/><text x="'+(67+i*98)+'" y="240">'+g.GEOLOGY_DATA.g1.features[i]+'</text>';});return svg(c.short,b);}
+  if(c.id==='g1'&&k===1){var a=U.remote(r,s.threshold);return svg('门槛和覆盖率的关系',box(15,25,310,205,'全部像元')+box(375,25,310,205,'达到当前门槛','#dfe8da')+'<text x="75" y="127" class="geo-diagram-large">'+r.truth.length+'</text><text x="421" y="127" class="geo-diagram-large">'+a.accepted+'</text><text x="45" y="181">全图正确率 '+U.pct(a.full)+'</text><text x="400" y="181">覆盖率 '+U.pct(a.coverage)+'</text>');}
+  if(c.id==='g1'){[8,2,3].forEach(function(n,i){b+=box(12+i*233,20,218,240,['训练 / 8幅','检查 / 2幅','留出 / 3幅'][i],['#dce6d6','#e5e0c7','#ead7bc'][i]);for(var j=0;j<n;j++)b+='<rect x="'+(35+i*233+j%3*58)+'" y="'+(76+Math.floor(j/3)*53)+'" width="43" height="33" fill="#fcf6e8" stroke="#b5bea4"/>';});return svg('整幅图隔离划分',b);}
+  if(c.id==='g2'&&k===0){var p=r.points[s.point];p.values.forEach(function(v,i){b+=box(15+i*233,25,218,220,['C1','C2','C3'][i]);b+='<text x="'+(43+i*233)+'" y="130" class="geo-diagram-large">'+v.toFixed(2)+'</text><text x="'+(50+i*233)+'" y="185">教学浓度 / ppm</text>';});return svg('同一样品三项浓度',b);}
+  if(c.id==='g2'&&k===1){b='<circle cx="335" cy="142" r="100" fill="#e3ebdc" stroke="#86a08c" stroke-dasharray="5 5"/>';[[335,142],[260,142],[410,142],[335,67],[335,217],[280,87],[390,197],[80,142],[620,142]].forEach(function(p,i){b+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="11" fill="'+(i===0?'#4d8c81':i<7?'#a2b99b':'#bda988')+'"/>';});return svg('DBSCAN密度邻域示意',b+'<text x="280" y="275">145 m邻域 / 示意</text>');}
+  if(c.id==='g2'){return svg('模型与环境记录的证据分工',box(15,35,310,200,'多指标模型')+box(375,35,310,200,'独立道路记录','#e8dfc9')+'<text x="45" y="125">异常分数与空间结构</text><text x="405" y="125">取样环境与需排除点</text><text x="160" y="270">两者共同形成复采与核查清单</text>');}
+  if(c.id==='g3'&&k<2){return svg(k?'墨迹与补缝':'图件原始输入','<image href="assets/geology/'+(k?r.variants[String(s.radius)].image:r.image)+'" x="20" y="12" width="660" height="260" preserveAspectRatio="xMidYMid meet"/>');}
+  if(c.id==='g3'){var l=r.labels[s.annotation];return svg('字符和图例语义之间的关联',box(15,35,208,205,'图面字符')+box(245,35,208,205,'图例原文','#e1e8dc')+box(475,35,208,205,'NLP候选','#e5ddeb')+'<text x="62" y="139" class="geo-diagram-large">'+l.ocrText+'</text><text x="266" y="128">'+esc(l.legend.slice(0,12))+'</text><text x="266" y="154">'+esc(l.legend.slice(12,24))+'</text><text x="510" y="139">'+U.nlp(s.legendText||l.legend).label+'</text>');}
+  if(c.id==='g4'&&k===0){return svg('像素尺度与长度面积换算',box(30,20,640,230,'固定观察窗 / 480 × 320 px')+'<path d="M90 190H570M90 182v16m480-16v16" stroke="#719386" stroke-width="3"/><text x="180" y="142">比例 '+s.ppm+' px/m</text><text x="165" y="225">宽 '+(480/s.ppm).toFixed(2)+' m · 面积 '+(480*320/s.ppm**2).toFixed(2)+' m²</text>');}
+  if(c.id==='g4'&&k===1){return svg('照片面内角度的定义','<path d="M160 235H590M160 235V35M160 235L445 85" fill="none" stroke="#7a9b8f" stroke-width="3"/><path d="M300 235A140 140 0 0 0 282 170" fill="none" stroke="#c09a62" stroke-width="3"/><text x="608" y="240">0°</text><text x="142" y="24">90°</text><text x="315" y="204">面内方向</text><text x="180" y="275">不是未经几何约束的三维走向、倾角</text>');}
+  return svg('裂缝、层理和阴影同在一张图中','<image href="assets/geology/'+r.image+'" x="20" y="10" width="660" height="264" preserveAspectRatio="xMidYMid meet"/>');
+ }
+ g.GeologyTeaching={byId:T,diagram:diagram};
+})(window);
