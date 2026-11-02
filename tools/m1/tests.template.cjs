@@ -64,7 +64,7 @@ test('only the requested three lesson names appear and the background retains fi
   const markup=entryHTML.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');const readable=markup.replace(/<style\b[^>]*>[\s\S]*?<\/style>/g,'').replace(/<[^>]+>/g,'');assert.equal(/人工复核|复核依据|可视化示范|近邻|kNN/.test(readable),false);
   const background=markup.split('id="panel-background"')[1].split('id="panel-workflow"')[0],chapters=background.split('<section class="background-chapter"').slice(1);
   assert.deepEqual(chapters.map(c=>/<h2[^>]*>([^<]+)<\/h2>/.exec(c)[1]),['真实背景','技术前沿','示例数据','技术难度与参考方向','术语对照表']);assert.ok(chapters[2].includes('id="reservoir-diagram"'));
-  const pkg=JSON.parse(read('m1-cuttings-case/case.json'));assert.equal(pkg.tabs.demo.label,'可运行示范');assert.equal(pkg.version,'3.2.0');assert.equal(pkg.id,'m1-cuttings');
+  const pkg=JSON.parse(read('m1-cuttings-case/case.json'));assert.equal(pkg.tabs.demo.label,'可运行示范');assert.equal(pkg.version,'3.2.1');assert.equal(pkg.id,'m1-cuttings');
 });
 test('shared offline assets contain the actual scripts, images and credited paper figures',()=>{
   const markup=entryHTML.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');const body=/<body\b[^>]*>([\s\S]*?)<\/body>/.exec(entryHTML)[1],theme=/<style data-m1-style="theme">([\s\S]*?)<\/style>/.exec(body)[1];assert.ok(Buffer.byteLength(theme)<64*1024);assert.ok(theme.includes('.background-chapter'));assert.ok(!theme.includes('data:image/'));
@@ -119,7 +119,7 @@ test('selecting a depth links the original image, source label, prediction and a
   const rt=appRuntime();await settle();const s=data.samples.find(s=>s.depth===2104),r=results.samples[s.id];delegated(rt,'depth-log','[data-pick]',{pick:s.id});assert.equal(rt.nodes.get('query-id').textContent,s.id);assert.equal(rt.nodes.get('query-image').src,s.image);assert.equal(rt.nodes.get('original-label').textContent,s.label);assert.equal(rt.nodes.get('prediction').textContent,data.classes.find(c=>c.id===r.prediction).name);for(const score of r.scores)assert.ok(rt.nodes.get('class-scores').innerHTML.includes((score*100).toFixed(1)+'%'));assert.match(rt.nodes.get('comparison-note').textContent,/不同/);
 });
 test('changing the response class changes the actual heat map without changing classification scores',async()=>{
-  const rt=appRuntime();await settle();const scoreHTML=rt.nodes.get('class-scores').innerHTML,selected=rt.nodes.get('query-id').textContent,prediction=rt.nodes.get('prediction').textContent,firstHeat=rt.canvases.filter(c=>c.width===7).at(-1).pixels;delegated(rt,'class-scores','[data-cam-class]',{camClass:'shale'});await settle();const secondHeat=rt.canvases.filter(c=>c.width===7).at(-1).pixels;assert.notDeepEqual(secondHeat,firstHeat);assert.equal(rt.nodes.get('query-id').textContent,selected);assert.equal(rt.nodes.get('prediction').textContent,prediction);assert.equal(rt.nodes.get('class-scores').innerHTML.replaceAll(/aria-pressed="(true|false)"/g,''),scoreHTML.replaceAll(/aria-pressed="(true|false)"/g,''));assert.match(rt.nodes.get('response-label').textContent,/页岩/);
+  const rt=appRuntime();await settle();const scoreHTML=rt.nodes.get('class-scores').innerHTML,selected=rt.nodes.get('query-id').textContent,prediction=rt.nodes.get('prediction').textContent,firstHeat=rt.nodes.get('response-image').children.at(-1).draws[1][0].pixels;delegated(rt,'class-scores','[data-cam-class]',{camClass:'shale'});await settle();const secondHeat=rt.nodes.get('response-image').children.at(-1).draws[1][0].pixels;assert.notDeepEqual(secondHeat,firstHeat);assert.equal(rt.nodes.get('query-id').textContent,selected);assert.equal(rt.nodes.get('prediction').textContent,prediction);assert.equal(rt.nodes.get('class-scores').innerHTML.replaceAll(/aria-pressed="(true|false)"/g,''),scoreHTML.replaceAll(/aria-pressed="(true|false)"/g,''));assert.match(rt.nodes.get('response-label').textContent,/页岩/);
 });
 test('holdout selection uses its own 24 observations and exports its actual fixed scores',async()=>{
   const rt=appRuntime();await settle();rt.event('phase-test','click');assert.equal((rt.nodes.get('depth-log').innerHTML.match(/data-pick=/g)||[]).length,24);assert.match(rt.nodes.get('phase-comparison').innerHTML,/33\.3%/);rt.event('export-identification','click');const lines=(await rt.blobs.at(-1).text()).trim().split('\r\n');assert.equal(lines.length,25);assert.match(lines[0],/identified_lithology/);assert.ok(lines[1].includes(results.method.weightsSha256));assert.ok(lines[1].includes('test'));assert.doesNotMatch(lines[0],/review/);
@@ -145,7 +145,7 @@ test('reduced motion, lag controls and bounded keyboard preparation navigation r
   const rt=appRuntime(false,true);await settle();assert.equal(rt.body.classList.contains('is-paused'),true);rt.event('motion-toggle','click');assert.equal(rt.body.classList.contains('is-paused'),false);rt.nodes.get('lag-minutes').value='60';rt.event('lag-minutes','input');assert.equal(rt.nodes.get('source-depth').textContent,'3188 m');rt.buttons.find(b=>b.dataset.step==='0').listeners.keydown({key:'End',preventDefault(){}});assert.equal(rt.nodes.get('flow-count').textContent,'6 / 6');
 });
 test('the portal mounts all three matching lesson views once and removes them when leaving the case',()=>{
-  const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings'),sc=rt.ctx.ATLAS.index.byScene.m1,tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=3.2.0'));const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});click('flow');const flowFrame=rt.document.getElementById('case-flow-root').children[0];assert.ok(flowFrame.src.includes('demo/workflow.html'));click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.includes('demo/identify.html'));click('bg');click('demo');assert.equal(rt.document.getElementById('case-demo-root').children.length,1);rt.ctx.__shellTest.unmountCurrent();for(const frame of [bg,flowFrame,demo])assert.equal(frame.removed,true);
+  const rt=support.makeRuntime(),c=rt.ctx.Cases.get('m1-cuttings'),sc=rt.ctx.ATLAS.index.byScene.m1,tabs=rt.document.getElementById('tabs');for(const name of ['bg','flow','demo']){const b=new support.El('button');b.dataset.tab=name;tabs.children.push(b);const p=new support.El();p.dataset.panel=name;rt.panels.push(p);}rt.ctx.__shellTest.bindTabs(sc,c);const bg=rt.document.getElementById('case-bg-root').children[0];assert.ok(bg.src.includes('?v=3.2.1'));const click=tab=>tabs.listeners.click({target:{closest:()=>tabs.children.find(b=>b.dataset.tab===tab)}});click('flow');const flowFrame=rt.document.getElementById('case-flow-root').children[0];assert.ok(flowFrame.src.includes('demo/workflow.html'));click('demo');const demo=rt.document.getElementById('case-demo-root').children[0];assert.ok(demo.src.includes('demo/identify.html'));click('bg');click('demo');assert.equal(rt.document.getElementById('case-demo-root').children.length,1);rt.ctx.__shellTest.unmountCurrent();for(const frame of [bg,flowFrame,demo])assert.equal(frame.removed,true);
 });
 
 test('the fixed conventional baseline uses matching folds, genuine twelve-dimensional features and no holdout fitting',()=>{
@@ -155,8 +155,25 @@ test('the fixed conventional baseline uses matching folds, genuine twelve-dimens
   for(const phase of ['validation','test']){const pool=data.samples.filter(s=>(s.split==='test')===(phase==='test')),matrix=Array.from({length:3},()=>[0,0,0]);for(const s of pool)matrix[baseline.classes.indexOf(s.classId)][baseline.classes.indexOf(baseline.samples[s.id].prediction)]++;assert.deepEqual(baseline.metrics[phase].matrix,matrix);assert.ok(Math.abs(baseline.metrics[phase].accuracy-matrix.reduce((n,row,i)=>n+row[i],0)/pool.length)<1e-8);}
 });
 
-test('both groups keep actual positive and negative CNN comparisons visible in workflow and demonstration',async()=>{
-  const rt=appRuntime();await settle();rt.step(4);for(const id of ['flow-snapshot','comparison-benchmarks']){const h=rt.nodes.get(id).innerHTML;for(const value of ['24/42','37/42','14/24','8/24','+31.0','-25.0'])assert.ok(h.includes(value),id+' missing '+value);assert.match(h,/不是人工专家成绩/);assert.match(h,/本组 CNN 的精度更低/);}rt.event('phase-test','click');assert.match(rt.nodes.get('comparison-benchmarks').innerHTML,/37\/42/);assert.match(rt.nodes.get('result-batch-note').textContent,/24 张/);
+test('background presents development results and complete experimental records stay accessible',async()=>{
+  const rt=appRuntime();await settle();rt.step(4);const flowHTML=rt.nodes.get('flow-snapshot').innerHTML;
+  for(const value of ['24/42','37/42','14/24','8/24','+31.0','-25.0'])assert.ok(flowHTML.includes(value));
+  let demoHTML=rt.nodes.get('comparison-benchmarks').innerHTML;assert.match(demoHTML,/37\/42/);assert.doesNotMatch(demoHTML,/14\/24/);
+  const background=sectionOf(rawEntryHTML,'background');assert.ok(background.includes('data-outcome-phase="validation"'));assert.ok(!background.includes('data-outcome-phase="test"'));assert.match(background,/开发组 42 张照片的分组验证结果/);
+  rt.event('phase-test','click');demoHTML=rt.nodes.get('comparison-benchmarks').innerHTML;assert.match(demoHTML,/8\/24/);assert.doesNotMatch(demoHTML,/37\/42/);assert.match(rt.nodes.get('result-batch-note').textContent,/24 张/);
+});
+
+test('three visual questions use the same real specimen, scores and class response',async()=>{
+  const rt=appRuntime();await settle();
+  for(const id of ['smart-method-title','smart-evidence-title','smart-effect-title'])assert.ok(rawEntryHTML.includes('id="'+id+'"'));
+  delegated(rt,'smart-example-controls','[data-smart-pick]',{smartPick:'w2-2134'});await settle();
+  const s=data.samples.find(s=>s.id==='w2-2134'),r=results.samples[s.id];
+  assert.equal(rt.nodes.get('query-id').textContent,s.id);for(const id of ['smart-route-image','smart-source-image'])assert.equal(rt.nodes.get(id).src,s.image);
+  assert.match(rt.nodes.get('smart-baseline-result').innerHTML,/灰质白云岩.*与源标签不同/);assert.match(rt.nodes.get('smart-cnn-result').innerHTML,/细砂岩.*与源标签一致/);
+  for(const score of r.scores)assert.ok(rt.nodes.get('smart-route-scores').innerHTML.includes((score*100).toFixed(1)+'%'));
+  assert.equal((rt.nodes.get('smart-color-chart').innerHTML.match(/<rect /g)||[]).length,12);
+  const canvas=rt.nodes.get('smart-response-image').children.at(-1);assert.equal(canvas.draws[0][0].sampleId,s.id);assert.equal(canvas.draws.length,2);
+  pick(rt,'w2-2104');await settle();assert.match(rt.nodes.get('smart-cnn-result').innerHTML,/与源标签不同/);
 });
 
 test('batch playback and before-after controls display only saved predictions for the chosen group',async()=>{

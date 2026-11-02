@@ -138,7 +138,7 @@
     $('class-scores').innerHTML=classes.map(function(c,i){return '<button type="button" class="class-score" data-cam-class="'+c.id+'" aria-pressed="'+(currentCamClass===c.id)+'"><span>'+c.name+'</span><i><b style="width:'+r.scores[i]*100+'%;background:'+c.color+'"></b></i><strong>'+pct(r.scores[i])+'</strong></button>';}).join('');
     $('response-label').textContent=className(currentCamClass)+' / 图像响应';drawSampleCanvas($('response-image'),currentCamClass);
     $('depth-legend').innerHTML=classes.map(function(c){return '<span><i style="background:'+c.color+'"></i>'+c.name+'</span>';}).join('');
-    renderDepth(focus);renderEvaluation();renderDemoComparison();
+    renderDepth(focus);renderEvaluation();renderDemoComparison();renderSmartMechanism();
   }
   function renderEvaluation(){
     $('phase-comparison').innerHTML=['validation','test'].map(function(phase){var m=RESULTS.metrics[phase];return '<div><span>'+(phase==='test'?'留出组 · 24 张':'开发组 · 42 张')+'</span><b>'+pct(m.accuracy)+'</b><small>与原始标签一致<br>宏平均 F1 '+m.macroF1.toFixed(3)+'</small></div>';}).join('');

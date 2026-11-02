@@ -1,0 +1,20 @@
+    <section class="smart-demo-chapter" aria-labelledby="smart-method-title">
+      <div class="smart-chapter-heading"><span>01</span><div><p class="mini-label">引入的智能化方法是什么？</p><h3 id="smart-method-title">ResNet-18 迁移学习</h3><p>复用预训练 CNN 的图像识别能力，用岩屑标签拟合三类分类器。</p></div><b class="smart-replay-label">固定实验回放</b></div>
+      <div class="smart-method-route" role="img" aria-label="岩屑照片进入预训练 ResNet-18 卷积神经网络，提取图像特征，由三类线性分类器产生岩性候选和分类得分">
+        <div class="smart-route-input"><span class="smart-node-label">输入</span><img id="smart-route-image" alt="当前岩屑照片的缩略图"><b>岩屑照片</b></div><i>→</i>
+        <div class="smart-route-cnn"><span class="smart-node-label">智能核心 · CNN</span><div class="smart-feature-stack" aria-hidden="true"><i></i><i></i><i></i></div><b>预训练 ResNet-18</b><small>边缘 · 纹理 · 形态</small></div><i>→</i>
+        <div class="smart-route-classifier"><span class="smart-node-label">适配本课岩性</span><svg viewBox="0 0 120 60" aria-hidden="true"><g stroke="#c18b6d" fill="none"><path d="M12 10L100 10M12 10L100 30M12 10L100 50M12 30L100 10M12 30L100 30M12 30L100 50M12 50L100 10M12 50L100 30M12 50L100 50"/></g><g fill="#b95739"><circle cx="12" cy="10" r="5"/><circle cx="12" cy="30" r="5"/><circle cx="12" cy="50" r="5"/><circle cx="100" cy="10" r="5"/><circle cx="100" cy="30" r="5"/><circle cx="100" cy="50" r="5"/></g></svg><b>三类线性分类器</b><small>用岩屑标签学习类别区分</small></div><i>→</i>
+        <div class="smart-route-output"><span class="smart-node-label">输出 · 当前照片</span><div id="smart-route-scores"></div><b id="smart-route-prediction"></b></div>
+      </div><p class="smart-diagram-caption">中间网络图为方法示意；两端照片、得分与岩性候选来自同一份实际实验记录。</p>
+    </section>
+    <section class="smart-demo-chapter" id="smart-evidence" aria-labelledby="smart-evidence-title">
+      <div class="smart-chapter-heading"><span>02</span><div><p class="mini-label">为什么加入此方法有作用？</p><h3 id="smart-evidence-title">不只统计颜色，还利用纹理和形态。</h3><p>颜色统计舍去了像素的位置关系；CNN 能组合局部边缘、纹理与形态，帮助区分颜色接近的岩屑。</p></div></div>
+      <div class="smart-example-heading"><b>先看颜色容易混淆的样品</b><div id="smart-example-controls" class="smart-example-controls" role="group" aria-label="选择颜色参照判错而CNN与源标签一致的示例"></div></div>
+      <div class="smart-evidence-grid">
+        <figure class="smart-source-photo"><span class="smart-node-label">同一张真实照片</span><div class="smart-source-frame"><img id="smart-source-image" alt="当前岩屑原图"><span id="smart-source-roi" class="roi-outline" aria-hidden="true"></span></div><figcaption><b id="smart-source-caption"></b><span id="smart-source-label"></span><span>虚线框对应 CNN 使用的区域</span></figcaption></figure>
+        <article class="smart-color-evidence"><span class="smart-node-label">常规颜色参照</span><h4>比较颜色分布</h4><div id="smart-color-chart"></div><p>只比较 R、G、B 各区间的数量。</p><div class="smart-decision" id="smart-baseline-result"></div></article>
+        <article class="smart-cnn-evidence"><span class="smart-node-label">CNN 图像识别</span><h4>保留空间图像特征</h4><div id="smart-response-image" class="response-image"></div><div class="smart-response-scale"><span>当前候选的类别响应</span><i></i></div><div class="smart-decision" id="smart-cnn-result"></div></article>
+      </div>
+      <p id="smart-evidence-note" class="smart-evidence-note" role="status"></p>
+      <p class="smart-diagram-caption">响应图表示哪些图像区域与当前类别关联较强，不表示矿物分布。每次切换样品，三栏同步更新。</p>
+    </section>

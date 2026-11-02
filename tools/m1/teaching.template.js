@@ -1,7 +1,7 @@
   var networkStage=0,batchTimer=null,batchToken=0,batchIndex=0,batchPlaying=false,resultView='both';
   function correctCount(m){return m.matrix.reduce(function(n,row,i){return n+row[i];},0);}
-  function methodComparisonHTML(){
-    return '<div class="method-comparison-grid">'+['validation','test'].map(function(phase){var a=BASELINE.metrics[phase],b=RESULTS.metrics[phase],delta=(b.accuracy-a.accuracy)*100;return '<article><h4>'+(phase==='test'?'留出组 · 24 张':'开发组逐组验证 · 42 张')+'</h4><div class="method-bar"><span>常规颜色参照</span><i><b style="width:'+a.accuracy*100+'%"></b></i><strong>'+correctCount(a)+'/'+a.count+'</strong></div><div class="method-bar is-cnn"><span>CNN 迁移学习</span><i><b style="width:'+b.accuracy*100+'%"></b></i><strong>'+correctCount(b)+'/'+b.count+'</strong></div><p class="method-delta '+(delta<0?'is-lower':'')+'">CNN '+(delta>=0?'+':'')+delta.toFixed(1)+' 个百分点</p><small>与源标签一致的照片数；'+(phase==='test'?'本组 CNN 的精度更低。':'每个井段的结果都来自其他开发组拟合的分类层。')+'</small></article>';}).join('')+'</div><p class="fine-print">常规参照使用 12 维 RGB 直方图与最近类别中心，是计算基线，不是人工专家成绩。两种方法使用相同原图、裁切和外层分组。</p>';
+  function methodComparisonHTML(phases){
+    return '<div class="method-comparison-grid">'+(phases||['validation','test']).map(function(phase){var a=BASELINE.metrics[phase],b=RESULTS.metrics[phase],delta=(b.accuracy-a.accuracy)*100;return '<article><h4>'+(phase==='test'?'留出组 · 24 张':'开发组逐组验证 · 42 张')+'</h4><div class="method-bar"><span>常规颜色参照</span><i><b style="width:'+a.accuracy*100+'%"></b></i><strong>'+(phases?pct(a.accuracy)+'<small>'+correctCount(a)+'/'+a.count+'</small>':correctCount(a)+'/'+a.count)+'</strong></div><div class="method-bar is-cnn"><span>CNN 迁移学习</span><i><b style="width:'+b.accuracy*100+'%"></b></i><strong>'+(phases?pct(b.accuracy)+'<small>'+correctCount(b)+'/'+b.count+'</small>':correctCount(b)+'/'+b.count)+'</strong></div><p class="method-delta '+(delta<0?'is-lower':'')+'">CNN '+(delta>=0?'+':'')+delta.toFixed(1)+' 个百分点</p><small>与源标签一致的照片数；'+(phase==='test'?'本组 CNN 的精度更低。':'每个井段的结果都来自其他开发组拟合的分类层。')+'</small></article>';}).join('')+'</div><p class="fine-print">常规参照使用 12 维 RGB 直方图与最近类别中心，是计算基线，不是人工专家成绩。两种方法使用相同原图、裁切和外层分组。</p>';
   }
   function networkHTML(){
     var names=['照片输入','卷积与残差','三类分类层','岩性候选'],explain=[
@@ -27,8 +27,28 @@
     stopBatchPlayback();var pool=phaseSamples();batchIndex=pool.length;batchPlaying=false;
     $('result-batch-note').textContent='同一批输入：'+pool.length+' 张照片、源井深与原始标签。';
     $('result-comparison').dataset.resultView=resultView;
-    $('comparison-benchmarks').innerHTML=methodComparisonHTML();updateBatchDisplay();
+    $('comparison-benchmarks').innerHTML=methodComparisonHTML([evaluationStage]);updateBatchDisplay();
   }
+  function renderSmartMechanism(){
+    var s=byId[currentId],r=RESULTS.samples[currentId],base=BASELINE.samples[currentId],pool=phaseSamples();
+    $('demo-phase-badge').textContent=(evaluationStage==='test'?'留出记录 · ':'开发组 · ')+pool.length+' 张';
+    $('smart-effect-title').textContent=evaluationStage==='test'?'查看完整记录，比较当前组的识别效果。':'分得更准，也能整批形成井深记录。';
+    $('smart-route-image').src=s.image;$('smart-source-image').src=s.image;
+    var audit=AUDIT[s.id],roi=audit.roi,roiStyle=$('smart-source-roi').style;roiStyle.left=roi[0]/audit.width*100+'%';roiStyle.top=roi[1]/audit.height*100+'%';roiStyle.right=(1-roi[2]/audit.width)*100+'%';roiStyle.bottom=(1-roi[3]/audit.height)*100+'%';
+    $('smart-source-caption').textContent=s.id+' · '+s.depth+' m';$('smart-source-label').textContent='源标签：'+className(s.classId);
+    $('smart-route-prediction').textContent='候选：'+className(r.prediction);
+    $('smart-route-scores').innerHTML=classes.map(function(c,i){return '<div class="smart-mini-score"><span>'+c.name+'</span><i><b style="width:'+r.scores[i]*100+'%"></b></i><strong>'+pct(r.scores[i])+'</strong></div>';}).join('');
+    $('smart-color-chart').innerHTML='<svg viewBox="0 0 255 145" role="img" aria-label="当前照片裁切区域的实际RGB颜色直方图">'+['R','G','B'].map(function(channel,c){return '<text x="'+(c*85+30)+'" y="140">'+channel+'</text>'+base.histogram.slice(c*4,c*4+4).map(function(v,j){return '<rect x="'+(c*85+j*18+7)+'" y="'+(120-v*95)+'" width="13" height="'+(v*95)+'" fill="'+['#bf826b','#92a787','#819dad'][c]+'"/>';}).join('');}).join('')+'<path d="M0 121H255" stroke="#d9c4ad"/></svg>';
+    [['smart-baseline-result',base.prediction],['smart-cnn-result',r.prediction]].forEach(function(pair){var hit=pair[1]===s.classId,node=$(pair[0]);node.classList.toggle('is-correct',hit);node.classList.toggle('is-mismatch',!hit);node.innerHTML='<b>'+className(pair[1])+'</b><span>'+(hit?'与源标签一致':'与源标签不同')+'</span>';});
+    drawSampleCanvas($('smart-response-image'),r.prediction);
+    var candidates=pool.filter(function(row){return BASELINE.samples[row.id].prediction!==row.classId&&RESULTS.samples[row.id].prediction===row.classId;}),examples=[];
+    candidates.forEach(function(row){if(examples.length<3&&!examples.some(function(old){return old.classId===row.classId;}))examples.push(row);});
+    candidates.forEach(function(row){if(examples.length<3&&!examples.some(function(old){return old.id===row.id||old.group===row.group;}))examples.push(row);});
+    $('smart-example-controls').innerHTML=examples.length?examples.map(function(row){return '<button type="button" data-smart-pick="'+row.id+'" aria-pressed="'+(row.id===currentId)+'">'+row.depth+' m →</button>';}).join(''):'<span class="fine-print">当前参数下没有此类样品，可切换照片继续比较。</span>';
+    var summary=base.prediction!==s.classId&&r.prediction===s.classId?'这张照片的颜色参照给出'+className(base.prediction)+'，CNN 给出'+className(r.prediction)+'，与源标签一致。':base.prediction===s.classId&&r.prediction===s.classId?'这张照片两种方法都与源标签一致。点击上方样品，查看颜色参照与 CNN 判断不同的例子。':'当前样品的两种结果已同步显示，可对照源标签查看差异。';
+    $('smart-evidence-note').textContent=summary+' 本组有 '+candidates.length+' 张照片的颜色参照判错、CNN 与源标签一致。';
+  }
+  $('smart-example-controls').addEventListener('click',function(event){var b=event.target.closest('[data-smart-pick]');if(b&&byId[b.dataset.smartPick])selectSample(b.dataset.smartPick,false);});
   $('play-batch').addEventListener('click',function(){
     stopBatchPlayback();var token=batchToken,total=phaseSamples().length;batchPlaying=true;batchIndex=0;updateBatchDisplay();
     function tick(){if(token!==batchToken)return;batchIndex=motionPaused?total:Math.min(total,batchIndex+1);updateBatchDisplay();if(batchIndex<total)batchTimer=window.setTimeout(tick,70);}

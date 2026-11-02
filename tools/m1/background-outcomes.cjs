@@ -9,7 +9,7 @@ module.exports = function backgroundOutcomes(data) {
     const sample = data.samples.find(row => row.classId === rock.id && row.split === 'reference' && cnn.samples[row.id].prediction === rock.id);
     return '<tr><td>' + sample.depth + ' m</td><td>' + rock.name + '</td><td>' + percent(Math.max(...cnn.samples[sample.id].scores)) + '</td></tr>';
   }).join('');
-  const charts = ['validation', 'test'].map(phase => {
+  const charts = ['validation'].map(phase => {
     const a = baseline.metrics[phase], b = cnn.metrics[phase];
     const delta = (b.accuracy - a.accuracy) * 100;
     return '<article class="outcome-accuracy-card" data-outcome-phase="' + phase + '">' +
@@ -38,6 +38,11 @@ module.exports = function backgroundOutcomes(data) {
     <p class="outcome-source">效率对照展示重复操作的变化；本课未采集人工计时，不换算为节省时长或提速倍数。</p>
     <div class="outcome-accuracy-heading"><span class="mini-label">准确度对照 / 与源标签一致的比例</span><h3>识别效果，用同一批照片比较。</h3><p>下图对照常规颜色统计程序与 CNN 的实际结果。两者都使用本课公开照片；未采集人工专家成绩。</p></div>
     <div class="outcome-accuracy-grid">${charts}</div>
-    <p class="outcome-source">数据：本课固定实验结果。CNN 在开发组表现更好，在留出组表现更低，当前小样本模型仍需改进。这里展示识别成果；数据划分与算法计算在案例流程中展开。</p>
+    <p class="outcome-source">数据：本课开发组 42 张照片的分组验证结果，不能代表新井或其他拍摄条件的识别精度。数据划分与算法计算在案例流程中展开。</p>
   </section>`;
+};
+// Older portals receive a compact equivalent; the full illustration lives in the chapter page.
+module.exports.legacy = function () {
+  const a=baseline.metrics.validation,b=cnn.metrics.validation;
+  return '<h3>传统与现在：岩屑辅助识别</h3><table><thead><tr><th>对照</th><th>传统人工观察</th><th>智能辅助识别</th></tr></thead><tbody><tr><td>处理方式</td><td>逐张观察、比较、登记</td><td>以 CNN 为代表的图像识别程序，成批生成候选</td></tr><tr><td>成果</td><td>岩性描述与井深记录</td><td>岩性候选、分类得分与井深汇总</td></tr></tbody></table><h4>开发组 · 42 张</h4><svg viewBox="0 0 640 112" role="img" aria-label="开发组颜色参照57.1%，CNN88.1%"><text x="0" y="27" font-size="14">颜色参照</text><rect x="115" y="10" width="'+a.accuracy*400+'" height="22" fill="#b4a18a"/><text x="520" y="27" font-size="14">'+percent(a.accuracy)+'</text><text x="0" y="75" font-size="14">CNN 辅助识别</text><rect x="115" y="58" width="'+b.accuracy*400+'" height="22" fill="#b95739"/><text x="520" y="75" font-size="14">'+percent(b.accuracy)+'</text></svg><p>开发组按井段分组验证，与源标签的一致率由 '+correct(a)+'/42 增至 '+correct(b)+'/42；不代表新井表现。效率展示批量处理方式，未采集人工计时。</p>';
 };
