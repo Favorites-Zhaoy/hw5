@@ -176,6 +176,9 @@
      五、环节页
      ========================================================= */
   function stageHTML(st, q) {
+    if (st.id === 'seismic' && global.SeismicStage) {
+      return global.SeismicStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
     if (st.id === 'drilling' && global.DrillingStage) {
       return global.DrillingStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
     }
@@ -1016,7 +1019,9 @@
 
     // 页面级交互
     if (p[0] === 'stage') {
-      if (p[1] === 'drilling' && global.DrillingStage) {
+      if (p[1] === 'seismic' && global.SeismicStage) {
+        stageHandle = global.SeismicStage.bind(view.querySelector('[data-seismic-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else if (p[1] === 'drilling' && global.DrillingStage) {
         stageHandle = global.DrillingStage.bind(view.querySelector('[data-drilling-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
       } else if (p[1] === 'welllog' && global.WelllogStage) {
         stageHandle = global.WelllogStage.bind(view.querySelector('[data-welllog-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });

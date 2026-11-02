@@ -16,3 +16,12 @@ assets/vendor/ort-1.31.1/* -text
 assets/vendor/ort-1.31.1/* whitespace=cr-at-eol
 assets/vendor/ort-1.31.1/SOURCE.json text eol=lf
 tools/mudlogging/real-data/raw/* whitespace=cr-at-eol
+
+# Keep byte-hashed training sources and published model payloads stable on Windows.
+tools/drilling/prepare-models.cjs text eol=crlf
+assets/drilling/engine.js text eol=lf
+tools/welllog/prepare.py text eol=lf
+assets/welllog/models.js text eol=lf
+assets/seismic/data.js text eol=lf
+assets/seismic/models.js text eol=lf
+assets/seismic/data/*.js text eol=lf

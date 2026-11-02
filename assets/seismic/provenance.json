@@ -1,0 +1,252 @@
+{
+  "seed": 20261102,
+  "illustrationsUsedForTraining": false,
+  "runtime": {
+    "python": "3.12.10",
+    "numpy": "2.2.6",
+    "torch": "2.9.1+cpu",
+    "sklearn": "1.6.1",
+    "scipy": "1.16.0",
+    "Pillow": "11.3.0"
+  },
+  "datasets": {
+    "s1": {
+      "loss": [
+        [
+          0,
+          0.791688,
+          1.414701
+        ],
+        [
+          40,
+          1.069728,
+          1.392801
+        ],
+        [
+          80,
+          0.709889,
+          1.34221
+        ],
+        [
+          120,
+          1.701411,
+          1.317958
+        ],
+        [
+          160,
+          1.257434,
+          1.290642
+        ]
+      ],
+      "labelOrigin": "FaultSeg3D author forward-model labels",
+      "selection": "Held-out windows centered on a reference fault near the cube center; no selection by model score.",
+      "attributeCalibration": {
+        "threshold": 0.002,
+        "checkF1": 0.087653,
+        "volume": 3,
+        "scope": "One reference-centered check window, all eight slices; freeze the attribute threshold on all display windows."
+      }
+    },
+    "s2": {
+      "loss": [
+        [
+          0,
+          2.301616,
+          2.289682
+        ],
+        [
+          40,
+          1.888313,
+          1.897577
+        ],
+        [
+          80,
+          1.213727,
+          1.524147
+        ],
+        [
+          120,
+          0.911113,
+          1.218436
+        ],
+        [
+          160,
+          0.822854,
+          1.024524
+        ],
+        [
+          200,
+          0.758089,
+          0.951247
+        ],
+        [
+          240,
+          0.581157,
+          0.880214
+        ],
+        [
+          280,
+          0.654711,
+          0.813598
+        ],
+        [
+          320,
+          0.648327,
+          0.748507
+        ],
+        [
+          360,
+          0.566212,
+          0.702146
+        ]
+      ],
+      "labels": "10 interpreted horizon intervals in the original v2 mask, not the different six-class F3 benchmark.",
+      "auxiliaryInput": "Normalized image-row position is an explicit same-survey stratigraphic prior. Baseline receives the same two pointwise inputs; neural model also sees a 5x5 neighborhood."
+    },
+    "s3": {
+      "loss": [
+        [
+          0,
+          0.669572,
+          0.661437
+        ],
+        [
+          40,
+          0.312235,
+          0.296957
+        ],
+        [
+          80,
+          0.156614,
+          0.153976
+        ],
+        [
+          120,
+          0.049223,
+          0.043989
+        ],
+        [
+          160,
+          0.014676,
+          0.013476
+        ]
+      ],
+      "fieldLabelStatus": "The source MAT contains only csg_ff and no independent arrival labels or sampling interval.",
+      "modelTraining": "Controlled synthetic onset signals; field application is an out-of-domain qualitative comparison."
+    },
+    "s4": {
+      "wells": {
+        "15_9-13": {
+          "rawRows": 21441,
+          "validRows": 13703,
+          "usedRows": 5428
+        },
+        "15_9-14": {
+          "rawRows": 22875,
+          "validRows": 20120,
+          "usedRows": 10874
+        },
+        "15_9-15": {
+          "rawRows": 20954,
+          "validRows": 13239,
+          "usedRows": 7207
+        },
+        "15_9-17": {
+          "rawRows": 19879,
+          "validRows": 13142,
+          "usedRows": 7214
+        },
+        "16_1-2": {
+          "rawRows": 18547,
+          "validRows": 1625,
+          "usedRows": 1155
+        },
+        "16_10-1": {
+          "rawRows": 20147,
+          "validRows": 11267,
+          "usedRows": 7761
+        }
+      },
+      "trainingLoss": 0.005115542380392374,
+      "target": "NPHI apparent neutron porosity, m3/m3",
+      "excluded": "Missing or outside DTC 40..220 us/ft, RHOB 1.4..3.2 g/cm3, NPHI 0..0.6; use longest consecutive valid interval, no filling across gaps."
+    },
+    "s5": {
+      "loss": [
+        [
+          0,
+          0.128413,
+          0.079903
+        ],
+        [
+          40,
+          0.030622,
+          0.013656
+        ],
+        [
+          80,
+          0.017651,
+          0.006487
+        ],
+        [
+          120,
+          0.009399,
+          0.006021
+        ],
+        [
+          160,
+          0.008356,
+          0.005904
+        ],
+        [
+          200,
+          0.008548,
+          0.005716
+        ]
+      ],
+      "modelSeed": 20261107,
+      "selection": "Full-resolution 128x160 crop at source row 180, column 300; deliberately separate from decimated S2 classification overview.",
+      "noise": "Independent zero-mean Gaussian noise, training sigma .08.. .4; browser multiplies saved independent unit-noise arrays by its actual slider setting.",
+      "reference": "Field F3 image remains a noisy processed reference, not a clean ground truth."
+    }
+  },
+  "dataSHA256": "3bf8bef14913754d8d3450d0a67d66f7211d9c94b0af0aea6131732f5e51abee",
+  "modelSHA256": {
+    "s1": "028beb5ed2d92735f3dbab460699f927cecae963a3f74a058cf74ac96dc1cc92",
+    "s2": "0e05a4293be8cafd02507b52a5dd9c58a9bf73e9000768f5109a758c0dd82dcf",
+    "s3": "5dfb39401791097c3ace51bd9e37533fb0e6ab893bcfce199af9b8683a4d5102",
+    "s4": "b50695e00ac891791791e3b128788db12ba4e28e4919244bdc0753c4fc5b9797",
+    "s5": "1c2177e8a8195514981649cbce43fc09860204494687958a8f353e50fd0150bc"
+  },
+  "generatorJSONSHA256": "28efffbd9d6e71ec3bcd9dc05205ec8473818f28e00929aa31f0c53202dd14e7",
+  "assetIntegrity": {
+    "data.js": {
+      "bytes": 1434,
+      "sha256": "86d82d1fcca00c4ebdaef445c51592dd00cfd432590b8cb8b6a7ab35c96f7cea"
+    },
+    "models.js": {
+      "bytes": 81990,
+      "sha256": "bb01a402004c2c582bbab76608cbd885aafcf9b2b0fdd110ec14d1d0111f4702"
+    },
+    "data/s1.js": {
+      "bytes": 2186961,
+      "sha256": "0e2ecaeefd6a5dde659232a062c821feaf09fb7ef3d64836c24b4f46c46ba0c6"
+    },
+    "data/s2.js": {
+      "bytes": 1211059,
+      "sha256": "6ddb73b39160b258fef70631a033a5ef6e84ac38b72bf8baf22859fadc446fc4"
+    },
+    "data/s3.js": {
+      "bytes": 2294549,
+      "sha256": "d3eef30ab048bbba42c648920589f883116902d4789208261bf13fec0c758664"
+    },
+    "data/s4.js": {
+      "bytes": 102789,
+      "sha256": "9e5d491cd294ca82bcbdaf0c2c70f450529580bb04fdf5034f2d18671c056f50"
+    },
+    "data/s5.js": {
+      "bytes": 2471231,
+      "sha256": "3b519cd72ad4958f9ba9a5ba93078fcd6315670eb1f3b519eed970f8ed8568a0"
+    }
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "sources": [
+    {
+      "file": "15_9-13.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/15_9-13.las",
+      "bytes": 5876460,
+      "sha256": "cc76ebdda1534e49ed9f03def12bc57ca5422e659e13e2063b78db04d2561c95",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "15_9-14.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/15_9-14.las",
+      "bytes": 6269357,
+      "sha256": "5d6cf7de93558402fbc4ca25d3e59eae7c25b4301e05dacb3327055c4203afb1",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "15_9-15.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/15_9-15.las",
+      "bytes": 6287878,
+      "sha256": "aa3da149b2483ca6270fc448fc0088f8860060437d9f9ec23df02280fff7eff0",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "15_9-17.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/15_9-17.las",
+      "bytes": 5706912,
+      "sha256": "08e45f8dafd9d2609611faca818453d137c219f45dc357491d7515227fb4a8b8",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "16_1-2.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/16_1-2.las",
+      "bytes": 4842356,
+      "sha256": "790636dc4fb687ffc3d07f5e950642489836f22e22b3723da171767500589771",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "16_10-1.las",
+      "url": "https://raw.githubusercontent.com/bolgebrygg/Force-2020-Machine-Learning-competition/c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1/lithology_competition/data/las_files_Lithostrat_data/16_10-1.las",
+      "bytes": 6045779,
+      "sha256": "9c487374adfd3c10a7958ccdee1c145702235ac9daaf97462a2c033b43bcd8e7",
+      "dataset": "FORCE2020",
+      "license": "NLOD 2.0 (raw logs); CC BY 4.0 (interpreted labels)",
+      "commit": "c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1",
+      "kind": "field well logs"
+    },
+    {
+      "file": "Ithra_field_Dataset.mat",
+      "url": "https://data.mendeley.com/public-files/datasets/p8pbnyfybr/files/cf38639b-35ed-4f17-b4a0-ca31cde86ff8/file_downloaded",
+      "bytes": 29558370,
+      "sha256": "aa62c01ce30c1f29d88e9e380e9f2601017756acd4c8c6a39af6c479f506259c",
+      "dataset": "Awais and Hanafy 2023",
+      "doi": "10.17632/p8pbnyfybr.1",
+      "license": "CC BY 4.0",
+      "kind": "field shot gathers",
+      "publisherSHA256": "aa62c01ce30c1f29d88e9e380e9f2601017756acd4c8c6a39af6c479f506259c"
+    },
+    {
+      "file": "f3-inline-100.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_100.tiff",
+      "bytes": 1757662,
+      "sha256": "c31ad15cb7de99a7296843342f71f45d09897a8fbb41d6cdfbf0bb4189dc4758",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-140.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_140.tiff",
+      "bytes": 1757662,
+      "sha256": "9004e9b454aba7e38437e29fa07d2ad7665baab903ff1da47d00c155eb602a82",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-180.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_180.tiff",
+      "bytes": 1757662,
+      "sha256": "aa170cbc5469d7c55baae309d98d65120915c73a588df62a1faca717fda9ee34",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-220.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_220.tiff",
+      "bytes": 1757662,
+      "sha256": "ccc160903f2f54d9bf4f5e8491b5807a1b3ac0aaaf563f9c96d75e96a1e046a6",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-260.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_260.tiff",
+      "bytes": 1757662,
+      "sha256": "8aef6a8ea82316b8584c7190c7d3bf06ede499945112cfbfd13eeaae81a1781a",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-300.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_300.tiff",
+      "bytes": 1757662,
+      "sha256": "564afb87aa821c7d174c6e0c089113a5efc8c9cb9069beda34fb40a114bceb95",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-340.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_340.tiff",
+      "bytes": 1757662,
+      "sha256": "a6228b5d147e47dc82eecf8c0128655cad487792e304b006018d4a1154934d4c",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-380.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_380.tiff",
+      "bytes": 1757662,
+      "sha256": "944d3a4ae8b5b8796239210c7e6ce083ff09f6814de546f393a4662e766283d2",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-440.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_440.tiff",
+      "bytes": 1757662,
+      "sha256": "c3ffa8995ca9216a31841956254ff7206b86f6d30aa4c6f72b92fc9976a454bc",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-540.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_540.tiff",
+      "bytes": 1757662,
+      "sha256": "7551fce36b4c7738e4a7e0d00ca5f0ece555f47d73afe403fa114e50d68a6791",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-600.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_600.tiff",
+      "bytes": 1757662,
+      "sha256": "2bd30e34a1ae888af933da9ec10d849be095de590448fd1ae0648a1565fbd68e",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-inline-680.tiff",
+      "url": "https://zenodo.org/api/records/1471548/files/inlines.zip/content",
+      "member": "inlines/inline_680.tiff",
+      "bytes": 1757662,
+      "sha256": "d7a01a89c945788d30b85573e071ba4ae37378a65240b6f1a3767a092a334e22",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "doi": "10.5281/zenodo.1471548",
+      "license": "CC BY 4.0",
+      "kind": "field post-stack seismic"
+    },
+    {
+      "file": "f3-masks.tar.gz",
+      "url": "https://zenodo.org/api/records/1471548/files/masks.tar.gz/content",
+      "bytes": 4800574,
+      "sha256": "f56bd426e29318ae6bcf64257daffc4772281745a142f63cc356f05ecad8b9ab",
+      "dataset": "Netherlands F3 Interpretation v2",
+      "license": "CC BY 4.0",
+      "kind": "interpreted seismic-facies intervals"
+    },
+    {
+      "file": "fault-fault-0.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/0.dat",
+      "bytes": 8388608,
+      "sha256": "b0a190f83dca77a14261902b7170a7d105667c2871bf0f631c7c9c9637a7f290",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-1.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/1.dat",
+      "bytes": 8388608,
+      "sha256": "6b60ceb4ad45eb023987eabbcbd5f78084f732a33500a2189b188f9987555d36",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-10.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/10.dat",
+      "bytes": 8388608,
+      "sha256": "96d4a78a4351c02ae738d3aa2217805123a5409da49db37eb0411f838cc09032",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-11.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/11.dat",
+      "bytes": 8388608,
+      "sha256": "b26fb24c2d6172e3bf51e319a8f4edaf3b59972cd07bb657da3bf9697be9d743",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-12.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/12.dat",
+      "bytes": 8388608,
+      "sha256": "bdb50dedffdedb9fa02780a774f2a4c75dfd735635411a2dc852d72d81ffc48b",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-2.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/2.dat",
+      "bytes": 8388608,
+      "sha256": "bb66792859ad6a47e07b375cf362a43c3a1e99a2dc881e39ec17cb5f879b36f7",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-fault-3.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/fault/3.dat",
+      "bytes": 8388608,
+      "sha256": "7284b2db36121065bb7258273b7dc13c0357e00e59b32a1cf211507739238fe9",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-0.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/0.dat",
+      "bytes": 8388608,
+      "sha256": "5cabbf8953a831b3db260d8a78a04f510cc570e5c5af4f27426d3edd83a24942",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-1.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/1.dat",
+      "bytes": 8388608,
+      "sha256": "5c3bb414d7b694ecd313cbbedbc9e3f213fcb9d995bfeb0bd6bf53c2afa781a3",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-10.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/10.dat",
+      "bytes": 8388608,
+      "sha256": "3e43f91c77fdd073a708d65552d0c5ab703817d785e29abc92ed79cde798f93a",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-11.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/11.dat",
+      "bytes": 8388608,
+      "sha256": "09f8116c9c865d9dac6aa1a7750795b98dda6b944a70189b9a858a7b65a731e3",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-12.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/12.dat",
+      "bytes": 8388608,
+      "sha256": "f32806fb53ab86c01cfb5de899b12a4b40bb47446d1992c5b2a86a12635a69e4",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-2.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/2.dat",
+      "bytes": 8388608,
+      "sha256": "4b368e347a53b0c36255b1e0279c12c6b0d4d257c180436740eb06d70bb97b6b",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-seis-3.dat",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/data/validation/seis/3.dat",
+      "bytes": 8388608,
+      "sha256": "31672674502dd0252f6fea69e32970c75e85b36c93f13fc5fc76f595408ec04e",
+      "dataset": "FaultSeg3D",
+      "license": "CC BY-NC 4.0",
+      "commit": "0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe",
+      "kind": "author-generated synthetic seismic and labels"
+    },
+    {
+      "file": "fault-utils.py.txt",
+      "url": "https://raw.githubusercontent.com/xinwucwp/faultSeg/0ab8ba1c10cb9e5748b0129bfe1a2fe3031b80fe/utils.py",
+      "bytes": 2573,
+      "sha256": "043990b7aa82a104c7ffbb2588c12b6e9286110657f678f00f73c9acecdc5c36",
+      "purpose": "read-only byte-order and axis documentation"
+    },
+    {
+      "file": "ozdata06.mat",
+      "url": "https://data.mendeley.com/public-files/datasets/p8pbnyfybr/files/ad7d5b4a-7e7b-4f86-b0fd-d595f219f33b/file_downloaded",
+      "bytes": 383286,
+      "sha256": "ee2dbbec35492e390a86208f2d5492bce9003354341f1467dce57f68d0815826",
+      "dataset": "Awais and Hanafy 2023",
+      "doi": "10.17632/p8pbnyfybr.1",
+      "license": "CC BY 4.0",
+      "kind": "field shot gathers",
+      "publisherSHA256": "ee2dbbec35492e390a86208f2d5492bce9003354341f1467dce57f68d0815826"
+    },
+    {
+      "file": "ozdata25.mat",
+      "url": "https://data.mendeley.com/public-files/datasets/p8pbnyfybr/files/0b08e15f-f5f5-49a7-a01d-64c481b80021/file_downloaded",
+      "bytes": 1961523,
+      "sha256": "b646414a796e08201cac76eee6f866c1df9d0a57ad4abc11aa27143fc566e4f9",
+      "dataset": "Awais and Hanafy 2023",
+      "doi": "10.17632/p8pbnyfybr.1",
+      "license": "CC BY 4.0",
+      "kind": "field shot gathers",
+      "publisherSHA256": "b646414a796e08201cac76eee6f866c1df9d0a57ad4abc11aa27143fc566e4f9"
+    }
+  ],
+  "illustrationsAreNotObservations": true
+}

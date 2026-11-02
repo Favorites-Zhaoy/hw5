@@ -116,6 +116,14 @@ python tools/welllog/prepare.py
 
 w1沿用 `welllog-layer` ID，旧测井示范脚本不再由首页加载，旧链接仍进入新版。此次只检查桌面浏览器。
 
+## 物探：五个数据与方法各有依据的案例
+
+入口：[物探关系图](https://favorites-zhaoy.github.io/hw5/#/stage/seismic)。S1断层解释使用3D卷积，S2地震相使用二维卷积，S3初至使用时序卷积，S4参数预测结合神经回归与约束优化，S5使用残差卷积去噪；保留原有CV／TS／OPT归类。
+
+数据分别来自FaultSeg正演体、F3真实剖面与解释标签、Ithra实测炮集和FORCE真实井曲线。无独立到时标签的实测炮集不报告准确率；简化派生响应、表观NPHI及受控加噪的评价范围在图表旁标明。三个页签延续同一资料和参数，支持局部检查与CSV/JSON导出。主题图由内置imagegen新生成，不进入模型训练。
+
+数据选择、授权、算法及复现命令见[物探案例说明](docs/物探案例说明.md)。`npm run seismic:build`整理已保存的资源，`npm run seismic:prepare`显式下载并重训；案例资料按需载入，主页只加载约1.4 KB元数据。
+
 ## 在线部署
 
 GitHub Pages从`main`分支根目录发布，`.nojekyll`让HTML、JavaScript和案例资源按静态文件提供。推送到`main`后自动部署；使用哈希路由，M1等场景链接可以直接分享。
