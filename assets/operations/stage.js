@@ -118,7 +118,7 @@ function deck(ctx, focus) {
 
     function applyFocus(value, updateUrl) {
       focus = selected(value);
-      root.dataset.mlMethod = focus;
+      root.dataset.mlMethod = focus;root.classList.toggle('has-many-focus', !!focus && TECH.filter(function(t){return relevant(t,focus);}).length>1);
       root.querySelector('[data-ml-map]').classList.toggle('has-focus', !!focus);
       root.querySelector('[data-ml-reading]').classList.toggle('has-focus', !!focus);
       buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mlMethodButton === focus)); });
@@ -318,7 +318,7 @@ function deck(ctx, focus) {
 
     function applyFocus(value, updateUrl) {
       focus = selected(value);
-      root.dataset.mlMethod = focus;
+      root.dataset.mlMethod = focus;root.classList.toggle('has-many-focus', !!focus && TECH.filter(function(t){return relevant(t,focus);}).length>1);
       root.querySelector('[data-ml-map]').classList.toggle('has-focus', !!focus);
       root.querySelector('[data-ml-reading]').classList.toggle('has-focus', !!focus);
       buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mlMethodButton === focus)); });
@@ -518,7 +518,7 @@ function deck(ctx, focus) {
 
     function applyFocus(value, updateUrl) {
       focus = selected(value);
-      root.dataset.mlMethod = focus;
+      root.dataset.mlMethod = focus;root.classList.toggle('has-many-focus', !!focus && TECH.filter(function(t){return relevant(t,focus);}).length>1);
       root.querySelector('[data-ml-map]').classList.toggle('has-focus', !!focus);
       root.querySelector('[data-ml-reading]').classList.toggle('has-focus', !!focus);
       buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mlMethodButton === focus)); });

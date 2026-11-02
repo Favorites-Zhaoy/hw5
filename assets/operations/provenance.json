@@ -1749,16 +1749,16 @@
       "sha256": "7100746207e4a67300a4c5e451a6153e936cbab5f6965302a9922eecc78ee163"
     },
     "stage.js": {
-      "bytes": 57243,
-      "sha256": "db6b71b91087f6f77930b81290c3660af47cd3448619972eb364cd6a8e48cb9d"
+      "bytes": 57582,
+      "sha256": "f77625226d0c927e7ef27777049405ba3aee545175df46bb36349653bc9ed695"
     },
     "content.js": {
-      "bytes": 126818,
-      "sha256": "c825ad789bdc75168208a7751751bd246ab20dee54a038412dcbe576fe0fc8e2"
+      "bytes": 126827,
+      "sha256": "06ac26cc4e8913d037e5ab13b9ff3cdeca2aaaab79cb5c29e9535cee8e5d4dfd"
     },
     "operations.css": {
-      "bytes": 12663,
-      "sha256": "3ba00ac726b3ea53ef3519205cea8f7f89a5667fb3fdd10a0e913e71498dfa36"
+      "bytes": 12986,
+      "sha256": "cf64ad22e29fc679bf928f7b85357e048951e13877d417c198b7855b99142b3b"
     }
   }
 }
