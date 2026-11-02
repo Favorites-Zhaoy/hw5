@@ -4,8 +4,8 @@
   "kind": "synthetic-teaching",
   "provenance": {
     "generator": "tools/cementing/prepare-models.cjs",
-    "generatorSha256": "bef0c865b32a60dc254e24ce20c90bfef96d0b24e6e6aa907a30264e5e70db0c",
-    "coreSha256": "c6634a29d5b15f5f7fbcc5a4477c5dcd174beae0bb121fffa074b94566cc8c06",
+    "generatorSha256": "da2916043897d1e86ed05e891815ca39a4f212cb58e007402a918af46acafb2a",
+    "coreSha256": "c63712c8037e19ccfc6603c24280fedd01855741bad1f3b7d8188f29150333b5",
     "modelTraining": "C1: all 75-12-3 MLP weights fitted by shuffled SGD / softmax cross entropy, 180 epochs. C2: normalized polynomial ridge least squares. C3: logistic full-batch BCE gradient descent, 1200 epochs. C4: explicit geometry plus exact combinatorial search, no neural network.",
     "featureBoundary": "Synthetic group IDs held apart before fitting. C1 uses spatial adjacent depths, not a temporal forecast. C2 unseen responses only used after search for evaluation. C3 calibration jobs tune threshold; test jobs never tune or fit. C4 is an unfitted idealized geometric model."
   },
