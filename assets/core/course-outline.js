@@ -30,11 +30,11 @@
   function motion() {
     return '<svg class="course-effects" data-course-motion-svg viewBox="0 0 887 1774" aria-hidden="true">' +
       '<g class="course-phase-effect" data-course-flow="0"><path class="course-survey-scan" d="M510 335H680"/>' +
-      flow('M606 247L600 303', '#4ec6ae', 3.1) + flow('M359 459V502', '#29b9d2', 3) + '</g>' +
+      flow('M606 247L600 303', '#4ec6ae', 3.1) + flow('M363.5 459V502', '#29b9d2', 3) + '</g>' +
       '<g class="course-phase-effect" data-course-flow="1">' + flow('M605 830V683', '#43bdec', 4.5) + flow('M613 683V830', '#eda344', 4.8) +
-      '<circle class="course-pulse" cx="608" cy="836" r="15"/>' + flow('M359 779V819', '#3799f2', 3) + '</g>' +
-      '<g class="course-phase-effect" data-course-flow="2">' + flow('M701 1066L628 1028L529 1010', '#68b7d0', 4.7) + flow('M359 1104V1143', '#9d68cf', 3) + '</g>' +
-      '<g class="course-phase-effect" data-course-flow="3">' + flow('M871 1434L678 1382L550 1351', '#50a995', 5) + flow('M359 1415V1456', '#65b56c', 3) + '</g>' +
+      '<circle class="course-pulse" cx="608" cy="836" r="15"/>' + flow('M363.5 779V819', '#3799f2', 3) + '</g>' +
+      '<g class="course-phase-effect" data-course-flow="2">' + flow('M701 1066L628 1028L529 1010', '#68b7d0', 4.7) + flow('M363.5 1104V1143', '#9d68cf', 3) + '</g>' +
+      '<g class="course-phase-effect" data-course-flow="3">' + flow('M871 1434L678 1382L550 1351', '#50a995', 5) + flow('M363.5 1415V1456', '#65b56c', 3) + '</g>' +
       '<g class="course-phase-effect" data-course-flow="4">' + flow('M536 1642L690 1701L869 1757', '#e7983f', 5.5) +
       '<g class="course-steam"><circle cx="637" cy="1492" r="8"/><circle cx="653" cy="1505" r="6"/></g></g></svg>';
   }
