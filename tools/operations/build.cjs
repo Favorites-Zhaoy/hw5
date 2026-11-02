@@ -1,0 +1,40 @@
+/* Generate only the three operations themes from their reviewed content and retained field template. */
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'../..'),out=path.join(root,'assets/operations');fs.mkdirSync(out,{recursive:true});
+const stages={
+ production:{name:'采油',en:'PRODUCTION',index:'09',headline:'把每一口井的变化，变成可核对的生产判断',lead:'先理解举升、注水与计量，再看诊断、预测和调配怎样帮助日常生产。',relation:'五项任务共享井号和时间基准，彼此互补；P1—P5是案例编号。配注示例作用于井间总液响应，不代表已完成分层配注。',flow:'生产记录 → 工况候选、预测与约束调配 → 工程复核',top:510,height:304},
+ workover:{name:'修井',en:'WORKOVER',index:'10',headline:'围绕同一口井，核对方案、工具与作业风险',lead:'从井筒状态与作业目标出发，认识检索、尺寸匹配、测厚和过程监测的不同任务。',relation:'五项任务围绕同一井筒与作业记录互补，不是必须依次运行的五道工序。W1—W5是案例编号。',flow:'井史与检测资料 → 方案与工具候选 → 现场复核与记录',top:510,height:330},
+ eor:{name:'增采',en:'ENHANCED RECOVERY',index:'11',headline:'从储层与流体入手，比较增采方案的条件',lead:'理解压裂、化学驱、热采与微生物研究怎样作用，再比较模型能回答的具体问题。',relation:'压裂、化学驱、蒸汽与微生物是不同技术路径；E1—E5是案例编号，不表示依次实施。试验与模拟的范围分别保留。',flow:'储层与流体条件 → 模型与方案比较 → 约束、验证与复核',top:520,height:330}
+};
+const names={cv:['CV','计算机视觉'],ts:['TS','时序分析'],opt:['OPT','约束优化'],nlp:['NLP','自然语言处理'],kg:['KG','知识图谱']};
+const algorithms={pr1:'二维卷积分类＋形状参照',pr2:'因果历史窗口GRU预测',pr3:'非负滞后CRM＋有界配注优化',pr4:'受控工况的时序预测与残差监测',pr5:'正常工况PCA残差监测',wo1:'TF-IDF文本检索＋来源知识关联',wo2:'工具尺寸与可抓取条件图谱',wo3:'超声时频图CNN测厚',wo4:'分工序自回归＋持续残差监测',wo5:'历史申报序列GRU估计',e1:'PKN响应代理＋压力体积约束',e2:'事件密度CNN＋稳健椭圆包络',e3:'高斯过程回归＋浓度约束筛选',e4:'条件GRU＋有限蒸汽方案搜索',e5:'过去传感器窗口GRU软测量'};
+const colors=['#b95739','#497d99','#8b65a0','#6b884b','#3a8c8a'];
+const content=Object.keys(stages).flatMap(stage=>JSON.parse(fs.readFileSync(path.join(__dirname,'content-'+stage+'.json'),'utf8')).map((c,i)=>({...c,algorithm:algorithms[c.id],color:colors[i],artBox:[i*289.6+2,stages[stage].top,285,stages[stage].height]})));
+fs.writeFileSync(path.join(out,'content.js'),'(function(g){g.OPERATIONS_CONTENT='+JSON.stringify(content)+';g.OPERATIONS_STAGES='+JSON.stringify(stages)+';})(window);\n');
+const source=fs.readFileSync(path.join(root,'assets/seismic/stage.js'),'utf8');
+let result='/* Generated from the retained mudlogging field template. */\nwindow.OperationsStages={};\n';
+for(const [id,st] of Object.entries(stages)){
+ const list=content.filter(c=>c.stageId===id),methods=[{id:'',abbr:'ALL',name:'完整关系',note:st.relation},...Object.keys(names).filter(m=>list.some(c=>c.methods.includes(m))).map(m=>({id:m,abbr:names[m][0],name:names[m][1],note:list.filter(c=>c.methods.includes(m)).map(c=>c.id.toUpperCase()+' '+c.short).join(' · ')+'。方法标签解释各任务怎样处理资料，仍需回到业务判断。'}))];
+ const tech=list.map((c,i)=>({id:c.id,method:c.methods[0],methods:c.methods,color:c.color,box:c.artBox,art:c.artBox,input:c.input,output:c.output}));
+ let s=source.replace(/var IMAGE = [\s\S]*?function relevant/,`var IMAGE='assets/images/operations/${id}-process-v1.webp';\nvar IMAGE_SET='assets/images/operations/${id}-process-v1-small.webp 768w, '+IMAGE+' 1448w';\nvar IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';\nvar WIDTH=1448,HEIGHT=1086;\nvar METHODS=${JSON.stringify(methods)};\nvar TECH=${JSON.stringify(tech)};\nfunction relevant`);
+ s=s.replace(/function effect\(t\)\{[\s\S]*?function sceneHref/,`function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 285 ${st.height}" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M32 74H250V${st.height-38}H32Z"/><path class="ml-monitor-scan" d="M33 74V${st.height-38}"/></svg>';}\nfunction sceneHref`);
+ const paths=tech.map((t,i)=>`flow('M724 ${st.top-52}H${Math.round(t.box[0]+142)}V${st.top}', '${colors[i]}', ${5+i/3}, '${t.id}')`).join('+');
+ s=s.replace(/function drawing\(\)\{[\s\S]*?function deck/,`function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+${paths}+'</svg>';}\nfunction deck`);
+ s=s.replaceAll('global.SEISMIC_CONTENT','global.OPERATIONS_CONTENT').replaceAll('data-seismic-stage','data-operations-stage').replaceAll('sx-stage','op-stage').replaceAll('#/stage/seismic','#/stage/'+id);
+ s=s.replace('02 / 13',st.index+' / 13').replace('GEOPHYSICS · 物探',st.en+' · '+st.name).replaceAll('更多物探场景','更多'+st.name+'场景').replaceAll('物探现场交互总览',st.name+'现场交互总览').replace('>物探</span>','>'+st.name+'</span>');
+ s=s.replace('从地震记录，读出地下线索',st.headline).replace('先认识采集、处理、解释与预测，再看每种方法具体接手哪一步。',st.lead).replace('采集记录 → 处理资料 → 解释与预测',st.flow).replace('断层与地震相是互补解释；初至与去噪是可按需组合的处理任务；参数预测另需井约束。S1—S5为案例编号。',st.relation+' AI生成的业务示意，实验资料与结果在各案例中。');
+ s=s.replace(/alt="物探关系图：[^"]*"/,'alt="'+st.name+'业务关系示意：'+st.relation+'；AI生成的教学插图，不是实验资料。"');
+ s=s.replace(/global.SeismicStage = [\s\S]*?;\s*\}\)\(window\);/,`global.OperationsStages.${id}={render:render,bind:bind};\n})(window);`);
+ result+=s+'\n';
+}
+result+='window.OperationsStage={supports:function(id){return !!window.OperationsStages[id];},render:function(ctx){return window.OperationsStages[ctx.stage.id].render(ctx);},bind:function(root,ctx){return window.OperationsStages[ctx.stage.id].bind(root,ctx);}};\n';
+fs.writeFileSync(path.join(out,'stage.js'),result.replace(/\r\n/g,'\n'));
+let css=fs.readFileSync(path.join(root,'assets/seismic/seismic.css'),'utf8').replace(/\.sx-stage[^\n]*\n/,'').replaceAll('sx-','ox-').replaceAll('data-seismic-lesson','data-operations-lesson');
+css+='\n.op-stage .ml-spot{scroll-margin-top:150px}.op-stage .ml-spot:first-of-type{transform-origin:left center}.op-stage .ml-spot:last-of-type{transform-origin:right center}.op-stage .ml-map-footer{align-items:flex-start}.op-stage .ml-map-footer p{max-width:650px;font-size:12px;line-height:1.8}.op-stage .ml-reading.has-focus .ml-deck{grid-template-columns:repeat(2,minmax(0,1fr))}.ox-chart-pair{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}.ox-chart-pair>*{min-width:0}.ox-field-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.ox-field-row label{font-size:12px;color:#8a6848}.ox-field-row input,.ox-field-row select{font:inherit;max-width:100%;padding:8px 12px;border:1px solid #d5bea1;background:#fffaf0;color:#684c34}.ox-field-row input[type=text]{min-width:340px}.ox-chart-label{font-size:11px;color:#997957}.ox-result-table td{max-width:420px}.ox-image{width:100%;max-width:360px;image-rendering:pixelated}.ox-svg-image{background:#f8efdf;border:1px solid #d9c5a5}.ox-status{font-size:12px;padding:12px 16px;border-left:3px solid #b95739;background:#f2e6d1}.ox-key-result{font:500 23px/1.7 var(--serif,Georgia,serif);color:#923f2c}.ox-source-url{overflow-wrap:anywhere}.ox-context select{max-width:520px;min-width:250px}.ox-related a{max-width:220px}.ox-controls{flex-wrap:wrap}.ox-control{flex:1 1 240px}.ox-scope{overflow-wrap:anywhere}.ox-stats{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}\n';
+fs.writeFileSync(path.join(out,'operations.css'),css.replace(/\r\n/g,'\n'));
+for(const c of content){const file=path.join(out,'data',c.id+'.json');if(!fs.existsSync(file))continue;const d=JSON.parse(fs.readFileSync(file,'utf8'));d.modelSHA256=crypto.createHash('sha256').update(JSON.stringify(d.model)).digest('hex');fs.writeFileSync(file,JSON.stringify(d)+'\n');}
+console.log('Operations: '+content.length+' cases, three stage maps; available data payloads normalized.');
+const integrity={version:1,generated:'2026-11-03',illustrationsUsedForTraining:false,cases:{},assetIntegrity:{}};
+for(const c of content){const name='data/'+c.id+'.json',file=path.join(out,name);if(!fs.existsSync(file))throw Error('Missing case payload: '+name);const bytes=fs.readFileSync(file),d=JSON.parse(bytes);integrity.cases[c.id]={caseId:c.caseId,methods:c.methods,records:d.records.length,kind:[...new Set(d.records.map(r=>r.kind))],source:d.source,validation:d.validation,modelSHA256:d.modelSHA256};integrity.assetIntegrity[name]={bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};}
+for(const name of ['core.js','experiments.js','lessons.js','stage.js','content.js','operations.css']){const bytes=fs.readFileSync(path.join(out,name));integrity.assetIntegrity[name]={bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};}
+fs.writeFileSync(path.join(out,'provenance.json'),JSON.stringify(integrity,null,2)+'\n');

@@ -1,0 +1,513 @@
+{
+  "researched_at": "2026-11-02",
+  "scope": "Bounded primary-source research for the confirmed existing workover stage, wo1-wo5. User confirmed the intended Chinese stage is workover. No shared app code changed.",
+  "important_decisions": [
+    "Real BSEE workover plans exist, with 6,265 WORKOVER permit rows. EST_OPERATION_DAYS is a planned-duration estimate, not a measured repair-cycle target.",
+    "No open, licensed, job-level repair-duration outcome benchmark or high-frequency pressure-and-torque workover fault sequence was verified in this bounded search. Do not infer nonexistence from this search.",
+    "Best openly licensed casing-domain asset is the Diez et al. numerical COMSOL pulse-echo dataset. It is synthetic scientific data with physical ground truth, not field images or multi-arm caliper logs.",
+    "BSEE 2024-01 contains a genuine measured casing-thickness grid. It concerns recovered above-water structural casing and a single fatal incident, not a downhole CV benchmark.",
+    "Tool compatibility may be explained as sourced categorical and geometric constraints. Do not invent field success probabilities or call a compatibility score a recovery probability."
+  ],
+  "sources": {
+    "bsee_apm": {
+      "name": "BSEE eWell Application for Permit to Modify raw tables",
+      "publisher": "Bureau of Safety and Environmental Enforcement",
+      "primary_url": "https://www.data.bsee.gov/Well/eWellAPM/Default.aspx",
+      "raw_index_url": "https://www.data.bsee.gov/Main/RawData.aspx",
+      "direct_download": "https://www.data.bsee.gov/Well/Files/eWellAPMRawData.zip",
+      "field_definitions": "https://www.data.bsee.gov/Well/eWellAPM/FieldDefinitions.aspx",
+      "license": "Federal public data; agency-authored material generally public domain. Operator-authored narrative text and third-party attachments are not automatically relicensed. Use factual fields and short attributed descriptions; link full narratives.",
+      "license_url": "https://www.bsee.gov/bsee/privacy-policy",
+      "acquisition": "Full ZIP is 35,737,186 bytes. Downloaded selected compressed members through HTTP Range, checked decoded lengths, filtered APM_OP_CD == WORKOVER and joined related records by SN_APM. Full ZIP not stored.",
+      "snapshot_date": "2026-11-02",
+      "summary": {
+        "rows": 6265,
+        "uniqueWellApi": 2239,
+        "estimatedDaysPresent": 6240,
+        "estimatedDaysPositive": 6240,
+        "positiveMin": 1.0,
+        "positiveMax": 180.0,
+        "positiveMedian": 10.0,
+        "nonemptyShortDescriptions": 2750
+      },
+      "local_files": [
+        "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-mv_apm_main.csv",
+        "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-mv_apm_main_prop.csv",
+        "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-mv_apm_suboperations.csv",
+        "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-mv_apm_primary_op_codes.csv",
+        "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-mv_apm_suboperation_codes.csv"
+      ],
+      "manifest": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-manifest.json",
+      "units": {
+        "EST_OPERATION_DAYS": "days; estimated/planned, not actual",
+        "SHUTIN_TUBING_PRSS": "psi; confirmed against public BSEE-0124 permit labels",
+        "WATER_DEPTH": "feet; query column label",
+        "SV_FEET_BML": "feet below mudline",
+        "dates": "source date strings; parse explicitly; some historical inconsistencies possible"
+      },
+      "labels": "Official categorical primary WORKOVER code and suboperation codes. No verified recovery success/failure labels; no measured actual duration.",
+      "verification_example": {
+        "primary_url": "https://www.bsee.gov/sites/bsee.gov/files/2024-08/APM%20with%20API%20043122004400%20february%202024.pdf",
+        "api": "043122004400",
+        "operation": "ESP and tubing replacement; pump ground fault reported",
+        "estimated_duration_days": 5,
+        "proposed_start": "2024-02-20",
+        "scope": "This public permit directly labels the duration as estimated. Use as a factual worked example, not evidence of achieved five-day completion."
+      }
+    },
+    "diez_pulse_echo": {
+      "name": "Simulated ultrasonic pulse-echo well-integrity dataset",
+      "authors": "Diez, Anja; Viggen, Erlend Magnus; Johansen, Tonni Franke",
+      "primary_url": "https://data.mendeley.com/datasets/3bs65nzpv2/1",
+      "doi": "10.17632/3bs65nzpv2.1",
+      "article_url": "https://www.nature.com/articles/s41597-025-04851-x",
+      "article_accessible_copy": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11962138/",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified": "Mendeley page Licence and embedded licence metadata; local receipt mendeley-page-script.txt.",
+      "provenance": "Numerical COMSOL models of plate and pipe ultrasonic pulse echo; no field-acquired waveform or casing-fault images in the selected subset.",
+      "metadata_rows": 1406,
+      "metadata_pipe_rows": 804,
+      "local_metadata": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\Metadata_overview.csv",
+      "local_units_readme": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\README_json.txt",
+      "selected_manifest": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\mendeley-selected-manifest.json",
+      "selected_record_count": 72,
+      "selected_bytes": 849101,
+      "selection": "72 unique diameter/thickness combinations: 24 sampled wall thicknesses at each of three pipe outside diameters (0.244475, 0.27305, 0.339725 m); 2.5D axisymmetric, oil-based mud inside, cement outside, no gap, transducer-wall distance 0.045 m.",
+      "local_waveform_dir": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\mendeley-json",
+      "example_direct_download": "https://data.mendeley.com/public-files/datasets/3bs65nzpv2/files/a3a7fef7-26c4-4b55-9d0e-8522cd5915f2/file_downloaded",
+      "units": {
+        "interface.thickness": "m",
+        "interface.inner_diameter": "m",
+        "interface.outer_diameter": "m",
+        "inside.transducer_pipe_distance": "m",
+        "rho": "kg/m^3",
+        "vp_and_vs": "m/s",
+        "pulse.f0": "Hz",
+        "waveform.t0_and_dt": "s",
+        "waveform.values": "normalized dimensionless pressure amplitude"
+      },
+      "example": "579.json has thickness 0.013 m; t0=0 s, dt=5e-7 s, 281 samples; values have normalization max absolute amplitude 1.",
+      "labels": "Continuous known physical thickness and controlled simulation conditions. No original corrosion/deformation class label; any wall-loss category must be explicitly a teaching label relative to a stated reference.",
+      "quality_flags": [
+        "Metadata table covers 1,406 rows, but endpoint file index has 1,812 JSON items; report selection using file IDs and metadata rather than claiming table is exhaustive.",
+        "README_json gap section transposes descriptions of rho/vp/vs; use article Table3: rho density, vp compressional speed, vs shear speed.",
+        "Do not treat plate models as casing or axisymmetric model variants as independent field wells.",
+        "Preserve creator attribution, CC BY link, source IDs, and a record of any resampling or image construction."
+      ]
+    },
+    "bsee_panel": {
+      "name": "BSEE Panel Report 2024-01: Main Pass 64 hydraulic workover unit failure",
+      "primary_url": "https://www.bsee.gov/panel-investigation/investigation-of-march-25-2022-hydraulic-workover-unit-failure-fatality",
+      "direct_download": "https://www.bsee.gov/sites/bsee.gov/files/2024-08/MP%2064%20No-19%20Report%2030May24.pdf",
+      "local_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-panel-2024-01.pdf",
+      "bytes": 4100537,
+      "sha256": "d76f6d9fa06dd330d5ba070e1c037fdf37bb719340a97dd3dd1d530e3e949ca3",
+      "license": "Federal investigative report; third-party images may retain their own rights. Prefer factual restatement and direct links to figures.",
+      "use": "PDF page17, Figure12 (zero-based index16), is a field-measured ultrasonic thickness grid, with holes and unavailable readings. Text explains original 0.5-in structural casing and severe thinning. Treat missing measurement, hole, and valid thickness as distinct states.",
+      "units": "inches; original structural-casing OD 20 in, nominal original wall 0.5 in. 1 inch = 25.4 mm exactly.",
+      "limitations": "Single recovered above-water structural casing; post-incident measurements. It cannot establish downhole classifier performance or an online warning lead time."
+    },
+    "fishing_primary": {
+      "overshot_url": "https://glossary.slb.com/terms/o/overshot",
+      "spear_manual_url": "https://www.nov.com/-/media/nov/files/brands/bowen/bowen-fishing-tools-instruction-manuals.pdf",
+      "junk_basket_url": "https://www.nov.com/products/bowen-reverse-circulation-junk-baskets",
+      "junk_basket_spec_url": "https://assets.nov.com/NCP4N68N/at/ww4s788t6pn6v6t97sjsp7x/Bowen_Reverse_Circulation_Junk_Baskets_Tool_Specification.pdf",
+      "junk_basket_local": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bowen-junk-basket-spec.pdf",
+      "wireline_catalog_url": "https://www.nov.com/media/nov/files/products/caps/intervention-and-stimulation-equipment/slickline-tools-and-flow-control/elmar-wireline-tools-catalog.pdf",
+      "magnet_definition": "https://www.osha.gov/etools/oil-and-gas/glossary-of-terms-f",
+      "license": "NOV and SLB materials are copyrighted. Link to sources, summarize the few relevant facts, and redraw original explanatory geometry. Do not redistribute manufacturer PDFs as licensed training datasets.",
+      "grounded_facts": [
+        "Overshot engages a fish on its outside surface; a releasable design can disengage.",
+        "A releasing spear engages the internal surface of tubular fish.",
+        "Reverse-circulation junk baskets target small irregular junk; catalog geometry constrains fit.",
+        "Magnetic recovery requires magnetically attractable material; generic metallic appearance alone is insufficient."
+      ],
+      "example_numeric_fact": {
+        "manufacturer": "NOV Bowen",
+        "assembly_number": "6635N",
+        "hole_range_in": [
+          3.75,
+          4.0
+        ],
+        "barrel_od_in": 3.625,
+        "maximum_fish_diameter_in": 2.25,
+        "source": "2026 tool specification; example only, no recovery-probability implication"
+      }
+    },
+    "tubers_proxy": {
+      "name": "TUBERS Ultrasonic and Synthetic Crack Datasets",
+      "primary_url": "https://zenodo.org/records/11239514",
+      "doi": "10.5281/zenodo.11239514",
+      "direct_download": "https://zenodo.org/api/records/11239514/files/Ultrasonic%20Data.zip/content",
+      "license": "MIT per Zenodo API metadata license.id=mit-license",
+      "license_receipt": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\tubers.json",
+      "local_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\tubers-ultrasonic.zip",
+      "bytes": 3937179,
+      "sha256": "978e316d28c5c8659edb59dca0a049fb19f18a5707518fae5c0c10a179ac94e1",
+      "units": "CSV oscilloscope timestamps and voltage in V; precise timestamp units require checking each file header.",
+      "labels": "Folders Plate_1, Plate_2, Wedge and frequencies 5/10 MHz. README does not provide verified per-trace crack/no-crack annotations.",
+      "decision": "Not recommended for casing-fault supervision: pipeline project laboratory plate/wedge traces, insufficient labels and geometry correspondence. Small signal-processing alternative only."
+    },
+    "kalid_proxy": {
+      "name": "Machine learning-driven flaw detection for ultrasonic pipe inspections with acoustic lens (ECNDT2026) supplementary code",
+      "primary_url": "https://zenodo.org/records/19410833",
+      "doi": "10.5281/zenodo.19410833",
+      "local_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\kalid-code.zip",
+      "bytes": 411186,
+      "license": "MIT for Python code; CC BY 4.0 for research figures/data per record.",
+      "decision": "This small archive contains code and derived figures, not raw ultrasonic scans. REPRODUCING links a separate data record 10.5281/zenodo.15115255. Do not call code.zip a downloaded raw scan benchmark or reuse published performance as our own."
+    },
+    "ntsb_daily_reports": {
+      "primary_url": "https://data.ntsb.gov/Docket/Document/docBLOB?FileExtension=pdf&FileName=July+Workover+Work_Redacted-Rel.pdf&ID=20627511",
+      "name": "Public NTSB docket, July 2025 Daily Workover reports for HS-23",
+      "content": "17 PDF pages include dated job activities and hour entries; one well, some redactions.",
+      "decision": "Useful genuine workover reporting example, but third-party operator narrative is not established as openly licensed and one job cannot validate a duration predictor. Linked, not downloaded."
+    }
+  },
+  "cases": [
+    {
+      "id": "wo1",
+      "category": "KG+NLP",
+      "title": "修井作业方案检索与证据图谱",
+      "recommended_source": "bsee_apm",
+      "teaching_experiment": "Index nonempty short operation descriptions, map Chinese queries with a visible bilingual operation glossary, retrieve BM25/TF-IDF or embedding neighbors, and render only source-supported record-to-well and record-to-suboperation edges. Show the permit URL or source SN_APM beside each returned record.",
+      "split": "Hold all permits for a well API together; deduplicate or group identical generic descriptions before reference/test assignment. A small manually checked query-to-record set measures retrieval relevance, not field repair success.",
+      "limitations": [
+        "No verified tool-combination outcome labels.",
+        "A relevant historical plan is evidence to inspect, not a validated prescription for the current well.",
+        "Use factual fields and short attributed excerpts; do not republish long third-party procedural narratives."
+      ]
+    },
+    {
+      "id": "wo2",
+      "category": "KG",
+      "title": "落物打捞工具约束匹配",
+      "recommended_source": "fishing_primary",
+      "teaching_experiment": "Use the compatibility schema below. Display pass/fail/unknown for each evidenced requirement and draw the overshot/spear/junk-basket geometry with original SVG. A symbolic demonstration is sufficient; any generated classifier trained on rules only learns those teaching rules.",
+      "split": "If learning is demonstrated, split complete fish configurations and hold all perturbations of one nominal configuration together. Evaluate constraint violations and unknown handling, not successful field recoveries.",
+      "limitations": [
+        "Manufacturer facts do not supply a field success probability.",
+        "Unknown diameter, load rating or material must remain unknown rather than guessed.",
+        "Clearance allowance must be an explicit exercise input; do not invent a universal operational tolerance."
+      ]
+    },
+    {
+      "id": "wo3",
+      "category": "CV/ultrasonic",
+      "title": "套管超声数据中的壁厚变化识别",
+      "recommended_source": "diez_pulse_echo",
+      "teaching_experiment": "Owner-selected implementation: compute fixed STFT images from published COMSOL A-scans and train a small2D CNN for thickness regression. Use an echo-spacing thickness estimate as physical baseline, with explicitly defined ringdown windows and ambiguity/failure handling. Hold all24 traces of one diameter together; one diameter each for training, validation and test. Published simulations are the actual input; STFT images are course-derived representations. Field UT grid remains separate context.",
+      "split": "Group by outside diameter: 24 traces each in 0.244475, 0.27305 and 0.339725 m families. Predeclare train/reference, validation and held-out diameter assignments; fit all normalization/window selection on train only. Report held-out MAE in mm and small sample count.",
+      "limitations": [
+        "72 controlled simulations, three geometry groups; performance is within synthetic scientific data.",
+        "Original target is physical thickness, not confirmed corrosion or deformation diagnosis.",
+        "A constructed B-scan or synthetic caliper image must never be captioned as a measured field log.",
+        "BSEE field grid is illustrative and independent of COMSOL labels, not a 2D training collection."
+      ]
+    },
+    {
+      "id": "wo4",
+      "category": "TS",
+      "title": "修井压力与扭矩异常预警",
+      "recommended_source": "No field time-series benchmark verified",
+      "teaching_experiment": "Use an explicitly labelled engineering teaching simulator if a runnable lesson is required: whole job episodes, staged normal pressure/torque channels, nuisance drift, and injected anomaly onset labels. Fit causal rolling robust residual/EWMA or an autoregression on normal training episodes. Let the user inspect false alarms versus missed events as threshold/window changes.",
+      "split": "Whole episodes and random seeds stay in one partition; chronology is preserved; no centered windows or future samples. Evaluate injected-event recall, false alarms per episode and observed lead/delay relative to injected onset.",
+      "limitations": [
+        "All signals, labels and metrics are simulation results until real operations data are supplied.",
+        "BSEE incident narratives are real context but do not contain high-frequency pressure/torque measurements or calibrated alert thresholds.",
+        "Never present simulator parameters as field operating limits or real safety probabilities."
+      ]
+    },
+    {
+      "id": "wo5",
+      "category": "TS/quantile",
+      "title": "修井工期估计：目标定义审计",
+      "recommended_source": "bsee_apm for planned days only",
+      "teaching_experiment": "Use genuine previously submitted BSEE plans to estimate the estimated duration of a subsequent plan. Histories include strictly earlier submittedAt within wellApi; fit autoregressive/quantile model on training histories only and compare last-value/history-median baselines. Selected data have295 rows/31 wells and233 eligible rows after two-history warmup. Output remains planned duration, never measured actual elapsed time.",
+      "split": "Global timestamp cuts: train before2021-08-26T09:36:02, validation before2022-04-07T14:31:34, later test;177/59/59 rows, eligible histories123/54/56. In walk-forward evaluation earlier revealed validation/test labels may become subsequent history, but model weights stay frozen. API+planned-start duplicate groups use earliest submission; later date changes may still be revisions.",
+      "metrics": "Planned days: constant-median baseline, MAE in days, pinball loss for quantiles and held-out interval coverage. These describe variation in submitted estimates, not actual schedule reliability.",
+      "limitations": [
+        "Available 6,240 positive estimated-day values are heavily rounded; median10, min1, max180.",
+        "WAR_START_DT and WAR_END_DT are reporting-period boundaries; their difference is not a repair-cycle label.",
+        "WELL_ACTV_START_DT can be a long historical well-activity milestone, so its distance to an abandonment date is not automatically a workover duration.",
+        "A real actual-duration target requires carefully matched operation start/finish evidence and job boundaries, not just a date subtraction."
+      ]
+    }
+  ],
+  "compatibility_schema": {
+    "status": "Original teaching schema derived from manufacturer definitions; not a manufacturer-approved selection engine.",
+    "node_types": {
+      "WellContext": [
+        "minimum_restriction_id_mm",
+        "required_radial_clearance_mm",
+        "pressure_mpa",
+        "temperature_c",
+        "source_evidence"
+      ],
+      "Fish": [
+        "kind:tubular|small_junk|wireline|other",
+        "outside_diameter_mm",
+        "inside_diameter_mm",
+        "external_grip_surface_accessible:bool|null",
+        "internal_bore_accessible:bool|null",
+        "ferromagnetic:bool|null",
+        "maximum_envelope_mm",
+        "mass_kg|null",
+        "source_evidence"
+      ],
+      "ToolSpecification": [
+        "family:overshot|spear|junk_basket|magnet",
+        "body_od_mm",
+        "published_catch_od_range_mm|null",
+        "published_catch_id_range_mm|null",
+        "published_max_fish_mm|null",
+        "published_lift_capacity_kg|null",
+        "release_capability:bool|null",
+        "source_url",
+        "specification_revision"
+      ],
+      "PlanRecord": [
+        "SN_APM",
+        "API_WELL_NUMBER",
+        "primary_code",
+        "suboperation_codes",
+        "planned_days",
+        "description_source"
+      ]
+    },
+    "edges": [
+      "PlanRecord operatesOn WellContext (source record)",
+      "PlanRecord includes SuboperationCode (official foreign-key table)",
+      "ToolSpecification engages FishSurface (manufacturer definition)",
+      "ToolSpecification constrainedBy PublishedDimension (manufacturer table)",
+      "ReturnedPlan supportedBy SourceRecord (retrieval trace)"
+    ],
+    "rules": [
+      {
+        "id": "pass_through",
+        "logic": "tool.body_od_mm + 2*exercise.required_radial_clearance_mm <= well.minimum_restriction_id_mm",
+        "meaning": "Exercise geometry screen; clearance is explicitly user supplied."
+      },
+      {
+        "id": "overshot",
+        "logic": "fish outside diameter lies in the published grapple catch-OD range AND accessible outside gripping surface is evidenced",
+        "source": "SLB overshot definition plus exact model catalog."
+      },
+      {
+        "id": "spear",
+        "logic": "fish inside diameter lies in published catch-ID range AND internal bore is accessible",
+        "source": "NOV full-circle releasing spear description."
+      },
+      {
+        "id": "junk_basket",
+        "logic": "small irregular fish fits published maximum fish size and applicable hole-size range",
+        "source": "NOV Bowen junk-basket specification."
+      },
+      {
+        "id": "magnet",
+        "logic": "ferromagnetic material is confirmed AND specified lift/temperature constraints are available",
+        "source": "Magnetic attraction is a physical requirement; product-specific capability must be sourced."
+      }
+    ],
+    "output": "compatible-by-stated-constraints | excluded | missing-required-evidence; show each evidence trail. No invented probability, no unsourced numerical recommendation."
+  },
+  "search_log": [
+    {
+      "query": "BSEE workover public raw data, eWell WAR and APM",
+      "result": "Verified raw tables, official field definitions and byte-range member access. Extracted WORKOVER factual subset."
+    },
+    {
+      "query": "multifinger caliper casing inspection dataset open download; casing ultrasonic defect data",
+      "result": "Located open Diez et al. simulated well-domain pulse-echo data; no licensed field multi-arm image benchmark verified."
+    },
+    {
+      "query": "workover duration dataset open data well intervention duration",
+      "result": "Found estimated durations in APM and real single-job reports in an NTSB docket; no verified multi-job actual-duration target under size/license constraints."
+    },
+    {
+      "query": "BSEE workover incident investigation pressure torque safety alert",
+      "result": "Official HWU failure report provides real incident context and measured structural-casing UT grid, not sensor time-series data."
+    },
+    {
+      "query": "NOV Bowen overshot spear junk basket instruction manuals",
+      "result": "Verified primary manufacturer definitions and one small current junk-basket specification; large 35.5 MB combined manual not saved."
+    },
+    {
+      "query": "TUBERS ultrasonic dataset; Kalid ECNDT2026 ultrasonic pipe flaw detection",
+      "result": "Downloaded small licensed proxies; noted plate geometry/missing labels and code-only archive. Not promoted to downhole casing field benchmarks."
+    }
+  ],
+  "file_policy": "No files deleted. Research caches and previews retained. Some HTML/error previews are research receipts, not deployable assets or validated training tables.",
+  "prepared_plan_history": {
+    "json": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-plan-sequences.json",
+    "csv": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-plan-sequences.csv",
+    "audit": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\workover\\bsee-workover-chronology-audit.json",
+    "summary": {
+      "totalRawWorkoverRows": 6265,
+      "datedPositiveLabelRows": 6240,
+      "datedPositiveWellCount": 2237,
+      "sameWellPlannedDateGroups": 3920,
+      "sameWellPlannedDateExtraRows": 2320,
+      "firstPerWellPlannedDateRecords": 3920,
+      "wellsAtLeast6DistinctPlannedDateRecords": 56,
+      "wellsAtLeast8DistinctPlannedDateRecords": 26,
+      "selectedRecords": 295,
+      "selectedWells": 31,
+      "selectedMinRecordsPerWell": 7,
+      "selectedMaxRecordsPerWell": 16,
+      "selectedNonemptyDescriptions": 165,
+      "selectedEligibleAfter2History": 233,
+      "partitions": {
+        "train": 177,
+        "validation": 59,
+        "test": 59
+      },
+      "partitionsWithAtLeast2PriorPlans": {
+        "train": 123,
+        "validation": 54,
+        "test": 56
+      },
+      "trainEndExclusive": "2021-08-26T09:36:02",
+      "validationEndExclusive": "2022-04-07T14:31:34",
+      "selectedDateMin": "2004-12-16T15:58:11",
+      "selectedDateMax": "2026-03-13T12:53:51",
+      "sourceTimezone": "Not asserted; retained source wall-clock timestamps without adding a UTC Z."
+    },
+    "selection": "Rows with parsed submitted/planned-start dates and positive EST_OPERATION_DAYS. Collapse API+planned-start groups to earliest submission; select whole wells with at least six groups, sorted by group count descending/API ascending, up to300 rows. No label-value balancing.",
+    "chronology": "Sort by SUB_STAT_DATE then API and SN_APM. Prior-history eligibility uses strictly earlier submittedAt within the same well. First two records per well are warmup. Global 60/20/20 chronological partitions; partition cut times are selected by record dates, never target values. Walk-forward validation/test may use earlier revealed labels as history without fitting new weights.",
+    "boundary": "Administrative plans are irregular events. Different planned starts may still be postponements/revisions of one field job. This is not independent completed workover-job history, and plannedStartDate is not a measured start.",
+    "subset_bias": "Whole wells with many dated plans were selected for history length; casing pressure repair code is present in171 of295 records. Not representative of all workovers."
+  },
+  "content_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\tools\\operations\\content-workover.json",
+  "built_assets": [
+    {
+      "id": "wo1",
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\assets\\operations\\data\\wo1.json",
+      "bytes": 33146,
+      "sha256": "d54980b59d1aa5072aa48f9954dc7211a72e20ca27aae94aa4c18d9b161fef5e",
+      "modelType": "tfidf",
+      "records": 3,
+      "metric": "No independent relevance accuracy asserted",
+      "baseline": null,
+      "model": null,
+      "n": 0,
+      "parity": {
+        "implementation": "independent NumPy forward pass on exported coefficients",
+        "maxAbsDifference": 1.0488024893007264e-09,
+        "tolerance": 0.0002,
+        "records": 3
+      },
+      "digestStage": "Preparation output, before owner adds top-level modelSHA256."
+    },
+    {
+      "id": "wo2",
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\assets\\operations\\data\\wo2.json",
+      "bytes": 48680,
+      "sha256": "4c25f270136d763417108dcd19dac2d2cfd8d4e4de824fbac4d880dddb7b2cae",
+      "modelType": "kg",
+      "records": 10,
+      "metric": "incompatible or unsupported recommendations by family-only baseline (count)",
+      "baseline": 25,
+      "model": 0,
+      "n": 10,
+      "parity": {
+        "implementation": "independent NumPy forward pass on exported coefficients",
+        "maxAbsDifference": 0.0,
+        "tolerance": 0.0002,
+        "records": 3
+      },
+      "digestStage": "Preparation output, before owner adds top-level modelSHA256."
+    },
+    {
+      "id": "wo3",
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\assets\\operations\\data\\wo3.json",
+      "bytes": 441293,
+      "sha256": "a971eb3452da059150d926e4da09021b5a9a232047a6ff52bd802f5fe0a8dbc5",
+      "modelType": "cnn",
+      "records": 8,
+      "metric": "held-out thickness MAE (mm)",
+      "baseline": 0.838216089,
+      "model": 0.262141407,
+      "n": 24,
+      "parity": {
+        "implementation": "independent NumPy forward pass on exported coefficients",
+        "maxAbsDifference": 9.432349177274091e-07,
+        "tolerance": 0.0002,
+        "records": 3
+      },
+      "digestStage": "Preparation output, before owner adds top-level modelSHA256."
+    },
+    {
+      "id": "wo4",
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\assets\\operations\\data\\wo4.json",
+      "bytes": 473024,
+      "sha256": "c837701da84eb3cfe8ae9929ced55c4f7470fe33268fdfecf06d56573376cbe9",
+      "modelType": "mlp",
+      "records": 8,
+      "metric": "held-out injected-event recall (0..1); false alarms and delays separately reported",
+      "baseline": 0.0,
+      "model": 0.8,
+      "n": 5,
+      "parity": {
+        "implementation": "independent NumPy forward pass on exported coefficients",
+        "maxAbsDifference": 7.082295780946879e-07,
+        "tolerance": 0.0002,
+        "records": 3
+      },
+      "digestStage": "Preparation output, before owner adds top-level modelSHA256."
+    },
+    {
+      "id": "wo5",
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\assets\\operations\\data\\wo5.json",
+      "bytes": 35268,
+      "sha256": "38819c6091f609df6d3819f80c9d66c4311416168e458d810bf671d945a24212",
+      "modelType": "gru",
+      "records": 10,
+      "metric": "held-out planned-estimate P50 MAE (days)",
+      "baseline": 3.22321429,
+      "model": 3.17142177,
+      "n": 56,
+      "parity": {
+        "implementation": "independent NumPy forward pass on exported coefficients",
+        "maxAbsDifference": 7.217836333062166e-07,
+        "tolerance": 0.0002,
+        "records": 3
+      },
+      "digestStage": "Preparation output, before owner adds top-level modelSHA256."
+    }
+  ],
+  "built_assets_script": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\tools\\operations\\prepare-workover.py",
+  "wo5_independent_check": {
+    "kind": "independent CHECK absolute-P50-residual range",
+    "unit": "days",
+    "centralOutputIndex": 1,
+    "centralFormula": "P50days = expected[1] = rawHead[1]*outputScale[1]+outputMean[1]",
+    "rangeFormula": "[P50days-halfWidthDays, P50days+halfWidthDays]; no silent sorting or clipping",
+    "halfWidthDays": 1.48207664,
+    "nominalResidualQuantile": 0.8,
+    "method": "higher empirical quantile: sortedAbsResidual[ceil(0.8*(nCheck-1))]",
+    "nCheck": 27,
+    "zeroBasedOrderIndex": 21,
+    "orderStatisticOneBased": 22,
+    "checkCoverage": 0.814814815,
+    "heldOutTestCoverage": 0.428571429,
+    "nTest": 56,
+    "checkSubmittedMin": "2021-12-01T08:51:09",
+    "checkSubmittedMax": "2022-03-31T14:42:42",
+    "boundary": "Empirical past CHECK-error range; not an assured80% conditional prediction interval or actual completion promise."
+  },
+  "tracked_source_snapshot": {
+    "root": "tools/operations/source-data/workover/",
+    "sourceIndex": "tools/operations/source-data/workover/source-index.json",
+    "actualInputAndManifestBytes": 1114630,
+    "totalIncludingIndexBytes": 1172353,
+    "jsonFiles": 75,
+    "plans": 295,
+    "traces": 72,
+    "omittedNonemptyArchivalSnippets": 165,
+    "originalResearchFiles": "preserved unchanged",
+    "reproduction": "python tools/operations/prepare-workover.py; no .artifacts input dependency",
+    "semanticFreezeVerified": "All model/records/validation/parity canonical hashes unchanged after matching owner JSON.stringify integer-number serialization. Only source paths and source-input hashes changed."
+  }
+}

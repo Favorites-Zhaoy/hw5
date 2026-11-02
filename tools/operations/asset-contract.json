@@ -1,0 +1,22 @@
+{
+  "purpose": "Bounded reproducible teaching data/model assets; owner implements all application runtime and UI.",
+  "output": "assets/operations/data/{id}.json, one self-contained lazy-loaded case payload",
+  "case": {
+    "id": "pr1",
+    "unit": "display unit",
+    "source": {"title": "primary source", "url": "https://...", "license": "exact license / limitations"},
+    "scope": "what current experiment can establish",
+    "model": {"type": "cnn|gru|mlp|pca|crm|tfidf|kg|gp", "name": "actual method"},
+    "records": [{"id": "source identifier", "kind": "field|published-simulation|controlled-synthetic|digitized-reference|derived-field", "scope": "nearest current data boundary", "sourceId": "original row/file/well", "split": "held-out|demonstration|validation", "input": "model input (flat for cnn/mlp, TxF for gru)", "target": "never used as model input", "baseline": "numeric/vector reference method if computed offline", "display": "case-specific plotted arrays, timestamps, features, source geometry"}],
+    "validation": {"split": "exact count/groups/dates", "metric": "MAE / accuracy with unit", "baseline": 0, "model": 0, "n": 1, "boundary": "sample scope; do not force improvement"},
+    "parity": [{"recordIndex": 0, "expected": "raw network or solver output before UI parameters; computed independently in Python"}],
+    "provenance": {"seed": 20261103, "sources": [], "counts": {}, "assumptions": [], "preparationScript": "tools/operations/prepare-THEME.py"}
+  },
+  "cnn": {
+    "type": "cnn", "dims": [1,32,32], "layers": [{"type":"conv2d","in":1,"out":4,"kernel":3,"stride":2,"padding":1,"weight":"flat PyTorch OIHW","bias":"array","activation":"relu"},{"type":"flatten"},{"type":"dense","weight":"flat [out,in]","bias":"array","activation":"relu|tanh|linear"}], "classification":"logits if applicable", "outputMean":"optional vector", "outputScale":"optional vector"
+  },
+  "gru": {"type":"gru","inputSize":1,"hiddenSize":8,"mean":"feature means (array)","scale":"feature std(array)","weightIH":"flat 3H x I; PyTorch r,z,n order","weightHH":"flat 3H x H","biasIH":"3H array","biasHH":"3H array","head":{"weight":"flat O x H","bias":"O array"},"outputMean":"O array","outputScale":"O array","note":"single layer, batch_first, zero hidden; no dropout at inference"},
+  "mlp": {"type":"mlp","mean":"array","scale":"array","layers":"dense layers same as cnn","outputMean":"array","outputScale":"array"},
+  "otherModels": "Document exact formula/schema beside script. Runtime owner can adapt. Store all coefficients, normalization, and independently computed parity checks. Do not edit core.js, shared content.js, lessons.js, stage.js, package, shell, index or other agent case files.",
+  "quality": ["No fabricated chronology, labels, scope or validation.","Group related records before splitting; fit all scalers on training only.","Use real CSV units; never silently relabel them.","Preserve failed/low-score candidates and feasible constraints.","Small CPU models; no huge dataset in initial page download.","All exported JSON finite, UTF-8 LF, round to sensible precision (typically 7 digits).","Keep raw research files unmodified; no deletes."]
+}

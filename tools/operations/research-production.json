@@ -1,0 +1,441 @@
+{
+  "researched_at": "2026-11-02",
+  "scope": "Production teaching cases pr1 CV, pr2 TS, pr3 OPT, pr4 TS, pr5 TS. Primary sources only; no old mudlogging dataset reused.",
+  "important_decisions": [
+    "Do not treat ESPset spectrum feature rows as chronological life histories.",
+    "3W Scaling in PCK is a real scale label, not wax and not an ESP failure label.",
+    "Sodir Volve is field-level monthly saleable production, not daily per-well production.",
+    "pywaterflood is explicitly synthetic; original CSV physical flow units were not established in inspected primary documentation."
+  ],
+  "cases": [
+    {
+      "id": "pr1",
+      "category": "CV",
+      "title": "Sucker-rod dynamometer card shape recognition",
+      "recommended_source": {
+        "name": "digitalmodel dynacard example library",
+        "publisher": "Vamsee Achanta",
+        "primary_url": "https://github.com/vamseeachanta/digitalmodel/issues/1288",
+        "schema_url": "https://raw.githubusercontent.com/vamseeachanta/digitalmodel/main/src/digitalmodel/marine_ops/artificial_lift/dynacard/example_cards.py",
+        "direct_download": "https://raw.githubusercontent.com/vamseeachanta/digitalmodel/main/src/digitalmodel/marine_ops/artificial_lift/dynacard/data/example_cards.json",
+        "license": "MIT at repository level; no independent release statement for original private training archive located",
+        "license_url": "https://raw.githubusercontent.com/vamseeachanta/digitalmodel/main/LICENSE",
+        "local_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\dynacard-example_cards.json",
+        "provenance": "346 cards mixed by explicit source field: 98 synthetic-verified, 3 field-measured, 245 field-archive-digitized.",
+        "labels": "Archive shape labels: BUTTERFLY 110, INCOMPLETE_FILLAGE 45, FILLAGE_COLLAPSE 45, FULL_CARD 45. Three measured surface examples: FULL_CARD 2, PUMPED_OFF 1. Synthetic labels cover 20 named mechanisms.",
+        "units": "field-archive-digitized is normalized unitless marker shapes; measured and synthetic cards have position inches, load pounds. Surface cards and downhole pump-card shapes are different domains."
+      },
+      "teaching_experiment": "Render normalized point sets into a 32x32 or 48x48 occupancy image. Train kNN or a small softmax image classifier on archive shape categories; do not use labels in the feature vector. Hold out all cards of the same anonymized well token (-wNN-) together. Report held-out confusion matrix, macro F1, number of wells, and image size. Keep the 3 real calibrated surface traces in a separate illustrative panel. If archival release uncertainty is unacceptable, use the explicitly synthetic subset and label all performance as simulation.",
+      "limitations": [
+        "Archive phenomena are shape annotations, not confirmed maintenance diagnoses.",
+        "Only 3 calibrated measured surface cards; insufficient to claim validated multi-fault field diagnosis.",
+        "Synthetic cards were selected to reproduce their generator classes; measuring that agreement is not independent real-world accuracy.",
+        "Preserve MIT notice and per-card source; do not erase provenance or invent physical units for normalized traces."
+      ],
+      "minimal_column_map": {
+        "file": "dynacard-example_cards.json",
+        "recordPath": "cards[]",
+        "input": {
+          "position": "位移点数组；档案为无量纲归一化值，实测/合成为in",
+          "load": "载荷点数组；档案为无量纲归一化值，实测/合成为lb"
+        },
+        "target": {
+          "phenomenon": "仅用于监督与检查；主实验使用四类档案形状"
+        },
+        "meta": {
+          "id": "卡片ID；以-wNN-匿名井标记保守分组",
+          "source": "field-archive-digitized / field-measured / synthetic-verified",
+          "units": "normalized / oilfield",
+          "meta.card_type": "pump / surface；不作为故障输入"
+        },
+        "excludeFromFeatures": [
+          "phenomenon",
+          "source",
+          "id",
+          "meta"
+        ],
+        "derived": "统一坐标后生成灰度/占据栅格；参考标签不得绘入输入。"
+      }
+    },
+    {
+      "id": "pr2",
+      "category": "TS",
+      "title": "Volve monthly field oil-rate forecasting",
+      "recommended_source": {
+        "name": "Norwegian Offshore Directorate FactPages, monthly saleable field production",
+        "publisher": "Sodir / Norwegian Offshore Directorate",
+        "primary_url": "https://factpages.sodir.no/en/field/TableView/Production/Saleable/Monthly",
+        "direct_download": "https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false",
+        "license": "Norwegian Licence for Open Government Data (NLOD) 2.0",
+        "license_url": "https://www.sodir.no/en/facts/data-and-analyses/open-data/",
+        "local_files": [
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-field-production-monthly.csv",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-volve-production-monthly.csv",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-volve-oil-rate.csv"
+        ],
+        "provenance": "Official reported real field totals. Full CSV 28,562 rows; filtered exactly prfInformationCarrier=VOLVE gives 114 months 2008-02 to 2017-07, 104 positive-oil months through 2016-09.",
+        "labels": "No fault labels. Oil/water monthly production are continuous regression targets.",
+        "units": "prfPrdOilNetMillSm3 and water: million standard cubic metres per month. Derived oil_sm3_month=original*1e6; oil_sm3_day=oil_sm3_month/calendar days in that month (calendar-day average, not flowing-day well rate)."
+      },
+      "teaching_experiment": "Compare previous-month persistence and a fitted 6-lag ridge autoregression or exponential smoothing. Split chronologically: train 2008-02 to 2013-12 (71), validation 2014-01 to 2014-12 (12), test 2015-01 to 2016-09 (21); zero-saleable months after shutdown are kept in source but separately annotated. Fit scalers and choose lag/penalty using train/validation only; report test MAE/RMSE in Sm3/day and show actual versus prediction at the same one-month horizon.",
+      "limitations": [
+        "Field totals blend well interventions, availability and reservoir decline; no well-level causal inference.",
+        "Sales/standard-condition quantities differ from reservoir liquid rates.",
+        "A phase-in/out period and shutdown zeros can dominate metrics; state the exact evaluation interval."
+      ],
+      "alternative_source": {
+        "name": "Equinor Volve complete field data",
+        "primary_url": "https://www.equinor.com/energy/volve-data-sharing",
+        "license_url": "https://cdn.equinor.com/files/h61q9gi9/global/de6532f6134b9a953f6c41bac47a0c055a3712d3.pdf?equinor-hrs-terms-and-conditions-for-licence-to-data-volve.pdf=",
+        "access": "Current official delivery uses Databricks Marketplace. Not downloaded; use Sodir CSV to avoid unverified third-party Excel mirrors."
+      },
+      "minimal_column_map": {
+        "file": "sodir-volve-production-monthly.csv",
+        "input": {
+          "prfYear": "记录年份",
+          "prfMonth": "记录月份",
+          "prfPrdOilNetMillSm3": "月产油量，百万Sm³；只允许历史月份进入模型"
+        },
+        "target": {
+          "prfPrdOilNetMillSm3[t+1]": "下一月月产油量，乘1000000得到Sm³/月"
+        },
+        "meta": {
+          "prfInformationCarrier": "必须等于VOLVE",
+          "prfNpdidInformationCarrier": "油田ID 3420717"
+        },
+        "derived": {
+          "month": "YYYY-MM-01",
+          "oilSm3Month": "prfPrdOilNetMillSm3 × 1000000；不除天数"
+        },
+        "excludeFromFeatures": [
+          "预测月及其后的实际油量",
+          "未来作业记录",
+          "全序列统计量"
+        ]
+      }
+    },
+    {
+      "id": "pr3",
+      "category": "OPT",
+      "title": "Constrained water-injection allocation with a response surrogate",
+      "recommended_source": {
+        "name": "pywaterflood small synthetic waterflood tutorial",
+        "publisher": "Frank Male",
+        "primary_url": "https://pywaterflood.readthedocs.io/en/v0.3.1/user-guide/7-minutes-to-pywaterflood.html",
+        "model_url": "https://github.com/frank1010111/pywaterflood/blob/master/paper/paper.md",
+        "direct_downloads": [
+          "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/injection.csv",
+          "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/production.csv",
+          "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/time.csv"
+        ],
+        "license": "BSD-2-Clause (repository)",
+        "license_url": "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/LICENSE",
+        "local_files": [
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-injection.csv",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-production.csv",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-time.csv"
+        ],
+        "provenance": "Tutorial explicitly calls the data synthetic. Aligned arrays: 298 time steps, 5 injectors, 4 producers; supplied time values run 30.99 to 9069.99.",
+        "labels": "No optimal allocations or oil-only output labels. Production is model total production response.",
+        "units": "Physical time/flow units not established in inspected source; display source time units and source flow units, or explicitly normalize all rates by a declared training reference. Do not label source as m3/day or bbl/day without further primary evidence."
+      },
+      "teaching_experiment": "Fit a nonnegative lag-response or capacitance-resistance surrogate from training injection/production histories, validate chronologically, then optimize candidate injection rates with fixed total-water supply, per-injector min/max, and optional ramp limits. Use an actual bounded optimization algorithm (SLSQP, or projected gradient onto capped simplex for an explicitly concave quadratic objective). Display baseline versus optimized predicted response plus every constraint residual. If adding oil fractions, costs, saturation penalties or productivity weights, label them explicit teaching assumptions rather than source measurements.",
+      "recommended_split": "First 208 time steps training, next 45 validation, last 45 test; scalers and chosen lag/tau trained without future rows.",
+      "limitations": [
+        "Synthetic response model demonstrates optimization, not field incremental-oil validation.",
+        "Maximizing total fluid alone can favor water production; keep objective wording honest.",
+        "Candidate decisions outside observed training injection ranges are extrapolation.",
+        "Dataset has no measured formation-fracture-pressure limits. User-supplied caps are scenario assumptions."
+      ],
+      "not_selected": {
+        "name": "TU Delft Egg model",
+        "primary_url": "https://api.figshare.com/v2/articles/12707642",
+        "direct_download": "https://ndownloader.figshare.com/files/24061982",
+        "size_bytes": 49267594,
+        "provenance": "101 synthetic reservoir realizations, 8 water injectors, 4 producers",
+        "license": "4TU General Terms of Use",
+        "reason": "49 MB archive exceeds bounded download preference and needs a reservoir simulator; pywaterflood small arrays are more practical for the live teaching demo."
+      },
+      "minimal_column_map": {
+        "files": [
+          "pywaterflood-time.csv",
+          "pywaterflood-injection.csv",
+          "pywaterflood-production.csv"
+        ],
+        "header": "三个CSV均无表头，按同一行号严格对齐。",
+        "input": {
+          "time.csv[:,0]": "原始时间坐标；保留原单位，不自行补为天",
+          "injection.csv[:,0:5]": "5口注水井历史，原始流量单位"
+        },
+        "target": {
+          "production.csv[:,0:4]": "4口生产井总液响应，原始流量单位"
+        },
+        "meta": {
+          "row_index": "对齐与时间划分索引"
+        },
+        "scenario": {
+          "budget": "同一原始/归一化流量尺度下的总水量上限",
+          "lower[5]": "单井下限，情景设定",
+          "upper[5]": "单井上限，情景设定"
+        },
+        "excludeFromFeatures": [
+          "留出时间段产液作为已知输入",
+          "最优方案标签（源数据未提供）"
+        ],
+        "derived": "由训练段构建非负滞后矩阵；若归一化，保存同一个训练参考尺度。"
+      }
+    },
+    {
+      "id": "pr4",
+      "category": "TS",
+      "title": "ESP condition anomaly warning",
+      "recommended_source": {
+        "name": "ESPset version 3",
+        "publisher": "Marcos Pellegrini et al. / Universidade Federal do Espirito Santo",
+        "primary_url": "https://data.mendeley.com/datasets/m268jsw339/3",
+        "doi": "10.17632/m268jsw339.3",
+        "author_code_url": "https://github.com/NINFA-UFES/ESPset",
+        "author_download_folder": "https://drive.google.com/drive/folders/1Tr0ddbopjVgHtccYg5nVcsjMraWkJOaM",
+        "direct_download": "https://drive.google.com/uc?export=download&id=1JNZ58PSe3b2x_tHHdrADLY9Dlrxddrx1",
+        "license": "CC BY 4.0 (dataset; code separately MIT)",
+        "license_url": "https://data.mendeley.com/datasets/m268jsw339/3",
+        "local_file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\ESPset-features.csv",
+        "provenance": "Real ESP pre-installation vibration tests, not deployed well failure life histories. Features file: 6,032 rows, 11 esp_id values, 10 columns.",
+        "labels": {
+          "Normal": 4801,
+          "Unbalance": 576,
+          "Faulty sensor": 295,
+          "Rubbing": 290,
+          "Misalignment": 70
+        },
+        "units": "Spectrum amplitudes and amplitude-derived peak/median/rms features are velocity inches/s. Frequencies normalized by shaft rotation; 1X at element 3003, 2X at 6006. a,b are fitted exponential-shape coefficients, not velocity. No time column."
+      },
+      "teaching_experiment": "For the real adjacent dataset, fit standardization on normal training pumps and detect anomalous vibration-feature vectors with Mahalanobis distance or Isolation Forest, holding out complete esp_id values. This is ESP condition screening, not TS early warning. To preserve required pr4 TS early-warning task, use a separately labeled, seeded pedagogical ESP SCADA simulation with explicit current A / temperature degC / pressure MPa / frequency Hz, normal-only training interval, injected-degradation onset, and causal EWMA or robust multichannel anomaly score. Report detection delay versus synthetic onset; do not derive fake timestamps from ESPset id or pretend fault labels are advance-warning outcomes.",
+      "limitations": [
+        "No reliable publicly downloadable ESP SCADA run-to-failure life history with explicit licence was verified in this bounded search.",
+        "Do not substitute 3W well-process anomalies and call them ESP mechanical failure.",
+        "Faulty sensor is a sensor category, not pump damage.",
+        "If using simulation, show the simulation badge on plot, metrics and downloads; no field accuracy or remaining-life claims."
+      ],
+      "minimal_column_map": {
+        "simulationSchema": {
+          "episode_id": "完整运行片段ID；按此分组",
+          "t": "从片段起点开始的时间，必须另存dt与单位",
+          "current_A": "模拟电流A",
+          "temperature_C": "模拟温度°C",
+          "pressure_MPa": "模拟压力MPa",
+          "frequency_Hz": "模拟运行频率Hz",
+          "anomaly_onset_t": "生成器给定起点，仅用于评价",
+          "seed": "生成种子，仅用于追溯"
+        },
+        "input": [
+          "过去窗口的current_A",
+          "过去窗口的temperature_C",
+          "过去窗口的pressure_MPa",
+          "已知历史frequency_Hz"
+        ],
+        "target": "下一点的运行通道；只用正常片段拟合",
+        "excludeFromFeatures": [
+          "anomaly_onset_t",
+          "seed",
+          "episode_id中的工况/异常编码",
+          "未来点"
+        ],
+        "contextOnly": {
+          "file": "ESPset-features.csv",
+          "esp_id": "真实设备分组编号",
+          "label": "Normal / Unbalance / Faulty sensor / Rubbing / Misalignment",
+          "peak1x,peak2x,median(8,13),median(98,102),rms(98,102)": "振动速度幅值特征，in/s",
+          "a,b": "谱形指数拟合系数",
+          "id": "样本号，不是时间戳"
+        }
+      }
+    },
+    {
+      "id": "pr5",
+      "category": "TS",
+      "title": "Scale growth risk / production-choke restriction warning",
+      "recommended_source": {
+        "name": "Petrobras 3W Dataset 2.0.0, real class-7 instances",
+        "publisher": "Petrobras",
+        "primary_url": "https://github.com/petrobras/3W",
+        "schema_url": "https://raw.githubusercontent.com/petrobras/3W/main/dataset/dataset.ini",
+        "direct_downloads": [
+          "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00021_20180611011218.parquet",
+          "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00001_20170226130146.parquet"
+        ],
+        "license": "CC BY 4.0 data; Apache-2.0 toolkit code",
+        "license_url": "https://github.com/petrobras/3W#licenses",
+        "local_files": [
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00021_20180611011218.parquet",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00001_20170226130146.parquet",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00021_20180611011218-minute.csv",
+          "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00001_20170226130146-minute.csv"
+        ],
+        "provenance": "Selected only WELL-* real measurements, no DRAWN/SIMULATED instances. WELL-00021 has 46,574 one-second rows (2018-06-11); WELL-00001 has 76,633 (2017-02-26/27). Original timestamps lack explicit timezone.",
+        "labels": "0 normal; 107 transition toward class 7; 7 established Scaling in PCK (production choke); nullable labels excluded from supervised scoring. WELL-00021: 17508 normal,23675 transition,1791 established,3600 unknown. WELL-00001:33750 normal,38335 transition,948 established,3600 unknown.",
+        "units": "Pressure Pa; temperatures degC; QGL m3/s gas lift. Pressure/1e6=MPa for display. P-PDG happens to be all zero in these examples, so exclude it. Many other channels absent; do not zero-impute as real measurements.",
+        "derived_files": "Minute CSVs use median sensor aggregation and within-minute modal observed class; preserve raw files for exact event-onset calculations."
+      },
+      "teaching_experiment": "Use normal segment to estimate multichannel robust baselines, then causal trailing-window slope/change point or EWMA score over P-TPT, P-MON-CKP, T-TPT and optionally QGL. Test on later chronological segments; use second real well as external illustration. Show onset of transition 107 and established condition 7 separately. Report false alarms during normal period and delay after transition; an alarm before class 7 but during class 107 is detection of an evolving labeled event, not pre-onset prediction.",
+      "limitations": [
+        "This is scaling at the production choke, not direct wax deposition measurement and not a combined wax/scale ground-truth dataset.",
+        "Do not use class/state as input features.",
+        "No direct scale thickness, chemical concentration or wax appearance temperature; displayed risk score is not a physical deposition rate or calibrated event probability.",
+        "Two selected instances are a teaching slice, insufficient for general field performance."
+      ],
+      "wax_background_only": {
+        "name": "Cold-finger wax deposition supplementary data",
+        "primary_url": "https://data.mendeley.com/datasets/rzzvmc4f5d/1",
+        "doi": "10.17632/rzzvmc4f5d.1",
+        "license": "CC0 1.0",
+        "status": "Primary metadata verified; numerical attachment not downloaded. Laboratory deposition measurements do not by themselves supply field TS early-warning labels."
+      },
+      "minimal_column_map": {
+        "files": [
+          "3w-scaling-WELL-00021_20180611011218.parquet",
+          "3w-scaling-WELL-00001_20170226130146.parquet"
+        ],
+        "input": {
+          "index": "源时间戳；原文件未明确时区，不额外声称UTC",
+          "P-TPT": "水下树压力，Pa；显示可除以10^6换成MPa",
+          "P-MON-CKP": "生产节流嘴上游压力，Pa",
+          "T-TPT": "水下树温度，°C",
+          "QGL": "气举流量，m³/s；仅在有效时使用"
+        },
+        "target": {
+          "class": "0正常、107过渡、7建立事件、空值未知，仅供评价"
+        },
+        "meta": {
+          "filename": "WELL来源和井号",
+          "state": "运行状态标签，仅作核对，不入模型"
+        },
+        "excludeFromFeatures": [
+          "class",
+          "state",
+          "P-PDG（本例全零）",
+          "全缺通道",
+          "未来窗口"
+        ],
+        "derived": "分钟显示取传感器中位数、标签取非缺失众数；精确起点和延迟应回到原秒级标签。"
+      }
+    }
+  ],
+  "download_manifest": [
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-dataset.ini",
+      "bytes": 4699,
+      "sha256": "c5ffad72bc1c46bccffa1e18412f2ddb87ca0e96eb7d2dfba92a4bc38a45bba2"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-README.md",
+      "bytes": 11458,
+      "sha256": "4fc516c12b5c87879c216107554fa38205b4003fd7eae712562c95b524ec740a"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00001_20170226130146-minute.csv",
+      "bytes": 107656,
+      "sha256": "35bcb37cd13106854625b8910dbab3b7d493784deac7e224a97e19f10f78cdb0"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00001_20170226130146.parquet",
+      "bytes": 1214225,
+      "sha256": "0ad0b0696d627c4c21ff95414b5da3524b478a28312cd82280d792f62a5ace92"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00021_20180611011218-minute.csv",
+      "bytes": 65526,
+      "sha256": "c2b8d2f591298650ae5385eb498b9acdf7efe4a85aff48c37cc96dc614cab494"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\3w-scaling-WELL-00021_20180611011218.parquet",
+      "bytes": 722735,
+      "sha256": "efd18fadf8c7f0b8cde024a6bd38cdcddde44222317e1bd0f9a427f906cbbbd7"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\digitalmodel-LICENSE",
+      "bytes": 1071,
+      "sha256": "abe9282066701ba45ec516e77329e14f5e27e5ae462fd1fd23fe9f62e27d4d91"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\dynacard-example_cards.json",
+      "bytes": 515571,
+      "sha256": "19f33c77593a60fe08387ff88c5f8ef929725d40e83e2ff5ee49f3be68915355"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\ESPset-features.csv",
+      "bytes": 673955,
+      "sha256": "84184c5852a55c1cd09157ef170407224fa8df70b54e04e8d9ad921c9f1f869e"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-gains.csv",
+      "bytes": 504,
+      "sha256": "b0ca58132c19985898200161668b07beee051e04be55eb3b4b8febd86c73bef4"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-injection.csv",
+      "bytes": 37548,
+      "sha256": "1b54db81d98ea26a8f4227356be72aa159476be935ed021e7a08b2653a093bfe"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-LICENSE",
+      "bytes": 1324,
+      "sha256": "3786b08c62044b2333ec3507272f1102b6c76946f87a84c502ca490119b6d585"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-production.csv",
+      "bytes": 30098,
+      "sha256": "edee35b6c92ae710fb9c842e8e013106682106767bcae6f35758f07c20390f5c"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-README.md",
+      "bytes": 5772,
+      "sha256": "903def7b994d967c43a608c273ade27248d133ad9e16929ab6c449fc3dfd24af"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-taus.csv",
+      "bytes": 104,
+      "sha256": "fd97dd75d19d9ca51ba2bc4d886171f9be35b73ec19388d760c35e5d5e2d761f"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-taus_per-pair.csv",
+      "bytes": 504,
+      "sha256": "8baa59414bbd42ba2611c2d5b5b41258b92366d9934462d5a699b464d1e3b682"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\pywaterflood-time.csv",
+      "bytes": 7748,
+      "sha256": "8cb5162de9e9b2a36c4636e960a2ed2928c5d40fe0898bf10fdbb492096da1f6"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-field-production-monthly.csv",
+      "bytes": 2033377,
+      "sha256": "ef15bc05662e2c245242d22a1537e14c74c9ebfc59fd63b4f3fb881d8df9f10c"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-volve-oil-rate.csv",
+      "bytes": 5513,
+      "sha256": "6e3ae8e63745253665145bf69d27144b22e4aee0d2e9380a418f1335d06d1a2f"
+    },
+    {
+      "file": "C:\\Users\\zhaoy\\Documents\\ChatGPT\\可视化导论\\hw5-operations-20261102\\.artifacts\\operations-research\\production\\sodir-volve-production-monthly.csv",
+      "bytes": 8214,
+      "sha256": "b6ed67f471b1301944a7bb382d3d96c6360598a5287b936a081ac01dc0aa98d1"
+    }
+  ],
+  "content_file": "tools/operations/content-production.json",
+  "implementation_alignment": {
+    "pr1": "CNN on source-separated dynacard images plus shape baseline",
+    "pr2": "causal small GRU plus persistence/decline baselines",
+    "pr3": "nonnegative lag CRM proxy plus actual budget/cap constrained allocation; total liquid only",
+    "pr4": "synthetic ESP episode forecast/residual monitor; ESPset background only",
+    "pr5": "causal-window PCA reconstruction residual plus single-pressure baseline on real 3W choke scaling"
+  },
+  "asset_implementation": {
+    "script": "tools/operations/prepare-production.py",
+    "schema": "tools/operations/production-asset-schema.md",
+    "date": "2026-11-03",
+    "pr2_target": "oilSm3/month; monthly volume, not the earlier optional calendar-day-rate research conversion",
+    "pr5_window": "fixed12 minutes; no target-well scaler; train-only threshold; default misses held-out event retained honestly"
+  }
+}

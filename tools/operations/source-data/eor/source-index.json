@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Offline numeric input snapshots required by prepare-eor.py; no .artifacts cache or network required for model preparation. Original downloads remain untouched.",
+  "preparationScript": "tools/operations/prepare-eor.py",
+  "generatedWithoutExternalInputs": [
+    "e1 physical PKN simulation",
+    "e2 controlled synthetic Gaussian training clouds"
+  ],
+  "inputs": [
+    {
+      "file": "forge_microseismic.csv",
+      "bytes": 681448,
+      "sha256": "2a6371e3dc6e13efb33afe67494d8961d231990386f21e282038f69fe8e1a279",
+      "title": "Utah FORGE: Phase-Picking Based Microseismic Event Catalog - April 2024 Stimulation",
+      "originalURL": "https://gdr.openei.org/submissions/1817",
+      "directDownloadURL": "https://gdr.openei.org/files/1817/Utah_FORGE_2024_Auto_Pick_catalog_2026.1.23.csv",
+      "authors": [
+        "Weiqiang Zhu",
+        "Junhao Song",
+        "Eyal Shimony",
+        "Ariel Lellouch",
+        "Uri Wygodny",
+        "Xiaoming Zhang",
+        "Noam Zach Dvory"
+      ],
+      "license": "CC BY 4.0",
+      "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+      "originalFile": {
+        "name": "Utah_FORGE_2024_Auto_Pick_catalog_2026.1.23.csv",
+        "sha256": "2a6371e3dc6e13efb33afe67494d8961d231990386f21e282038f69fe8e1a279",
+        "bytes": 681448
+      },
+      "transformation": "Byte-exact primary CSV; retained complete catalog because generator computes shared coordinate reference and full source count before selecting dates.",
+      "counts": {
+        "events": 2948
+      },
+      "units": {
+        "longitude/latitude": "degrees",
+        "depth_km": "km, source coordinate reference",
+        "sigma_x/y/z_km": "km, location standard deviations"
+      }
+    },
+    {
+      "file": "polymer_resistance_factor.csv",
+      "bytes": 440,
+      "sha256": "ff5886e373c59df0a6fb5586f79d8af02e6d36a1c557d64c8af60e11ad03390c",
+      "title": "Data for: Performance of Enlarging Swept Volume by Surface-active Polymer Flooding for Enhancing Oil Recovery",
+      "originalURL": "https://data.mendeley.com/datasets/ns7xbjz54h/1",
+      "directDownloadURL": "https://data.mendeley.com/public-files/datasets/ns7xbjz54h/files/53ff8888-e5f5-457d-9576-3cbee5c84090/file_downloaded",
+      "authors": [
+        "Qiannan Yu"
+      ],
+      "license": "CC BY 4.0",
+      "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+      "originalFile": {
+        "name": "Data for Performance of Enlarging Swept Volume by Surface-active Polymer Flooding for Enhancing Oil Recovery.xlsx",
+        "sha256": "cd181dd463d421f156912ccd9cd208e38cb0283aec5ae36100554538daa91456",
+        "bytes": 82379
+      },
+      "transformation": "Extract clearly headed source cells BP3:BS17; forward-restore concentration only inside its merged BR cells. No averages or separate recovery table added as labels.",
+      "counts": {
+        "experiments": 15,
+        "concentrations": 5,
+        "permeability_levels": 3
+      },
+      "units": {
+        "polymer_concentration_mg_l": "mg/L",
+        "permeability_1e_minus_3_um2": "10^-3 micrometer^2",
+        "resistance_factor": "dimensionless"
+      }
+    },
+    {
+      "file": "oil_sands_monthly.csv",
+      "bytes": 10905,
+      "sha256": "5657963cfeb4dbc827e8cfbfdff4395ca991efb36560d1ffdfcad964bd4d88c8",
+      "title": "Data Mining and Unsupervised Machine Learning in Canadian In Situ Oil Sands Database for Knowledge Discovery and Carbon Cost Analysis",
+      "originalURL": "https://data.mendeley.com/datasets/8ngkgz69zb/2",
+      "directDownloadURL": "https://data.mendeley.com/public-files/datasets/8ngkgz69zb/files/7bb4af5e-36ce-49fc-9e57-846dd5eedc6c/file_downloaded",
+      "authors": [
+        "Minxing Si"
+      ],
+      "license": "CC BY 4.0",
+      "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+      "originalFile": {
+        "name": "facility_2015_2019_v6_Mendeley.xlsx",
+        "sha256": "f4f4723641826db2da298fb4804522ca63a41072fee7256ef233174599224b8d",
+        "bytes": 286900
+      },
+      "transformation": "Keep only Method=CSS, UID1/3/17 and the seven columns consumed by prepare-eor.py. Cell values are unchanged; CSV uses LF. Other947 SAGD rows and unused gas/emission fields are omitted.",
+      "counts": {
+        "months": 180,
+        "UIDs": [
+          1,
+          3,
+          17
+        ],
+        "columns": [
+          "UID",
+          "Operation",
+          "Scheme",
+          "Method",
+          "ProductionMonth",
+          "Oil",
+          "SteamINJ"
+        ]
+      },
+      "units": {
+        "Oil": "m3/month",
+        "SteamINJ": "m3 cold-water equivalent/month at15 C",
+        "ProductionMonth": "YYYY-MM"
+      }
+    },
+    {
+      "file": "biosurfactant_online_windows.json",
+      "bytes": 89442,
+      "sha256": "b2d1ef72ae05c46a64a7ceb82178f74168a76ec95086723fb912484442db5a65",
+      "title": "Production and separation of a trehalolipid biosurfactant: data",
+      "originalURL": "https://data.mendeley.com/datasets/bw79v9vnbs/1",
+      "directDownloadURL": "https://data.mendeley.com/public-files/datasets/bw79v9vnbs/files/59054450-2514-4ab6-b320-0b05638d18ca/file_downloaded",
+      "authors": [
+        "Peter Martin",
+        "Sara Bages Estopa",
+        "James Winterburn",
+        "Colin Webb",
+        "Dan White"
+      ],
+      "license": "CC BY 4.0",
+      "licenseURL": "https://creativecommons.org/licenses/by/4.0/",
+      "originalFile": {
+        "name": "data.csv (local canonical name biosurfactant.csv)",
+        "sha256": "097925dfaf194f35e8531567d201764849d9290246b39073db83ebb318d957d7",
+        "bytes": 4750053
+      },
+      "transformation": "Reference extractor retains60 measured assay labels with24 hourly bins of strictly earlier rpm/temperature/DO observations; four t=0 labels lack history. B2a+B2b share conditionB2. No fill, synthetic labels, target features or future sensors.",
+      "counts": {
+        "original_assays": 64,
+        "usable_assays": 60,
+        "shape_per_sample": [
+          24,
+          3
+        ],
+        "condition_groups": 3
+      },
+      "units": {
+        "target_trehalolipid_g_l": "g/L",
+        "features": [
+          "rpm",
+          "degree C",
+          "% oxygen saturation"
+        ]
+      }
+    }
+  ],
+  "inputBytes": 782235,
+  "referenceExtractor": {
+    "file": "extract_sensor_windows.py",
+    "requiredForPreparation": false,
+    "purpose": "Optional regeneration of e5 snapshot after manually downloading original4.75MB CSV; full sensor file is not committed.",
+    "command": "python -X utf8 tools/operations/source-data/eor/extract_sensor_windows.py --raw /path/to/downloaded/data.csv --output-dir /path/to/rebuild",
+    "bytes": 10730,
+    "sha256": "3737c2bbc71b435b95636a34905a0f8c15631425cc9aac61d564d5e0d6bc3107"
+  },
+  "notes": [
+    "CC BY4.0 source attribution must accompany derived records.",
+    "Primary numerical sources only; no long article text, PDFs, XLSX containers, large raw sensors or model binaries are bundled.",
+    "Local .gitattributes preserves byte-hashed input snapshots across Windows and Unix."
+  ],
+  "testedEnvironment": {
+    "python": "3.12.10",
+    "numpy": "2.2.6",
+    "scipy": "1.16.0",
+    "torch": "2.9.1"
+  }
+}

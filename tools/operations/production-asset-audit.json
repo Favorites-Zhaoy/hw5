@@ -1,0 +1,134 @@
+{
+  "script": "tools/operations/prepare-production.py",
+  "schema": "tools/operations/production-asset-schema.md",
+  "cases": [
+    {
+      "id": "pr1",
+      "file": "assets/operations/data/pr1.json",
+      "bytes": 162846,
+      "sha256": "6d5fb19b5d3d22d929ce1da6e5ab2659701aed7f16232bc5fbda24fe49d2a3f8",
+      "records": 12,
+      "parityMaxDifferences": [
+        2.40796893535844e-09,
+        4.995821090147956e-09,
+        4.2851491244277895e-09
+      ],
+      "metric": "accuracy",
+      "baseline": 0.69090909,
+      "model": 0.65454545,
+      "n": 55,
+      "evaluationRecords": 55,
+      "displayClassCounts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "evaluationClassCounts": [
+        22,
+        12,
+        9,
+        12
+      ],
+      "frozenWeightsReused": true
+    },
+    {
+      "id": "pr2",
+      "file": "assets/operations/data/pr2.json",
+      "bytes": 28436,
+      "sha256": "5ff143236c1ec176267d25c2c129768718df4d640c687be5712b157feb2c44d2",
+      "records": 16,
+      "parityMaxDifferences": [
+        4.685716703534126e-09,
+        3.208697307854891e-09,
+        4.43833414465189e-10
+      ],
+      "metric": "MAE",
+      "baseline": 10220.95238095,
+      "model": 14002.61512424,
+      "n": 21
+    },
+    {
+      "id": "pr3",
+      "file": "assets/operations/data/pr3.json",
+      "bytes": 37329,
+      "sha256": "fad430d56a0df528ea12e7eed08d3519f17e18282ab1ae1458f7489468dbaecf",
+      "records": 7,
+      "parityMaxDifferences": [
+        2.220446049250313e-16,
+        1.1102230246251565e-16,
+        6.661338147750939e-16
+      ],
+      "metric": "MAE of field-total liquid",
+      "baseline": 0.53917528,
+      "model": 0.03244441,
+      "n": 45
+    },
+    {
+      "id": "pr4",
+      "file": "assets/operations/data/pr4.json",
+      "bytes": 491382,
+      "sha256": "1f7738c10db558c3296b2ec014b22c65273a4f105a368a16584859c8245e3275",
+      "records": 12,
+      "parityMaxDifferences": [
+        7.228541765158525e-09,
+        9.31063226516926e-09,
+        4.06656397444749e-09
+      ],
+      "metric": "F1（仿真逐点异常）",
+      "baseline": 0.39822024,
+      "model": 0.73730298,
+      "n": 2736
+    },
+    {
+      "id": "pr5",
+      "file": "assets/operations/data/pr5.json",
+      "bytes": 123162,
+      "sha256": "9503f75a458b9620d2fa165918f391c3ef168eb138049bc3c8ce07da4b77e745",
+      "records": 8,
+      "parityMaxDifferences": [
+        1.3179104474403402e-09,
+        1.4796776581782467e-09,
+        3.559780165085513e-09
+      ],
+      "metric": "F1（107/7视为事件发展）",
+      "baseline": 0.0,
+      "model": 0.0,
+      "n": 717
+    }
+  ],
+  "hashStage": "Preparation snapshot, before owner canonical JSON serialization and modelSHA256 packaging; whole-file hashes can change at that step.",
+  "sourceIndex": "tools/operations/source-data/production/source-index.json",
+  "sourceSnapshots": {
+    "files": 11,
+    "bytes": 717860,
+    "allSnapshotHashesVerified": true
+  },
+  "offlineSourceReproduction": {
+    "passed": true,
+    "cacheAndNetworkAvailable": false,
+    "output": "separate .artifacts/production-tracked-input-smoke-20261103/data",
+    "cases": {
+      "pr1": {
+        "modelParametersEqual": true,
+        "validationMetricEqual": true
+      },
+      "pr2": {
+        "modelParametersEqual": true,
+        "validationMetricEqual": true
+      },
+      "pr3": {
+        "modelParametersEqual": true,
+        "validationMetricEqual": true
+      },
+      "pr4": {
+        "modelParametersEqual": true,
+        "validationMetricEqual": true
+      },
+      "pr5": {
+        "modelParametersEqual": true,
+        "validationMetricEqual": true
+      }
+    }
+  }
+}

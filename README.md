@@ -124,6 +124,14 @@ w1沿用 `welllog-layer` ID，旧测井示范脚本不再由首页加载，旧�
 
 数据选择、授权、算法及复现命令见[物探案例说明](docs/物探案例说明.md)。`npm run seismic:build`整理已保存的资源，`npm run seismic:prepare`显式下载并重训；案例资料按需载入，主页只加载约1.4 KB元数据。
 
+## 采油、修井与增采
+
+新增三个图解主题、15个案例和45个原生教学页签，沿用录井的业务线和图内交互。入口：[采油](https://favorites-zhaoy.github.io/hw5/#/stage/production)、[修井](https://favorites-zhaoy.github.io/hw5/#/stage/workover)、[增采](https://favorites-zhaoy.github.io/hw5/#/stage/eor)。
+
+保留原CV／TS／OPT／NLP／KG归类，实际运行卷积、GRU、CRM配注、文本检索、尺寸图谱、PCA、GP和约束搜索。真实实测、室内实验、公开科学模拟与教学合成分别标注，不用没有标签的数据冒充现场验证。每例三个页签共享资料、参数和观察，支持导出来源与结果。模型弱于参照的结果保留。
+
+最小输入快照、来源许可索引和训练准备脚本随仓库保存；网页按需载入单个案例。运行`npm run operations:build`整理已保存资源。数据选择、算法、适用范围和复现步骤见[案例说明](docs/采油修井增采案例说明.md)。
+
 ## 在线部署
 
 GitHub Pages从`main`分支根目录发布，`.nojekyll`让HTML、JavaScript和案例资源按静态文件提供。推送到`main`后自动部署；使用哈希路由，M1等场景链接可以直接分享。

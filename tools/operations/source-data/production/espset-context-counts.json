@@ -1,0 +1,14 @@
+{
+  "samples": 6032,
+  "devices": 11,
+  "labels": {
+    "Normal": 4801,
+    "Unbalance": 576,
+    "Faulty sensor": 295,
+    "Rubbing": 290,
+    "Misalignment": 70
+  },
+  "chronologyAvailable": false,
+  "use": "Context counts only; not model training and not calibration of synthetic current/temperature/pressure",
+  "sourceSHA256": "84184c5852a55c1cd09157ef170407224fa8df70b54e04e8d9ad921c9f1f869e"
+}

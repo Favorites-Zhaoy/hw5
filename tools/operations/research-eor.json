@@ -1,0 +1,437 @@
+{
+  "checked_at": "2026-11-02",
+  "scope": "Primary source research for five EOR teaching cases. Raw small licensed numerical files; no fabricated field/lab truth.",
+  "important_findings": [
+    "e1: no small design-parameter / production-response supervised corpus verified; use transparent analytical PKN teaching simulator with SI units, no oil-gain labels.",
+    "e2: a licensed processed field microseismic catalog is available; it has event locations, not fracture masks, fracture-tip ground truth or oil recovery.",
+    "e3: verified small real laboratory polymer dataset has 15 resistance-factor rows and 5 viscosity/recovery pairs. It cannot support high-dimensional recipe optimization.",
+    "e4: verified real field monthly source has 1127 rows and 20 Operation/UID groups (19 distinct Scheme names because Hangingstone is repeated). 3 CSS facilities give 180 rows; other 947 are SAGD.",
+    "e5: verified laboratory biosurfactant production CSV has 4 fermentation batches, each 16 offline assays (64 labels total), plus ~21600 sensor points/batch. Do not count interpolated assays as measured labels."
+  ],
+  "sources": [
+    {
+      "case": "e1",
+      "id": "geos_pkn",
+      "role": "primary physical benchmark basis; recommend independently implemented teaching simulation",
+      "title": "Viscosity-Storage-Dominated PKN Hydraulic Fracture — GEOS validation study",
+      "url": "https://geosx-geosx.readthedocs-hosted.com/en/develop/docs/sphinx/advancedExamples/validationStudies/hydraulicFracture/pknFracViscosityDominated/Example.html",
+      "license": "New teaching simulation should use project license; formulas are reimplemented from cited benchmark, no simulator code needs to be copied.",
+      "kind": "simulation, not measurements",
+      "formulas": {
+        "plane_modulus": "Ep=E/(1-nu^2)",
+        "half_length_m": "l=0.3817*(Ep*Q^3*t^4/(mu*h^4))^(1/5)",
+        "inlet_width_m": "w=3*(mu*Q*l/Ep)^(1/4)",
+        "inlet_net_pressure_pa": "p=(16*mu*Q*Ep^3*l/(pi*h^4))^(1/4)",
+        "volume_m3": "V=Q*t"
+      },
+      "units": {
+        "E": "Pa",
+        "nu": "1",
+        "Q": "m3/s total injection rate; preserve same convention as benchmark",
+        "t": "s",
+        "mu": "Pa s",
+        "h": "m",
+        "l": "m",
+        "w": "m",
+        "p": "Pa"
+      },
+      "targets": [
+        "fracture half length (m)",
+        "inlet aperture (m)",
+        "net pressure (MPa)"
+      ],
+      "recommended_experiment": "Parameter sweep -> train a surrogate -> predict held-out combinations -> maximize modeled half length under explicit net-pressure and injected-volume constraints; compare optimizer result to analytical response. Restrict to viscosity-storage PKN assumptions, homogeneous rock, fixed height, negligible leakoff; filter to l/h well above 1.",
+      "split": "Group by complete (E, nu, height) rock scenario; do not split time samples from one scenario into both train and test.",
+      "label_guardrail": "Use modeled fracture geometry/pressure, never measured recovery, causal oil gain, field optimum or NPV.",
+      "primary_basis": "GEOS validation documentation cites Kovalyshen and Detournay (2010) and Economides and Nolte (2000) for the PKN analytical solutions."
+    },
+    {
+      "case": "e1",
+      "id": "pyfrac_archive_checked",
+      "title": "Hydraulic Fracture Propagation, Arrest, and Closure Simulations using PyFrac",
+      "url": "https://zenodo.org/records/13935864",
+      "doi": "10.5281/zenodo.13935864",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "software_url": "https://github.com/GeoEnergyLab-EPFL/PyFrac",
+      "software_license": "LGPL-3.0-or-later",
+      "downloaded": [
+        "PyFrac_Script.zip",
+        "PostProcessing_Script.zip"
+      ],
+      "decision": "Not a ready numerical dataset under 30 MB. Main outputs ZIP is 46168199 bytes. Small postprocessor is a Mathematica notebook; small Python script uses dimensionless inputs with many parameters set to 1. Do not relabel as dimensional measurements."
+    },
+    {
+      "case": "e2",
+      "id": "forge_1817",
+      "title": "Utah FORGE: Phase-Picking Based Microseismic Event Catalog - April 2024 Stimulation",
+      "url": "https://gdr.openei.org/submissions/1817",
+      "direct_url": "https://gdr.openei.org/files/1817/Utah_FORGE_2024_Auto_Pick_catalog_2026.1.23.csv",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "local_file": "forge_microseismic.csv",
+      "bytes": 681448,
+      "rows": 2948,
+      "authors": "Weiqiang Zhu; Junhao Song; Eyal Shimony; Ariel Lellouch; Uri Wygodny; Xiaoming Zhang; Noam Zach Dvory",
+      "kind": "processed observed field seismic event catalog, enhanced geothermal stimulation; domain transfer to oil EOR must be explicit",
+      "units": {
+        "time": "origin timestamp",
+        "longitude": "degrees",
+        "latitude": "degrees",
+        "depth_km": "km, catalog coordinate reference, not automatically depth below ground",
+        "elevation_m": "m; numerical file has elevation_m=-1000*depth_km",
+        "sigma_x_km": "km bootstrap location uncertainty",
+        "sigma_y_km": "km bootstrap location uncertainty",
+        "sigma_z_km": "km bootstrap location uncertainty",
+        "magnitude": "estimated local magnitude, dimensionless",
+        "num_picks": "count",
+        "adloc_score": "quality score, dimensionless",
+        "adloc_residual_time": "residual time; likely seconds but unit not explicitly verified in CSV header"
+      },
+      "target_availability": "No true fracture extent, masks, treatment parameters or oil gain. Event locations and uncertainties can support geometric fit/uncertainty exercises, not supervised fracture reconstruction accuracy.",
+      "recommended_experiment": "Transform lat/lon to a local meter coordinate system, retain uncertainty, use robust weighted plane/ellipsoid fit or rasterize density for CV preprocessing. Compare PCA baseline to robust optimization with held-out spatial residual and bootstrap stability. Call it microseismic event-cloud extent proxy; if true segmentation training is needed create explicitly synthetic fracture images/masks in an independent teaching simulator.",
+      "split": "Group by acquisition day or stimulation stage if joined to primary stage metadata; no random event split claimed independent. Do not infer true fracture boundaries from event-cloud hull."
+    },
+    {
+      "case": "e3",
+      "id": "polymer_ns7",
+      "title": "Data for: Performance of Enlarging Swept Volume by Surface-active Polymer Flooding for Enhancing Oil Recovery",
+      "url": "https://data.mendeley.com/datasets/ns7xbjz54h/1",
+      "doi": "10.17632/ns7xbjz54h.1",
+      "direct_url": "https://data.mendeley.com/public-files/datasets/ns7xbjz54h/files/53ff8888-e5f5-457d-9576-3cbee5c84090/file_downloaded",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "author": "Qiannan Yu",
+      "article_doi": "10.1080/15567036.2019.1656306",
+      "local_file": "Data for Performance of Enlarging Swept Volume by Surface-active Polymer Flooding for Enhancing Oil Recovery.xlsx",
+      "bytes": 82379,
+      "extracted_files": [
+        "polymer_resistance_factor.csv",
+        "polymer_recovery.csv"
+      ],
+      "kind": "laboratory results; workbook contains several unrelated plots/tables in one sheet. Only use the clearly headed tables.",
+      "rows": {
+        "resistance_factor": 15,
+        "viscosity_recovery": 5
+      },
+      "units": {
+        "permeability": "10^-3 micrometer^2 as explicitly headed BQ1, values 100/200/500; do not silently call these mD",
+        "polymer_concentration": "mg/L (750,1000,1250,1500,2000)",
+        "resistance_factor": "dimensionless measured ratio",
+        "viscosity": "mPa s (45,100,200,300,400)",
+        "waterflood_recovery": "% (shared baseline 23.67)",
+        "polymer_recovery": "%",
+        "recovery_increase": "percentage points; source labels increments as %"
+      },
+      "extraction": "BP3:BS17 gives serial, permeability, concentration (forward fill only within merged BR cells), resistance factor. BW4:CA8 gives viscosity, linked-polymer and surface-active-polymer recoveries/increments. Explicit shared waterflood baseline BV4:BV8=23.67. Do not treat concentration-group averages BT as independent samples.",
+      "recommended_experiment": "Tiny Gaussian-process regression or monotone interpolation; minimize concentration to meet a user-selected resistance factor within observed permeability range. Report uncertainty and measured support. Recovery table is a separate five-point experiment and must not be joined to concentration rows to invent recovery labels.",
+      "split": "Leave one concentration group out (5 folds, 3 rows/fold); separately leave one permeability level out to reveal extrapolation. Only 15 measured labels; avoid deep models or impressive accuracy claims.",
+      "label_guardrail": "No surfactant concentration input in the selected table, no multicomponent recipe optimum, no field recovery or causal oil gain."
+    },
+    {
+      "case": "e4",
+      "id": "oil_sands_monthly",
+      "title": "Data Mining and Unsupervised Machine Learning in Canadian In Situ Oil Sands Database for Knowledge Discovery and Carbon Cost Analysis",
+      "url": "https://data.mendeley.com/datasets/8ngkgz69zb/2",
+      "doi": "10.17632/8ngkgz69zb.2",
+      "paper_dataset_version": "10.17632/8ngkgz69zb.4; public API v4 returns byte-identical file/hash as v2 checked here",
+      "direct_url": "https://data.mendeley.com/public-files/datasets/8ngkgz69zb/files/7bb4af5e-36ce-49fc-9e57-846dd5eedc6c/file_downloaded",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "author": "Minxing Si",
+      "article_url": "https://www.mdpi.com/2071-1050/13/4/1968",
+      "article_doi": "10.3390/su13041968",
+      "author_paper_mirror": "https://ming2046.github.io/assets/files/sustainability-13-01968-v2.pdf",
+      "local_file": "facility_2015_2019_v6_Mendeley.xlsx",
+      "extracted_file": "oil_sands_monthly.csv",
+      "bytes": 286900,
+      "kind": "observed scheme-level monthly field operation aggregates extracted from Petrinex",
+      "rows": 1127,
+      "groups": 20,
+      "group_key": "Operation or UID, not Scheme (Hangingstone has two operations)",
+      "method_counts": {
+        "CSS": 180,
+        "SAGD": 947
+      },
+      "CSS_UIDs": [
+        1,
+        3,
+        17
+      ],
+      "units": {
+        "Oil": "m3 produced per month",
+        "SteamINJ": "m3 cold water equivalent per month at 15 C",
+        "SOR": "SteamINJ/Oil, m3/m3 dimensionless ratio",
+        "SGF": "10^3 m3 fuel gas per month at 15 C and 101.325 kPa absolute",
+        "Flare": "10^3 m3 gas/month",
+        "Vent": "10^3 m3 gas/month",
+        "SolutionGas": "10^3 m3 gas/month",
+        "FuelINJ": "gas injection, 10^3 m3/month; verify exact semantic field if used",
+        "CondINJ": "m3 solvent injection/month",
+        "C3INJ": "m3 solvent injection/month",
+        "ProductionMonth": "YYYY-MM"
+      },
+      "units_basis": "Source article Table 2 and following paragraph explicitly specify oil/steam m3, gas 10^3 m3, steam cold-water equivalent and standard conditions.",
+      "recommended_experiment": "For CSS task subset Method=CSS, compare persistence/seasonal naive baseline to lagged ridge/random-forest next-month production forecast with previous oil, previous steam and seasonal terms. Evaluate MAE in m3/month and normalized error. If adding a steam-constrained what-if, label it an assumed heating/production simulation or observational scenario, not causal uplift optimization.",
+      "split": "Train 2015-2017, validation 2018, test 2019 within operations; also leave one CSS Operation out to demonstrate cross-facility generalization. Fit scaling/imputation on train only. Gaps should break sequences or be flagged.",
+      "leakage": [
+        "Same-month SOR contains Oil target directly; never use SOR to predict same-month Oil.",
+        "Do not shift/roll across operation boundaries.",
+        "No row-random split across months.",
+        "Scheme aggregates cannot identify individual injection/soak/production cycles."
+      ],
+      "label_guardrail": "No well-level controls, soak duration, steam quality or measured counterfactual, so no per-cycle optimum or causal oil increase."
+    },
+    {
+      "case": "e5",
+      "id": "biosurfactant_batches",
+      "title": "Production and separation of a trehalolipid biosurfactant: data",
+      "url": "https://data.mendeley.com/datasets/bw79v9vnbs/1",
+      "doi": "10.17632/bw79v9vnbs.1",
+      "direct_url": "https://data.mendeley.com/public-files/datasets/bw79v9vnbs/files/59054450-2514-4ab6-b320-0b05638d18ca/file_downloaded",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "authors": "Peter Martin; Sara Bages Estopa; James Winterburn; Colin Webb; Dan White",
+      "article_doi": "10.1016/j.bej.2018.07.006",
+      "article_url": "https://www.sciencedirect.com/science/article/abs/pii/S1369703X18302249",
+      "institution_url": "https://research.manchester.ac.uk/en/publications/production-and-separation-of-a-trehalolipid-biosurfactant/",
+      "local_file": "biosurfactant.csv",
+      "original_filename": "data.csv",
+      "bytes": 4750053,
+      "extracted_file": "biosurfactant_assays.csv",
+      "kind": "measured ex-situ Rhodococcus sp. PML026 laboratory fermentation; MEOR-relevant biosurfactant production, not reservoir microbial activity or recovery",
+      "batches": [
+        "Figure 1 -> B1",
+        "Figure 2a -> B2a",
+        "Figure 2b -> B2b",
+        "Figure 3 -> B3"
+      ],
+      "rows": {
+        "offline_assays_total": 64,
+        "assays_per_batch": 16,
+        "sensor_points_per_batch_approx": 21600
+      },
+      "time": "0 to 360 hours; offline assay interval 24 hours",
+      "units": {
+        "time": "h",
+        "stirrer_speed": "rpm",
+        "temperature": "C",
+        "pH": "dimensionless",
+        "dry_cell_weight": "g/L",
+        "OD": "absorbance at 600 nm (dimensionless)",
+        "DO": "% oxygen saturation",
+        "trehalolipid": "g/L",
+        "hexadecane": "% v/v",
+        "trehalolipid_std": "g/L",
+        "hexadecane_std": "% v/v"
+      },
+      "csv_0_based_column_map": {
+        "B1": {
+          "sensor_time": 0,
+          "rpm": 1,
+          "temp": 2,
+          "pH": 3,
+          "assay_time": 5,
+          "biomass": 6,
+          "od": 7,
+          "od_std": 8,
+          "DO_time": 9,
+          "DO": 10,
+          "product_time": 14,
+          "product": 15,
+          "substrate": 16,
+          "product_std": 17,
+          "substrate_std": 18
+        },
+        "B2a": {
+          "sensor_time": 20,
+          "rpm": 21,
+          "temp": 22,
+          "pH": 23,
+          "assay_time": 25,
+          "biomass": 26,
+          "od": 27,
+          "od_std": 28,
+          "DO_time": 29,
+          "DO": 30,
+          "product_time": 33,
+          "product": 34,
+          "substrate": 35,
+          "product_std": 36,
+          "substrate_std": 37
+        },
+        "B2b": {
+          "sensor_time": 39,
+          "rpm": 40,
+          "temp": 41,
+          "pH_time": 42,
+          "pH": 43,
+          "assay_time": 45,
+          "biomass": 46,
+          "od": 47,
+          "od_std": 48,
+          "DO_time": 49,
+          "DO": 50,
+          "product_time": 53,
+          "product": 54,
+          "substrate": 55,
+          "product_std": 56,
+          "substrate_std": 57
+        },
+        "B3": {
+          "sensor_time": 59,
+          "rpm": 60,
+          "temp": 61,
+          "pH": 62,
+          "assay_time": 64,
+          "biomass": 65,
+          "od": 66,
+          "od_std": 67,
+          "DO_time": 68,
+          "DO": 69,
+          "product_time": 72,
+          "product": 73,
+          "substrate": 74,
+          "product_std": 75,
+          "substrate_std": 76
+        }
+      },
+      "recommended_experiment": "Forecast the next 24-h trehalolipid concentration or biomass. Compare persistence to ridge/low-complexity kinetic-informed regression; fit on training batches with only past assays and past sensor-window summaries. Show uncertainty and an explicit 64-label limitation. B2a and B2b are reported replicates; keep them together for genuine process generalization or use them explicitly for replicate reproducibility evaluation.",
+      "split": "Group by fermentation batch/condition; keep B2a/B2b together for grouped holdout. Also use chronological last 4 assay times as forecast evaluation. Never randomly split minute sensor rows, and never interpolate 64 offline assays into 86000 supposedly measured targets.",
+      "label_guardrail": "Rename scope to microbial biosurfactant fermentation monitoring/forecasting. No claim to reservoir oil-gain prediction or field microbial activity."
+    }
+  ],
+  "rejected_or_not_selected": [
+    {
+      "url": "https://data.mendeley.com/datasets/gd98hf4bj9/1",
+      "reason": "Four real lab hydraulic-fracturing MAT files are each 442 MB to 1.6 GB; over size cap."
+    },
+    {
+      "url": "https://zenodo.org/records/3710746",
+      "reason": "Lab granite/marble fracture benchmark raw RAR is 2.4 GB; over cap."
+    },
+    {
+      "url": "https://zenodo.org/records/13358915",
+      "reason": "CT scan raw ZIP is 15.3 GB. Small core photos are illustrations, not a labeled CV corpus."
+    },
+    {
+      "url": "https://zenodo.org/records/3530029",
+      "reason": "Seismic imaging ZIP is 57.8 MB; over cap."
+    },
+    {
+      "url": "https://data.mendeley.com/datasets/kfbtjy4w4s/1",
+      "reason": "Downloaded 1.69 MB filtered AE moment-tensor archive; no self-contained unit/column documentation verified yet, so do not use for supervised metrics."
+    },
+    {
+      "url": "https://data.mendeley.com/datasets/t62khmjtdc/2",
+      "reason": "Small SAGD optimization code archive lead, not verified cyclic-steam measurements; do not reuse without checking."
+    }
+  ],
+  "downloaded_files": [
+    {
+      "file": "biosurfactant.csv",
+      "bytes": 4750053,
+      "sha256": "097925dfaf194f35e8531567d201764849d9290246b39073db83ebb318d957d7"
+    },
+    {
+      "file": "biosurfactant_assays.csv",
+      "bytes": 4161,
+      "sha256": "d91a92b11a7f86fd08142c6e2c889fa682b5d59ac83bba614f8379fc7dcd1dd3"
+    },
+    {
+      "file": "Data for Performance of Enlarging Swept Volume by Surface-active Polymer Flooding for Enhancing Oil Recovery.xlsx",
+      "bytes": 82379,
+      "sha256": "cd181dd463d421f156912ccd9cd208e38cb0283aec5ae36100554538daa91456"
+    },
+    {
+      "file": "facility_2015_2019_v6_Mendeley.xlsx",
+      "bytes": 286900,
+      "sha256": "f4f4723641826db2da298fb4804522ca63a41072fee7256ef233174599224b8d"
+    },
+    {
+      "file": "forge_microseismic.csv",
+      "bytes": 681448,
+      "sha256": "2a6371e3dc6e13efb33afe67494d8961d231990386f21e282038f69fe8e1a279"
+    },
+    {
+      "file": "gdr-1817.html",
+      "bytes": 92855,
+      "sha256": "2b94f772494344a1217aa1362c60ddc332c0cfa06e54fc9a23eb751e9f13894b"
+    },
+    {
+      "file": "hf_lab-file-list.json",
+      "bytes": 3197,
+      "sha256": "9ce5eac6b294816845b69cbff0acbbc3aad55c5ee9c0da7b08efe49e9642fe36"
+    },
+    {
+      "file": "hf_mt-file-list.json",
+      "bytes": 865,
+      "sha256": "f683952556b56e1a0b0a22445422066a66d626582bc6a0e2ce1a685e7bcfd2e0"
+    },
+    {
+      "file": "oil-sands-paper.pdf",
+      "bytes": 1888286,
+      "sha256": "28e437e530c1b65468d2317de17e435480599e60495566392e6fb686a34f2719"
+    },
+    {
+      "file": "oil-sands-paper.txt",
+      "bytes": 46491,
+      "sha256": "5b36ceb0392b175602aab510b896c5c8b5ec1155897cc4aa200d78a8f9367c87"
+    },
+    {
+      "file": "oil_sands-file-list.json",
+      "bytes": 911,
+      "sha256": "d2bc0eeb908f93c6c2044095a15e6d9860fc01138ecb703f38665a6320748ad5"
+    },
+    {
+      "file": "oil_sands_monthly.csv",
+      "bytes": 136325,
+      "sha256": "3063ebf77ca0a1147ae0fc30a74b9652f46abe6c22e121eda960382463669e61"
+    },
+    {
+      "file": "oil_sands_v4-file-list.json",
+      "bytes": 781,
+      "sha256": "bc1b2be50d92d58bc270b9c50984142ed872b72f9b7841f6657727299445f4e0"
+    },
+    {
+      "file": "polymer-file-list.json",
+      "bytes": 979,
+      "sha256": "5ca7c1908d14dcc25bd1a44d7fb31797776b912b37989d08ff09b034dd7f0ec8"
+    },
+    {
+      "file": "polymer_recovery.csv",
+      "bytes": 349,
+      "sha256": "554055b02f4580c55ffb1e327993df4faa28e91826447041a0e222f6d73d32c8"
+    },
+    {
+      "file": "polymer_resistance_factor.csv",
+      "bytes": 440,
+      "sha256": "ff5886e373c59df0a6fb5586f79d8af02e6d36a1c557d64c8af60e11ad03390c"
+    },
+    {
+      "file": "PostProcessing_Script.zip",
+      "bytes": 7469172,
+      "sha256": "1ebf430fd22b987c0b45ff777fdf5607e82af3ab74df05ffd056b33ac23e051b"
+    },
+    {
+      "file": "pyfrac-record.json",
+      "bytes": 10346,
+      "sha256": "3df8e492b0a5da8e12fca845ac870276bfaaae559f20517c4e0dfdc3b38bb022"
+    },
+    {
+      "file": "PyFrac_Script.zip",
+      "bytes": 4748,
+      "sha256": "9331e7f3b4dcc79ec232190b1c3e07a4c56e7132fb001fbdb2f69e4da15123b1"
+    },
+    {
+      "file": "steam_opt-file-list.json",
+      "bytes": 839,
+      "sha256": "b966f6d6da2536f870005c120a8eb1cd71c127812bda54fe8b86a20ade2ebf8c"
+    },
+    {
+      "file": "The data extract from full waveform of AE.zip",
+      "bytes": 1688292,
+      "sha256": "e3b46cef3320109c18e05f5be530da9d02054ea9ae1b02c1f4caa5aecbedce39"
+    }
+  ]
+}

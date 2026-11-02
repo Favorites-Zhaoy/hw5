@@ -1,0 +1,146 @@
+{
+  "created": "2026-11-03",
+  "purpose": "Minimal tracked inputs required by prepare-production.py. Original research downloads remain in .artifacts unchanged.",
+  "licensingBoundary": "The public dynacard repository is MIT, but its original private field archive has no separately verified data release; this caveat must follow snapshots and outputs.",
+  "sourceSHAConvention": "sourceSHA256 identifies the original upstream download; snapshotSHA256 identifies this exact tracked file after any documented reduction.",
+  "entries": [
+    {
+      "file": "dynacard-example_cards.json",
+      "originalUrl": "https://raw.githubusercontent.com/vamseeachanta/digitalmodel/main/src/digitalmodel/marine_ops/artificial_lift/dynacard/data/example_cards.json",
+      "license": "Repository MIT; independent original-private-archive data permission not located. Preserve per-card sources and this caveat.",
+      "sourceSHA256": "19f33c77593a60fe08387ff88c5f8ef929725d40e83e2ff5ee49f3be68915355",
+      "snapshotSHA256": "19f33c77593a60fe08387ff88c5f8ef929725d40e83e2ff5ee49f3be68915355",
+      "bytes": 515571,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr1"
+      ]
+    },
+    {
+      "file": "digitalmodel-LICENSE",
+      "originalUrl": "https://raw.githubusercontent.com/vamseeachanta/digitalmodel/main/LICENSE",
+      "license": "MIT notice for repository software/associated documentation; not an independently verified archival-data release.",
+      "sourceSHA256": "abe9282066701ba45ec516e77329e14f5e27e5ae462fd1fd23fe9f62e27d4d91",
+      "snapshotSHA256": "abe9282066701ba45ec516e77329e14f5e27e5ae462fd1fd23fe9f62e27d4d91",
+      "bytes": 1071,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr1"
+      ]
+    },
+    {
+      "file": "pywaterflood-injection.csv",
+      "originalUrl": "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/injection.csv",
+      "license": "BSD-2-Clause repository; synthetic tutorial data.",
+      "sourceSHA256": "1b54db81d98ea26a8f4227356be72aa159476be935ed021e7a08b2653a093bfe",
+      "snapshotSHA256": "1b54db81d98ea26a8f4227356be72aa159476be935ed021e7a08b2653a093bfe",
+      "bytes": 37548,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr3"
+      ]
+    },
+    {
+      "file": "pywaterflood-production.csv",
+      "originalUrl": "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/production.csv",
+      "license": "BSD-2-Clause repository; synthetic tutorial data.",
+      "sourceSHA256": "edee35b6c92ae710fb9c842e8e013106682106767bcae6f35758f07c20390f5c",
+      "snapshotSHA256": "edee35b6c92ae710fb9c842e8e013106682106767bcae6f35758f07c20390f5c",
+      "bytes": 30098,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr3"
+      ]
+    },
+    {
+      "file": "pywaterflood-time.csv",
+      "originalUrl": "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/testing/data/time.csv",
+      "license": "BSD-2-Clause repository; original physical time unit not established.",
+      "sourceSHA256": "8cb5162de9e9b2a36c4636e960a2ed2928c5d40fe0898bf10fdbb492096da1f6",
+      "snapshotSHA256": "8cb5162de9e9b2a36c4636e960a2ed2928c5d40fe0898bf10fdbb492096da1f6",
+      "bytes": 7748,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr3"
+      ]
+    },
+    {
+      "file": "pywaterflood-LICENSE",
+      "originalUrl": "https://raw.githubusercontent.com/frank1010111/pywaterflood/master/LICENSE",
+      "license": "BSD-2-Clause.",
+      "sourceSHA256": "3786b08c62044b2333ec3507272f1102b6c76946f87a84c502ca490119b6d585",
+      "snapshotSHA256": "3786b08c62044b2333ec3507272f1102b6c76946f87a84c502ca490119b6d585",
+      "bytes": 1324,
+      "transformation": "Byte-identical original input or required license notice.",
+      "requiredBy": [
+        "pr3"
+      ]
+    },
+    {
+      "file": "sodir-volve-production-monthly.csv",
+      "originalUrl": "https://factpages.sodir.no/public?/Factpages/external/tableview/field_production_monthly&rs:Command=Render&rc:Toolbar=false&rc:Parameters=f&IpAddress=not_used&CultureCode=en&rs:Format=CSV&Top100=false",
+      "license": "NLOD 2.0; Norwegian Offshore Directorate / Sodir.",
+      "sourceSHA256": "ef15bc05662e2c245242d22a1537e14c74c9ebfc59fd63b4f3fb881d8df9f10c",
+      "snapshotSHA256": "b6ed67f471b1301944a7bb382d3d96c6360598a5287b936a081ac01dc0aa98d1",
+      "bytes": 8214,
+      "transformation": "CSV filtered exactly prfInformationCarrier=VOLVE; 114 rows, all original columns; original raw full-export SHA above.",
+      "requiredBy": [
+        "pr2"
+      ]
+    },
+    {
+      "file": "3w-scaling-WELL-00001_20170226130146-minute.csv",
+      "originalUrl": "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00001_20170226130146.parquet",
+      "license": "CC BY 4.0 data; Petrobras 3W Dataset 2.0.0.",
+      "sourceSHA256": "0ad0b0696d627c4c21ff95414b5da3524b478a28312cd82280d792f62a5ace92",
+      "snapshotSHA256": "a397b7d833882093b8506119844a7ba0c8395f6b0d926fcaa2efb8ae892deb5f",
+      "bytes": 71693,
+      "transformation": "Derived one-minute medians and modal labels, retaining only the 3 model channels, timestamp, and class. Source SHA is original Parquet.",
+      "requiredBy": [
+        "pr5"
+      ]
+    },
+    {
+      "file": "3w-scaling-WELL-00021_20180611011218-minute.csv",
+      "originalUrl": "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00021_20180611011218.parquet",
+      "license": "CC BY 4.0 data; Petrobras 3W Dataset 2.0.0.",
+      "sourceSHA256": "efd18fadf8c7f0b8cde024a6bd38cdcddde44222317e1bd0f9a427f906cbbbd7",
+      "snapshotSHA256": "26f80798f0aa107929c863138a7a4cbc66c11e0c123622939b53bf4cd03f98d5",
+      "bytes": 42926,
+      "transformation": "Derived one-minute medians and modal labels, retaining only the 3 model channels, timestamp, and class. Source SHA is original Parquet.",
+      "requiredBy": [
+        "pr5"
+      ]
+    },
+    {
+      "file": "3w-minute-source-metadata.json",
+      "originalUrl": [
+        "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00001_20170226130146.parquet",
+        "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00021_20180611011218.parquet"
+      ],
+      "license": "CC BY 4.0 source data; derived onset/count/aggregation metadata.",
+      "sourceSHA256": [
+        "0ad0b0696d627c4c21ff95414b5da3524b478a28312cd82280d792f62a5ace92",
+        "efd18fadf8c7f0b8cde024a6bd38cdcddde44222317e1bd0f9a427f906cbbbd7"
+      ],
+      "snapshotSHA256": "531ca0244495585ee106f1b63c7135e8c6e17955407072feb7c5dea2ae2ad02d",
+      "bytes": 1252,
+      "transformation": "Exact second-level onsets/counts derived from the two original Parquet sources, without invented timezone.",
+      "requiredBy": [
+        "pr5"
+      ]
+    },
+    {
+      "file": "espset-context-counts.json",
+      "originalUrl": "https://drive.google.com/uc?export=download&id=1JNZ58PSe3b2x_tHHdrADLY9Dlrxddrx1",
+      "license": "CC BY 4.0 data; ESPset v3, DOI 10.17632/m268jsw339.3.",
+      "sourceSHA256": "84184c5852a55c1cd09157ef170407224fa8df70b54e04e8d9ad921c9f1f869e",
+      "snapshotSHA256": "c65486fdf05121d92902794cae3bbe000e49fd3957881b22e95909998718e0c9",
+      "bytes": 415,
+      "transformation": "Aggregated actual 6032 feature rows into device and label counts; no signal rows/chronology copied.",
+      "requiredBy": [
+        "pr4"
+      ]
+    }
+  ]
+}

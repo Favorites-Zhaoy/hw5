@@ -1,0 +1,4 @@
+*.csv -text
+biosurfactant_online_windows.json -text
+source-index.json text eol=lf
+*.py text eol=lf

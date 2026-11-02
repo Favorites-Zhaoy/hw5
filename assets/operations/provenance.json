@@ -1,0 +1,1764 @@
+{
+  "version": 1,
+  "generated": "2026-11-03",
+  "illustrationsUsedForTraining": false,
+  "cases": {
+    "pr1": {
+      "caseId": "pr1-dynacard",
+      "methods": [
+        "cv"
+      ],
+      "records": 12,
+      "kind": [
+        "digitized-reference"
+      ],
+      "source": {
+        "title": "digitalmodel · dynacard example library",
+        "url": "https://github.com/vamseeachanta/digitalmodel/issues/1288",
+        "license": "代码库MIT；原始私人档案的独立数据授权声明未找到"
+      },
+      "validation": {
+        "split": {
+          "trainCards": 150,
+          "checkCards": 40,
+          "testCards": 55,
+          "trainGroups": [
+            "11",
+            "06",
+            "09",
+            "48",
+            "03",
+            "31",
+            "24",
+            "40",
+            "14",
+            "57",
+            "08",
+            "56",
+            "52",
+            "33",
+            "47",
+            "53",
+            "39",
+            "30",
+            "51",
+            "41",
+            "54",
+            "05",
+            "15",
+            "16",
+            "22",
+            "01",
+            "10",
+            "12",
+            "55",
+            "27",
+            "37",
+            "44",
+            "19",
+            "17",
+            "29",
+            "38"
+          ],
+          "checkGroups": [
+            "32",
+            "49",
+            "58",
+            "28",
+            "45",
+            "60",
+            "18",
+            "07",
+            "42",
+            "25",
+            "59",
+            "26"
+          ],
+          "testGroups": [
+            "23",
+            "02",
+            "43",
+            "21",
+            "36",
+            "04",
+            "50",
+            "34",
+            "46",
+            "13",
+            "35",
+            "20"
+          ]
+        },
+        "metric": "accuracy",
+        "baseline": 0.69090909,
+        "model": 0.65454545,
+        "n": 55,
+        "modelMetrics": {
+          "accuracy": 0.65454545,
+          "macroF1": 0.63179825,
+          "precision": null,
+          "recall": null,
+          "confusion": [
+            [
+              13,
+              2,
+              7,
+              0
+            ],
+            [
+              2,
+              9,
+              1,
+              0
+            ],
+            [
+              3,
+              4,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              12
+            ]
+          ]
+        },
+        "baselineMetrics": {
+          "accuracy": 0.69090909,
+          "macroF1": 0.65259113,
+          "precision": null,
+          "recall": null,
+          "confusion": [
+            [
+              16,
+              0,
+              5,
+              1
+            ],
+            [
+              1,
+              8,
+              3,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              12
+            ]
+          ]
+        },
+        "boundary": "按-wNN-标记保守分组；数字化形状标签，无现场故障验证；未按测试成绩选择卡片"
+      },
+      "modelSHA256": "0b8f8cef0f39cce6ad25c57e19264220b9735edc1fb0341a800875db0bde9363"
+    },
+    "pr2": {
+      "caseId": "pr2-oil-forecast",
+      "methods": [
+        "ts"
+      ],
+      "records": 16,
+      "kind": [
+        "derived-field"
+      ],
+      "source": {
+        "title": "Sodir FactPages · Monthly saleable field production",
+        "url": "https://factpages.sodir.no/en/field/TableView/Production/Saleable/Monthly",
+        "license": "NLOD 2.0"
+      },
+      "validation": {
+        "split": {
+          "trainTargetMonths": [
+            "2009-02-01",
+            "2013-12-01"
+          ],
+          "checkTargetMonths": [
+            "2014-01-01",
+            "2014-12-01"
+          ],
+          "testTargetMonths": [
+            "2015-01-01",
+            "2016-09-01"
+          ],
+          "trainWindows": 59,
+          "checkWindows": 12,
+          "testWindows": 21
+        },
+        "metric": "MAE",
+        "unit": "Sm³/月",
+        "baseline": 10220.95238095,
+        "model": 14002.61512424,
+        "n": 21,
+        "declineMAE": 12587.46825167,
+        "modelRMSE": 17180.77958555,
+        "boundary": "目标月份按时间前后分区；固定训练权重；滚动输入可包含已观察到的更早测试月份；只评价至2016-09，后续停产零值另存"
+      },
+      "modelSHA256": "2c41d69272ee2fef3046f986b0953eb2e2af3ecaee01f051232a73ae1c153729"
+    },
+    "pr3": {
+      "caseId": "pr3-injection-allocation",
+      "methods": [
+        "opt"
+      ],
+      "records": 7,
+      "kind": [
+        "published-simulation"
+      ],
+      "source": {
+        "title": "pywaterflood · synthetic waterflood tutorial",
+        "url": "https://pywaterflood.readthedocs.io/en/v0.3.1/user-guide/7-minutes-to-pywaterflood.html",
+        "license": "BSD-2-Clause repository; explicitly synthetic"
+      },
+      "validation": {
+        "split": {
+          "trainRows": [
+            12,
+            207
+          ],
+          "checkRows": [
+            208,
+            252
+          ],
+          "testRows": [
+            253,
+            297
+          ]
+        },
+        "metric": "MAE of field-total liquid",
+        "unit": "归一化源流量",
+        "baseline": 0.53917528,
+        "model": 0.03244441,
+        "n": 45,
+        "producerMAE": [
+          0.00966162,
+          0.01037201,
+          0.00790961,
+          0.00918085
+        ],
+        "boundary": "历史检验使用当时已知注水；它只验证代理的历史预测，不验证优化配注的反事实效果"
+      },
+      "modelSHA256": "8f2fdf33e21ed05d71eec07a371dbec285c46398d06982488e6b1980668b43f1"
+    },
+    "pr4": {
+      "caseId": "pr4-esp-warning",
+      "methods": [
+        "ts"
+      ],
+      "records": 12,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "主时序：本课显式ESP运行仿真；背景：ESPset v3",
+        "url": "https://data.mendeley.com/datasets/m268jsw339/3",
+        "license": "ESPset数据CC BY 4.0；仿真独立生成并公开种子/公式"
+      },
+      "validation": {
+        "split": {
+          "trainEpisodes": 16,
+          "checkEpisodes": 4,
+          "testEpisodes": 12,
+          "pointsPerEpisode": 240,
+          "lookback": 12
+        },
+        "metric": "F1（仿真逐点异常）",
+        "baseline": 0.39822024,
+        "model": 0.73730298,
+        "n": 2736,
+        "modelMetrics": {
+          "accuracy": 0.89035088,
+          "macroF1": 0.83400946,
+          "precision": 0.99763033,
+          "recall": 0.58472222,
+          "confusion": [
+            [
+              2015,
+              1
+            ],
+            [
+              299,
+              421
+            ]
+          ]
+        },
+        "baselineMetrics": {
+          "accuracy": 0.80226608,
+          "macroF1": 0.63995858,
+          "precision": 1,
+          "recall": 0.24861111,
+          "confusion": [
+            [
+              2016,
+              0
+            ],
+            [
+              541,
+              179
+            ]
+          ]
+        },
+        "currentForecastMAE_A": 0.26979112,
+        "currentPersistenceMAE_A": 0.13328969,
+        "delays": [
+          {
+            "episode": 1,
+            "mode": "current-drift",
+            "delayMinutes": 67
+          },
+          {
+            "episode": 2,
+            "mode": "pressure-drift",
+            "delayMinutes": 21
+          },
+          {
+            "episode": 3,
+            "mode": "thermal-drift",
+            "delayMinutes": 14
+          },
+          {
+            "episode": 4,
+            "mode": "sensor-drift",
+            "delayMinutes": 57
+          },
+          {
+            "episode": 7,
+            "mode": "current-drift",
+            "delayMinutes": 58
+          },
+          {
+            "episode": 8,
+            "mode": "pressure-drift",
+            "delayMinutes": 19
+          },
+          {
+            "episode": 9,
+            "mode": "thermal-drift",
+            "delayMinutes": 10
+          },
+          {
+            "episode": 10,
+            "mode": "sensor-drift",
+            "delayMinutes": 53
+          }
+        ],
+        "boundary": "训练/检查仅正常独立片段；门槛来自训练正常分数；仿真异常检出延迟，不是现场故障提前时间"
+      },
+      "modelSHA256": "9339c81b19c2b048068aa64d35ff1de89979e407b917ffe8c1a04445e9892c3e"
+    },
+    "pr5": {
+      "caseId": "pr5-scaling-risk",
+      "methods": [
+        "ts"
+      ],
+      "records": 8,
+      "kind": [
+        "field"
+      ],
+      "source": {
+        "title": "Petrobras · 3W Dataset 2.0.0 real choke-scaling windows",
+        "url": "https://github.com/petrobras/3W",
+        "license": "数据CC BY 4.0；工具Apache-2.0"
+      },
+      "validation": {
+        "split": {
+          "trainWell": "WELL-00001_20170226130146",
+          "trainNormalEndMinutes": [
+            71,
+            481
+          ],
+          "checkNormalEndMinutes": [
+            493,
+            622
+          ],
+          "trainWindows": 411,
+          "checkWindows": 130,
+          "testWell": "WELL-00021_20180611011218"
+        },
+        "metric": "F1（107/7视为事件发展）",
+        "baseline": 0,
+        "model": 0,
+        "n": 717,
+        "modelMetrics": {
+          "accuracy": 0.40725244,
+          "macroF1": 0.28939544,
+          "precision": 0,
+          "recall": 0,
+          "confusion": [
+            [
+              292,
+              0
+            ],
+            [
+              425,
+              0
+            ]
+          ]
+        },
+        "baselineMetrics": {
+          "accuracy": 0.40725244,
+          "macroF1": 0.28939544,
+          "precision": 0,
+          "recall": 0,
+          "confusion": [
+            [
+              292,
+              0
+            ],
+            [
+              425,
+              0
+            ]
+          ]
+        },
+        "sourceCheckNormalAlarmRate": 0,
+        "boundary": "整井留出且尺度/门槛固定；只与专家0/107/7阶段比较；PCA残差不证明沉积原因，未调测试门槛强求提升"
+      },
+      "modelSHA256": "5b9c3b31eaa16f64e560a0ea4c202864b3f2ed1d205e8d6dccef2fdf2b31c65d"
+    },
+    "wo1": {
+      "caseId": "wo1-plan",
+      "methods": [
+        "kg",
+        "nlp"
+      ],
+      "records": 3,
+      "kind": [
+        "derived-field"
+      ],
+      "source": {
+        "title": "BSEE eWell APM workover factual records",
+        "url": "https://www.data.bsee.gov/Well/eWellAPM/Default.aspx",
+        "license": "Federal factual data; third-party operator prose is not automatically openly licensed. Normalized factual text only."
+      },
+      "validation": {
+        "split": "20-document reference corpus; 3 constructed source-grounded example queries; no labelled relevance holdout",
+        "metric": "No independent relevance accuracy asserted",
+        "baseline": null,
+        "model": null,
+        "n": 0,
+        "boundary": "Numerical cosine parity is verified. Similarity is not plan effectiveness or field success."
+      },
+      "modelSHA256": "32525f57b899d0d7dd90259360c9ce1ca4dd1ee9c9e0626958ab7a12a90698c2"
+    },
+    "wo2": {
+      "caseId": "wo2-fishing",
+      "methods": [
+        "kg"
+      ],
+      "records": 10,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "NOV Bowen reverse-circulation junk basket tool specification",
+        "url": "https://assets.nov.com/NCP4N68N/at/ww4s788t6pn6v6t97sjsp7x/Bowen_Reverse_Circulation_Junk_Baskets_Tool_Specification.pdf",
+        "license": "Manufacturer copyright; a few dimension facts cited; original classroom geometry; no catalog images redistributed."
+      },
+      "validation": {
+        "split": "10 constructed dimensional scenarios; no field training or success labels",
+        "metric": "incompatible or unsupported recommendations by family-only baseline (count)",
+        "baseline": 25,
+        "model": 0,
+        "n": 10,
+        "boundary": "Constraint consistency, not empirical recovery accuracy. Actual basket dimensions remain missing-evidence when total assembly OD is unverified."
+      },
+      "modelSHA256": "5802a01e76e41c6b605ac93437ca8c1360a4f50e05bd37398e1d0a745518ab6e"
+    },
+    "wo3": {
+      "caseId": "wo3-casing",
+      "methods": [
+        "cv"
+      ],
+      "records": 8,
+      "kind": [
+        "published-simulation"
+      ],
+      "source": {
+        "title": "Diez, Viggen & Johansen: Simulated ultrasonic pulse-echo well-integrity dataset",
+        "url": "https://data.mendeley.com/datasets/3bs65nzpv2/1",
+        "license": "CC BY4.0; attribution and transformation notes retained."
+      },
+      "validation": {
+        "split": {
+          "train": {
+            "outerDiameterM": 0.244475,
+            "n": 24
+          },
+          "validation": {
+            "outerDiameterM": 0.27305,
+            "n": 24
+          },
+          "test": {
+            "outerDiameterM": 0.339725,
+            "n": 24
+          }
+        },
+        "metric": "held-out thickness MAE (mm)",
+        "baseline": 0.838216089,
+        "model": 0.262141407,
+        "n": 24,
+        "baselineValidN": 24,
+        "boundary": "24 synthetic test traces; field UT report is context only; model need not outperform baseline.",
+        "allTest": {
+          "sourceIds": [
+            "660",
+            "661",
+            "662",
+            "663",
+            "664",
+            "665",
+            "666",
+            "667",
+            "668",
+            "669",
+            "670",
+            "671",
+            "672",
+            "673",
+            "674",
+            "675",
+            "676",
+            "677",
+            "678",
+            "679",
+            "680",
+            "681",
+            "682",
+            "683"
+          ],
+          "targetMm": [
+            7.4000001,
+            7.80000019,
+            8.19999981,
+            8.60000038,
+            9,
+            9.39999962,
+            9.80000019,
+            10.1999998,
+            10.6000004,
+            11,
+            11.3999996,
+            11.8000002,
+            12.1999998,
+            12.6000004,
+            13,
+            13.3999996,
+            13.8000002,
+            14.1999998,
+            14.6000004,
+            15,
+            15.3999996,
+            15.8000002,
+            16.2000008,
+            16.6000004
+          ],
+          "modelMm": [
+            7.71947575,
+            8.44696236,
+            8.67543793,
+            9.11196899,
+            10.0875988,
+            10.2215538,
+            10.2861147,
+            10.6300192,
+            10.9338026,
+            11.2024021,
+            11.4477062,
+            11.723155,
+            12.2455969,
+            12.6320086,
+            12.9854107,
+            13.4921074,
+            13.7613287,
+            14.2221298,
+            14.6048965,
+            14.9306898,
+            15.4473009,
+            15.7847576,
+            16.0570641,
+            16.2732849
+          ],
+          "baselineMm": [
+            15.5183636,
+            8.35063176,
+            8.53862337,
+            8.98084707,
+            9.47782472,
+            9.84860688,
+            10.1986357,
+            10.6706466,
+            11.1272578,
+            11.4748589,
+            11.8572943,
+            12.2794904,
+            12.7155239,
+            13.1393516,
+            13.5540627,
+            13.9418329,
+            14.2873586,
+            14.6670193,
+            15.0988673,
+            15.5695495,
+            16.0194285,
+            16.4713596,
+            16.9418438,
+            17.3879086
+          ]
+        }
+      },
+      "modelSHA256": "c2659793a7306be7bb44745afe0caf689646c4cda629f536da146b38117679c8"
+    },
+    "wo4": {
+      "caseId": "wo4-risk",
+      "methods": [
+        "ts"
+      ],
+      "records": 8,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "Controlled classroom workover episode generator",
+        "url": "https://www.bsee.gov/panel-investigation/investigation-of-march-25-2022-hydraulic-workover-unit-failure-fatality",
+        "license": "Sensor data are original controlled synthetic teaching fixtures. BSEE link supplies real context only, not the generated sensor data."
+      },
+      "validation": {
+        "split": "12 normal training,6 validation,8 held-out complete episodes; seeds and entire histories isolated",
+        "metric": "held-out injected-event recall (0..1); false alarms and delays separately reported",
+        "baseline": 0,
+        "model": 0.8,
+        "n": 5,
+        "baselineDetails": {
+          "eventCount": 5,
+          "detected": 0,
+          "eventRecall": 0,
+          "falseAlarmEvents": 0,
+          "falseAlarmsPerEpisode": 0,
+          "meanDetectionDelayS": null,
+          "delaysS": [],
+          "episodeCount": 8
+        },
+        "modelDetails": {
+          "eventCount": 5,
+          "detected": 4,
+          "eventRecall": 0.8,
+          "falseAlarmEvents": 2,
+          "falseAlarmsPerEpisode": 0.25,
+          "meanDetectionDelayS": 21.25,
+          "delaysS": [
+            42,
+            2,
+            2,
+            39
+          ],
+          "episodeCount": 8
+        },
+        "boundary": "Detection must begin inside the injected event; after-event starts count as false alarms, not advance warning. Simulated results only.",
+        "validationEpisodes": {
+          "baseline": {
+            "eventCount": 4,
+            "detected": 0,
+            "eventRecall": 0,
+            "falseAlarmEvents": 0,
+            "falseAlarmsPerEpisode": 0,
+            "meanDetectionDelayS": null,
+            "delaysS": [],
+            "episodeCount": 6
+          },
+          "model": {
+            "eventCount": 4,
+            "detected": 3,
+            "eventRecall": 0.75,
+            "falseAlarmEvents": 2,
+            "falseAlarmsPerEpisode": 0.333333333,
+            "meanDetectionDelayS": 15.3333333,
+            "delaysS": [
+              42,
+              2,
+              2
+            ],
+            "episodeCount": 6
+          }
+        }
+      },
+      "modelSHA256": "16c30f59632bdc1666d305f52380b515effd1a95a29f264e38ae2640ada9d62a"
+    },
+    "wo5": {
+      "caseId": "wo5-duration",
+      "methods": [
+        "ts"
+      ],
+      "records": 10,
+      "kind": [
+        "derived-field"
+      ],
+      "source": {
+        "title": "BSEE eWell APM dated workover plans",
+        "url": "https://www.data.bsee.gov/Well/eWellAPM/Default.aspx",
+        "license": "Public federal factual fields; normalized operation keywords; no long third-party procedural narratives deployed."
+      },
+      "validation": {
+        "split": {
+          "sourceRows": 295,
+          "wells": 31,
+          "eligibleHistoryRows": 233,
+          "train": 123,
+          "validation": 54,
+          "checkpointTuning": 27,
+          "independentCalibrationCheck": 27,
+          "test": 56,
+          "trainEndExclusive": "2021-08-26T09:36:02",
+          "validationEndExclusive": "2022-04-07T14:31:34"
+        },
+        "metric": "held-out planned-estimate P50 MAE (days)",
+        "baseline": 3.22321429,
+        "model": 3.17142177,
+        "n": 56,
+        "lastValueBaselineMAE": 3,
+        "pinballDays": 1.58191368,
+        "P10P90Coverage": 0.357142857,
+        "meanIntervalWidthDays": 2.71754408,
+        "quantileCrossingCount": 25,
+        "negativeMedianCount": 0,
+        "empiricalCheckErrorRange": {
+          "kind": "independent CHECK absolute-P50-residual range",
+          "unit": "days",
+          "centralOutputIndex": 1,
+          "centralFormula": "P50days = expected[1] = rawHead[1]*outputScale[1]+outputMean[1]",
+          "rangeFormula": "[P50days-halfWidthDays, P50days+halfWidthDays]; no silent sorting or clipping",
+          "halfWidthDays": 1.48207664,
+          "nominalResidualQuantile": 0.8,
+          "method": "higher empirical quantile: sortedAbsResidual[ceil(0.8*(nCheck-1))]",
+          "nCheck": 27,
+          "zeroBasedOrderIndex": 21,
+          "orderStatisticOneBased": 22,
+          "checkCoverage": 0.814814815,
+          "heldOutTestCoverage": 0.428571429,
+          "nTest": 56,
+          "checkSubmittedMin": "2021-12-01T08:51:09",
+          "checkSubmittedMax": "2022-03-31T14:42:42",
+          "checkPlanIds": [
+            "-239369",
+            "-239558",
+            "-239559",
+            "-239562",
+            "-240039",
+            "-240096",
+            "-240175",
+            "-240203",
+            "-240201",
+            "-240202",
+            "-240205",
+            "-240267",
+            "-240270",
+            "-240390",
+            "-240430",
+            "-240435",
+            "-240461",
+            "-240479",
+            "-240480",
+            "-240758",
+            "-240759",
+            "-240760",
+            "-240761",
+            "-240840",
+            "-240828",
+            "-241003",
+            "-241111"
+          ],
+          "checkAbsoluteP50ResidualDays": [
+            0.805548668,
+            0.272232056,
+            0.0616521835,
+            0.413117409,
+            0.0474462509,
+            0.207355499,
+            4.73960686,
+            0.00187969208,
+            0.00202941895,
+            0.0018825531,
+            0.0575237274,
+            1.48207664,
+            0.111204147,
+            0.569468498,
+            0.311745644,
+            0.246676445,
+            0.235435486,
+            4.76068974,
+            5.76476097,
+            0.0455121994,
+            0.0453033447,
+            0.0452976227,
+            0.0399036407,
+            1.65477562,
+            0.620009422,
+            0.337767601,
+            2.78831005
+          ],
+          "boundary": "Empirical past CHECK-error range; not an assured80% conditional prediction interval or actual completion promise."
+        },
+        "boundary": "56 next-plan estimates, not independent completed jobs; sampled repeated-plan wells are casing-repair heavy. Results need not improve on baselines.",
+        "allTest": {
+          "planIds": [
+            "-241200",
+            "-241357",
+            "-241470",
+            "-241518",
+            "-241543",
+            "-241567",
+            "-241940",
+            "-242080",
+            "-242113",
+            "-242192",
+            "-242185",
+            "-242410",
+            "-242411",
+            "-242432",
+            "-242433",
+            "-242510",
+            "-242569",
+            "-243021",
+            "-243081",
+            "-243049",
+            "-243143",
+            "-243406",
+            "-243407",
+            "-243628",
+            "-243716",
+            "-244166",
+            "-243722",
+            "-243946",
+            "-244859",
+            "-244916",
+            "-245082",
+            "-245918",
+            "-246466",
+            "-248741",
+            "-249693",
+            "-251187",
+            "-251163",
+            "-251503",
+            "-251888",
+            "-251889",
+            "-252299",
+            "-252395",
+            "-252614",
+            "-253221",
+            "-253385",
+            "-253881",
+            "-253933",
+            "-253997",
+            "-254177",
+            "-254556",
+            "-255154",
+            "-255258",
+            "-255833",
+            "-257323",
+            "-258392",
+            "-259868"
+          ],
+          "targetDays": [
+            10,
+            10,
+            10,
+            10,
+            1,
+            1,
+            15,
+            1,
+            15,
+            10,
+            5,
+            15,
+            15,
+            15,
+            7,
+            15,
+            5,
+            1,
+            5,
+            10,
+            5,
+            15,
+            15,
+            1,
+            10,
+            10,
+            7,
+            15,
+            15,
+            15,
+            12,
+            1,
+            1,
+            15,
+            1,
+            2,
+            14,
+            5,
+            1,
+            1,
+            3,
+            10,
+            17,
+            2,
+            5,
+            1,
+            1,
+            14,
+            12,
+            1,
+            14,
+            1,
+            5,
+            20,
+            10,
+            2
+          ],
+          "modelQuantilesDays": [
+            [
+              7.39734173,
+              9.9161253,
+              10.2331734
+            ],
+            [
+              5.21103573,
+              3.7848959,
+              4.79994011
+            ],
+            [
+              7.1099472,
+              9.77819633,
+              10.2147408
+            ],
+            [
+              6.43586349,
+              8.04354572,
+              9.06056213
+            ],
+            [
+              4.90170765,
+              2.57014942,
+              3.82571411
+            ],
+            [
+              3.31355095,
+              3.02842903,
+              5.77113056
+            ],
+            [
+              5.55651665,
+              3.25297642,
+              3.6530962
+            ],
+            [
+              8.05066872,
+              11.2664223,
+              11.2785997
+            ],
+            [
+              7.64078331,
+              16.1002293,
+              21.0386639
+            ],
+            [
+              7.07136822,
+              9.74960995,
+              10.0675659
+            ],
+            [
+              6.58686256,
+              7.29760265,
+              7.7003541
+            ],
+            [
+              8.49759293,
+              15.0513515,
+              15.5891647
+            ],
+            [
+              8.49777222,
+              15.0513773,
+              15.5890169
+            ],
+            [
+              8.49777317,
+              15.0513783,
+              15.5890207
+            ],
+            [
+              6.18835545,
+              6.96897697,
+              7.47872734
+            ],
+            [
+              5.78535938,
+              4.83424568,
+              5.05953121
+            ],
+            [
+              11.9896851,
+              9.80751419,
+              12.5969839
+            ],
+            [
+              8.11232376,
+              11.8988419,
+              11.8667984
+            ],
+            [
+              6.76128674,
+              3.93710613,
+              5.97907162
+            ],
+            [
+              7.01307774,
+              9.7496376,
+              10.1320181
+            ],
+            [
+              5.82037354,
+              3.91199017,
+              5.13812256
+            ],
+            [
+              8.38495636,
+              15.10114,
+              15.9227057
+            ],
+            [
+              8.38496208,
+              15.1011391,
+              15.9226933
+            ],
+            [
+              3.85846043,
+              2.58499622,
+              4.91021919
+            ],
+            [
+              6.94547367,
+              9.76358795,
+              10.2759228
+            ],
+            [
+              6.96082878,
+              9.76198864,
+              10.2205925
+            ],
+            [
+              6.95478344,
+              9.35801125,
+              9.84326935
+            ],
+            [
+              5.8223505,
+              4.50249577,
+              5.05904293
+            ],
+            [
+              7.97064877,
+              11.7718296,
+              12.2001209
+            ],
+            [
+              5.66501713,
+              4.97519112,
+              5.38477707
+            ],
+            [
+              7.85118723,
+              12.0629196,
+              12.6237326
+            ],
+            [
+              4.66637135,
+              2.44962978,
+              4.07574081
+            ],
+            [
+              4.42796898,
+              2.48244095,
+              4.06981945
+            ],
+            [
+              8.41363049,
+              15.0914955,
+              15.8115578
+            ],
+            [
+              4.36132336,
+              2.43632317,
+              4.69807816
+            ],
+            [
+              5.72818279,
+              4.20109177,
+              4.74489021
+            ],
+            [
+              8.41363335,
+              15.0914946,
+              15.8115501
+            ],
+            [
+              5.42317581,
+              3.36038685,
+              3.80686665
+            ],
+            [
+              4.5038271,
+              2.46090984,
+              4.3048048
+            ],
+            [
+              4.65912247,
+              2.42661858,
+              3.94430828
+            ],
+            [
+              5.80378532,
+              4.64544582,
+              4.93841743
+            ],
+            [
+              7.39792538,
+              14.6050558,
+              17.3783951
+            ],
+            [
+              4.5469265,
+              2.45336914,
+              4.17035103
+            ],
+            [
+              5.53152752,
+              4.02872372,
+              4.48220539
+            ],
+            [
+              7.05821609,
+              9.72279072,
+              9.97234154
+            ],
+            [
+              8.17149448,
+              12.8461561,
+              13.577424
+            ],
+            [
+              5.29523373,
+              5.17301369,
+              6.50979424
+            ],
+            [
+              6.34886074,
+              10.9966812,
+              13.1169453
+            ],
+            [
+              7.76276159,
+              11.96171,
+              12.2948341
+            ],
+            [
+              5.12636185,
+              3.23536873,
+              3.81681824
+            ],
+            [
+              7.36549425,
+              13.2859678,
+              14.9815493
+            ],
+            [
+              5.30307579,
+              3.36281395,
+              3.93977928
+            ],
+            [
+              6.06802177,
+              6.99195385,
+              7.78517437
+            ],
+            [
+              7.72394276,
+              13.9281416,
+              15.3047638
+            ],
+            [
+              6.33670425,
+              6.93033123,
+              7.09783745
+            ],
+            [
+              5.93467045,
+              9.63577461,
+              14.1332932
+            ]
+          ],
+          "historyMedianBaselineDays": [
+            10,
+            3,
+            10,
+            3,
+            1,
+            30.5,
+            1.5,
+            2,
+            15,
+            10,
+            7,
+            15,
+            15,
+            15,
+            7,
+            1.5,
+            7,
+            2,
+            6,
+            10,
+            5,
+            15,
+            15,
+            1,
+            10,
+            10,
+            3,
+            5,
+            5,
+            1.5,
+            2,
+            1,
+            1,
+            15,
+            1,
+            2.5,
+            15,
+            2,
+            1,
+            1,
+            2.5,
+            15,
+            1,
+            3,
+            10,
+            1,
+            1,
+            15,
+            7,
+            1,
+            15,
+            2.5,
+            7,
+            15,
+            7,
+            7
+          ]
+        }
+      },
+      "modelSHA256": "22e116f3b782a9229efab749ccccfcf67ad94f3cdcc6fffb019f68ff8e215bd9"
+    },
+    "e1": {
+      "caseId": "e1-pkn",
+      "methods": [
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "GEOS · Viscosity-storage-dominated PKN validation",
+        "url": "https://geosx-geosx.readthedocs-hosted.com/en/develop/docs/sphinx/advancedExamples/validationStudies/hydraulicFracture/pknFracViscosityDominated/Example.html",
+        "license": "Independent teaching simulations from cited analytical formulas; no GEOS code copied; not field data."
+      },
+      "validation": {
+        "split": {
+          "trainGroups": [
+            "E3-h0",
+            "E0-h2",
+            "E1-h0",
+            "E4-h3",
+            "E3-h3",
+            "E4-h0",
+            "E4-h2",
+            "E2-h3",
+            "E3-h1",
+            "E2-h1",
+            "E1-h1",
+            "E4-h1",
+            "E0-h3"
+          ],
+          "validationGroups": [
+            "E2-h2",
+            "E1-h2",
+            "E1-h3"
+          ],
+          "testGroups": [
+            "E0-h0",
+            "E2-h0",
+            "E0-h1",
+            "E3-h2"
+          ],
+          "counts": [
+            1274,
+            289,
+            399
+          ],
+          "groupKey": "complete (E,height) rock scenario; all mu/rate/time values from a scenario stay together"
+        },
+        "metric": "mean absolute relative error across length,width,pressure (%)",
+        "baseline": 0,
+        "model": 1.01243895,
+        "perOutputMAE": [
+          5.32713492,
+          0.000025202573,
+          44508.3409
+        ],
+        "n": 399,
+        "boundary": "Pure simulated response; exact analytical baseline has zero label error by construction.",
+        "training": {
+          "epochsRun": 1145,
+          "selectedEpoch": 1015,
+          "validationNormalizedMSE": 0.000347709632
+        }
+      },
+      "modelSHA256": "f8fc605e66b49faf62a6e692d34dc5f3f7c400430037ffd53693ac6b3261a1c3"
+    },
+    "e2": {
+      "caseId": "e2-fracture",
+      "methods": [
+        "cv",
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "controlled-synthetic",
+        "derived-field"
+      ],
+      "source": {
+        "title": "Utah FORGE April 2024 microseismic event catalog",
+        "url": "https://gdr.openei.org/submissions/1817",
+        "license": "CC BY 4.0"
+      },
+      "validation": {
+        "split": {
+          "geometries": 420,
+          "viewsPerGeometry": 2,
+          "trainGeometryCount": 300,
+          "validationGeometryCount": 60,
+          "testGeometryCount": 60,
+          "counts": [
+            600,
+            120,
+            120
+          ],
+          "groupKey": "underlying ellipse geometry; both noisy views together"
+        },
+        "metric": "mean absolute Gaussian axis error in normalized coordinates",
+        "baseline": 0.0254126883,
+        "model": 0.0172991392,
+        "details": {
+          "baseline": {
+            "centerMAE": 0.0269763017,
+            "axisMAE": 0.0254126883,
+            "angleMAEDeg": 1.78641917,
+            "ellipseIoUMeanAt90pct": 0.80593729
+          },
+          "model": {
+            "centerMAE": 0.0399789984,
+            "axisMAE": 0.0172991392,
+            "angleMAEDeg": 3.7272741,
+            "ellipseIoUMeanAt90pct": 0.850289911
+          }
+        },
+        "n": 120,
+        "boundary": "Only synthetic labels are scored; real ground truth is null.",
+        "training": {
+          "epochsRun": 260,
+          "selectedEpoch": 258,
+          "validationNormalizedMSE": 0.118185051
+        }
+      },
+      "modelSHA256": "843f7b4e7c31ddc0c00dc8e9965d5d55aba803f0b6ff9853e5a34d13e1b38bb8"
+    },
+    "e3": {
+      "caseId": "e3-polymer",
+      "methods": [
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "published-laboratory"
+      ],
+      "source": {
+        "title": "Yu · Surface-active Polymer Flooding experimental workbook",
+        "url": "https://data.mendeley.com/datasets/ns7xbjz54h/1",
+        "license": "CC BY 4.0"
+      },
+      "validation": {
+        "split": "5 leave-one-concentration-out folds, each train12/test3; all feature/target scalers and kernel optimization fit within each training fold",
+        "metric": "MAE in dimensionless resistance factor",
+        "baseline": 312.044444,
+        "model": 432.439728,
+        "n": 15,
+        "foldRows": [
+          {
+            "rowIndex": 0,
+            "sourceId": "1",
+            "concentration": 750,
+            "permeability": 100,
+            "target": 168,
+            "prediction": 570.422044,
+            "baseline": 121,
+            "modelKey": "leave-c750"
+          },
+          {
+            "rowIndex": 1,
+            "sourceId": "2",
+            "concentration": 750,
+            "permeability": 200,
+            "target": 120,
+            "prediction": 643.523218,
+            "baseline": 211,
+            "modelKey": "leave-c750"
+          },
+          {
+            "rowIndex": 2,
+            "sourceId": "3",
+            "concentration": 750,
+            "permeability": 500,
+            "target": 70,
+            "prediction": 490.200608,
+            "baseline": 123,
+            "modelKey": "leave-c750"
+          },
+          {
+            "rowIndex": 3,
+            "sourceId": "4",
+            "concentration": 1000,
+            "permeability": 100,
+            "target": 268,
+            "prediction": 39.3712633,
+            "baseline": 291.5,
+            "modelKey": "leave-c1000"
+          },
+          {
+            "rowIndex": 4,
+            "sourceId": "5",
+            "concentration": 1000,
+            "permeability": 200,
+            "target": 245,
+            "prediction": -47.9491271,
+            "baseline": 199.5,
+            "modelKey": "leave-c1000"
+          },
+          {
+            "rowIndex": 5,
+            "sourceId": "6",
+            "concentration": 1000,
+            "permeability": 500,
+            "target": 170,
+            "prediction": -51.6922106,
+            "baseline": 143.5,
+            "modelKey": "leave-c1000"
+          },
+          {
+            "rowIndex": 6,
+            "sourceId": "7",
+            "concentration": 1250,
+            "permeability": 100,
+            "target": 415,
+            "prediction": 642.121163,
+            "baseline": 724.5,
+            "modelKey": "leave-c1250"
+          },
+          {
+            "rowIndex": 7,
+            "sourceId": "8",
+            "concentration": 1250,
+            "permeability": 200,
+            "target": 279,
+            "prediction": 552.62219,
+            "baseline": 571.5,
+            "modelKey": "leave-c1250"
+          },
+          {
+            "rowIndex": 8,
+            "sourceId": "9",
+            "concentration": 1250,
+            "permeability": 500,
+            "target": 217,
+            "prediction": 419.24412,
+            "baseline": 422.5,
+            "modelKey": "leave-c1250"
+          },
+          {
+            "rowIndex": 9,
+            "sourceId": "10",
+            "concentration": 1500,
+            "permeability": 100,
+            "target": 1181,
+            "prediction": 759.800331,
+            "baseline": 909.666667,
+            "modelKey": "leave-c1500"
+          },
+          {
+            "rowIndex": 10,
+            "sourceId": "11",
+            "concentration": 1500,
+            "permeability": 200,
+            "target": 898,
+            "prediction": 387.648051,
+            "baseline": 557,
+            "modelKey": "leave-c1500"
+          },
+          {
+            "rowIndex": 11,
+            "sourceId": "12",
+            "concentration": 1500,
+            "permeability": 500,
+            "target": 675,
+            "prediction": 296.760128,
+            "baseline": 390.666667,
+            "modelKey": "leave-c1500"
+          },
+          {
+            "rowIndex": 12,
+            "sourceId": "13",
+            "concentration": 2000,
+            "permeability": 100,
+            "target": 1899,
+            "prediction": 467.414307,
+            "baseline": 2713,
+            "modelKey": "leave-c2000"
+          },
+          {
+            "rowIndex": 13,
+            "sourceId": "14",
+            "concentration": 2000,
+            "permeability": 200,
+            "target": 1113,
+            "prediction": 461.277631,
+            "baseline": 2136,
+            "modelKey": "leave-c2000"
+          },
+          {
+            "rowIndex": 14,
+            "sourceId": "15",
+            "concentration": 2000,
+            "permeability": 500,
+            "target": 738,
+            "prediction": 436.907048,
+            "baseline": 1591,
+            "modelKey": "leave-c2000"
+          }
+        ],
+        "boundary": "Only15 genuine measured rows; the750 and2000mg/L edge holdouts test concentration extrapolation. Final top model refit to all15 for interpolation is distinct from LOCO evaluation models."
+      },
+      "modelSHA256": "ea1e2e70ed2189141cd7f95541179b7a2f5f425fc8c0d38c4fd6abdd82ffc79b"
+    },
+    "e4": {
+      "caseId": "e4-steam",
+      "methods": [
+        "ts",
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "field"
+      ],
+      "source": {
+        "title": "Si · Canadian in-situ oil sands monthly operating data",
+        "url": "https://data.mendeley.com/datasets/8ngkgz69zb/2",
+        "license": "CC BY 4.0"
+      },
+      "validation": {
+        "split": {
+          "train": "UID1+3 target months2015-07..2017-12 (60 windows)",
+          "validation": "UID1+3 target months2018 (24 windows)",
+          "timeTest": "UID1+3 target months2019 (24 windows)",
+          "groupTest": "UID17 all target months2015-07..2019-12 (54 windows), never fitted or selected on",
+          "historyLength": 6,
+          "counts": [
+            60,
+            24,
+            24,
+            54
+          ]
+        },
+        "metric": "MAE in Oil m3/month",
+        "baseline": 3648.42222,
+        "model": 7996.56156,
+        "n": 54,
+        "details": {
+          "unseenOperation": {
+            "n": 54,
+            "modelMAE": 7996.56156,
+            "baselineMAE": 3648.42222
+          },
+          "futureTimeKnownOperations": {
+            "n": 24,
+            "modelMAE": 33663.674,
+            "baselineMAE": 55680.5125
+          }
+        },
+        "boundary": "Known future steam conditioning is retrospective, not unconstrained future-steam forecasting. Report low scores as obtained; no SOR feature.",
+        "training": {
+          "epochsRun": 326,
+          "selectedEpoch": 176,
+          "validationNormalizedMSE": 0.0373861827
+        }
+      },
+      "modelSHA256": "07b6289f1404ca9493d6050c1369ff5ab41a008be4e40f547e9bf762cbcf150c"
+    },
+    "e5": {
+      "caseId": "e5-microbial",
+      "methods": [
+        "ts"
+      ],
+      "records": 6,
+      "kind": [
+        "published-laboratory"
+      ],
+      "source": {
+        "title": "PML026 · Production and separation of a trehalolipid biosurfactant: data",
+        "url": "https://data.mendeley.com/datasets/bw79v9vnbs/1",
+        "license": "CC BY 4.0"
+      },
+      "validation": {
+        "split": {
+          "train": "B1+B3 assays24..288h,24 labels",
+          "validation": "B1+B3 assays312/336/360h,6 labels",
+          "test": "B2a+B2b together, all15 noninitial assays per batch,30 labels",
+          "conditionGroup": "B2a and B2b are replicates and never split between train/test",
+          "counts": [
+            24,
+            6,
+            30
+          ]
+        },
+        "metric": "MAE in trehalolipid g/L",
+        "baseline": 0.606016333,
+        "model": 0.452486491,
+        "n": 30,
+        "details": {
+          "B2a": {
+            "n": 15,
+            "modelMAE": 0.294358267,
+            "baselineMAE": 0.630416667
+          },
+          "B2b": {
+            "n": 15,
+            "modelMAE": 0.610614715,
+            "baselineMAE": 0.581616
+          }
+        },
+        "negativePredictionCount": 0,
+        "boundary": "Only3 conditions and60 usable assay labels. Dense sensors do not add independent labels. Past-only timing does not identify intervention causality.",
+        "training": {
+          "epochsRun": 248,
+          "selectedEpoch": 68,
+          "validationNormalizedMSE": 0.119686924
+        }
+      },
+      "modelSHA256": "07f44ea7978598687036e5451f90dffc8295bd5af03d98fe4a482d19f772a67a"
+    }
+  },
+  "assetIntegrity": {
+    "data/pr1.json": {
+      "bytes": 113676,
+      "sha256": "e9f9b5bcbb171c8c06ac3c685de5875f401715053005d2fb48795e42c331186f"
+    },
+    "data/pr2.json": {
+      "bytes": 27184,
+      "sha256": "528b93bfa40b5aec750b0e79918b0fe1d50b17b97b20a153b6a4246b8e8442eb"
+    },
+    "data/pr3.json": {
+      "bytes": 37184,
+      "sha256": "9f0c0013e7976150a676228181c54d165a55a8a8e6a9ae697652ba9cc79e758a"
+    },
+    "data/pr4.json": {
+      "bytes": 491467,
+      "sha256": "252e36e9e6bb1ecebf4a8fb90ead85b8a47c98d95b568d2c0ff4c6019d4921cd"
+    },
+    "data/pr5.json": {
+      "bytes": 123018,
+      "sha256": "7808dda13b0ff5f211bcae2cec2c08a295c1412689a7e5cff43698dc0f596479"
+    },
+    "data/wo1.json": {
+      "bytes": 30871,
+      "sha256": "9225427f72183b768a7721ade0179508a4edb1557826ae78948153664abfeba6"
+    },
+    "data/wo2.json": {
+      "bytes": 48547,
+      "sha256": "2698106f914bbc3918c28aed8238a85cbb9cded4b7dd6b5d98604781e3ab72d1"
+    },
+    "data/wo3.json": {
+      "bytes": 438254,
+      "sha256": "532fdc6768064cf5456bd3ec712c5414066cdde3a73eecf62b15e5b9d53773da"
+    },
+    "data/wo4.json": {
+      "bytes": 461266,
+      "sha256": "c0ebb4cb0e9079edbce70bbca2fe091bd70fcd1ecdf1cbb305df99504dddd0e3"
+    },
+    "data/wo5.json": {
+      "bytes": 34805,
+      "sha256": "48c1dea8e1e541ae74d5c6e95eedfe89bdebf1690928265b4f8779060ba1787a"
+    },
+    "data/e1.json": {
+      "bytes": 13196,
+      "sha256": "d903ccb14398d16091998d961850f5708e1cd2a8fcf0e0dd7aa030a04728cf46"
+    },
+    "data/e2.json": {
+      "bytes": 491374,
+      "sha256": "3fe299ecfb6fafc22df2d070d031ce9c3712a497e5178a2162282a804b626d0d"
+    },
+    "data/e3.json": {
+      "bytes": 29181,
+      "sha256": "b9f31348cf60642058540e249e477c3adc856ea4a7161bb07d7b26f03338a897"
+    },
+    "data/e4.json": {
+      "bytes": 16207,
+      "sha256": "051ed345f183ed0241dd94970b376d6173d9a0890568d21ef8d3066eb2e00a12"
+    },
+    "data/e5.json": {
+      "bytes": 20729,
+      "sha256": "a18231c3fe15ff4274ec349883fb67c55a109898fa8891e4433c3bb827f92f0b"
+    },
+    "core.js": {
+      "bytes": 5371,
+      "sha256": "a71794bd9404ac3e3e52d4d13f4c559b2d36af9fed2408ff728a06a236a5fd9c"
+    },
+    "experiments.js": {
+      "bytes": 15182,
+      "sha256": "e1babcab9c1632c46bb322522718e73b1fcdcb814957098ca554e1ac3cff77f0"
+    },
+    "lessons.js": {
+      "bytes": 56119,
+      "sha256": "7100746207e4a67300a4c5e451a6153e936cbab5f6965302a9922eecc78ee163"
+    },
+    "stage.js": {
+      "bytes": 57243,
+      "sha256": "db6b71b91087f6f77930b81290c3660af47cd3448619972eb364cd6a8e48cb9d"
+    },
+    "content.js": {
+      "bytes": 126818,
+      "sha256": "c825ad789bdc75168208a7751751bd246ab20dee54a038412dcbe576fe0fc8e2"
+    },
+    "operations.css": {
+      "bytes": 12663,
+      "sha256": "3ba00ac726b3ea53ef3519205cea8f7f89a5667fb3fdd10a0e913e71498dfa36"
+    }
+  }
+}

@@ -40,3 +40,11 @@ tools/perforation/*.cjs text eol=lf
 tools/perforation/*.json text eol=lf
 tools/shared-perforation/*.cjs text eol=lf
 tools/shared-perforation/*.json text eol=lf
+
+assets/operations/data/*.json text eol=lf
+assets/operations/*.js text eol=lf
+assets/operations/*.css text eol=lf
+assets/operations/*.json text eol=lf
+tools/operations/*.py text eol=lf
+tools/operations/source-data/** -text
+tools/operations/source-data/** whitespace=cr-at-eol

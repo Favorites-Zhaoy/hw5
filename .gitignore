@@ -2,6 +2,8 @@
 .artifacts/
 node_modules/
 tools/seismic/__pycache__/
+tools/operations/__pycache__/
+tools/operations/**/__pycache__/
 *.log
 .DS_Store
 Thumbs.db

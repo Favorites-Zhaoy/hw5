@@ -1,0 +1,33 @@
+{
+  "aggregation": "One-minute sensor medians; mode of nonmissing class within each minute. Exact event onsets retained from original second-level labels.",
+  "units": {
+    "P-TPT": "Pa",
+    "P-MON-CKP": "Pa",
+    "T-TPT": "degrees Celsius"
+  },
+  "timestampTimezone": "Original source does not declare timezone",
+  "sources": {
+    "WELL-00001_20170226130146": {
+      "originalUrl": "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00001_20170226130146.parquet",
+      "sourceSHA256": "0ad0b0696d627c4c21ff95414b5da3524b478a28312cd82280d792f62a5ace92",
+      "rawRows": 76633,
+      "minuteRows": 1278,
+      "exactOnsets": {
+        "0": "2017-02-26 14:01:46",
+        "107": "2017-02-26 23:24:16",
+        "7": "2017-02-27 10:03:11"
+      }
+    },
+    "WELL-00021_20180611011218": {
+      "originalUrl": "https://raw.githubusercontent.com/petrobras/3W/main/dataset/7/WELL-00021_20180611011218.parquet",
+      "sourceSHA256": "efd18fadf8c7f0b8cde024a6bd38cdcddde44222317e1bd0f9a427f906cbbbd7",
+      "rawRows": 46574,
+      "minuteRows": 777,
+      "exactOnsets": {
+        "0": "2018-06-11 02:12:18",
+        "107": "2018-06-11 07:04:06",
+        "7": "2018-06-11 13:38:41"
+      }
+    }
+  }
+}
