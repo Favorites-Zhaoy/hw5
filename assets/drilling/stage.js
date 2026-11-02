@@ -24,7 +24,16 @@
       '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
   }
   var effect=function effects(t){
- var w=t.box[2],h=t.box[3],index=Number(t.id.slice(1))-1,well=STAGE_KIND==='welllog';
+ var w=t.box[2],h=t.box[3],index=TECH.findIndex(function(row){return row.id===t.id;}),well=STAGE_KIND==='welllog';
+ if(STAGE_KIND!=='drilling'&&!well){
+  var overlays=[
+   '<path class="dmap-monitor-scan" d="M138 80V175"/><path class="dmap-trace dmap-trace-gas" d="M92 135l17-6 11-19 13 19 18-8 13 4 18-13 17 6"/>',
+   '<path class="dmap-trace dmap-trace-rpm" d="M105 154l18-12 16-5 14-16 18 4 20-15"/><circle class="dmap-report-pulse" cx="190" cy="124" r="17"/>',
+   '<path class="dmap-trace dmap-trace-drill" d="M100 126l20-5 16-19 14 18 21-8 22 11"/><path class="dmap-monitor-scan" d="M180 82V182"/>',
+   '<circle class="dmap-report-pulse" cx="150" cy="129" r="21"/><path class="dmap-depth-scan" d="M75 152H270"/>'
+  ];
+  return '<svg class="dmap-tech-effect" viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'+overlays[index]+'</svg>';
+ }
  var drilling=[
   '<path class="dmap-monitor-scan" d="M92 85V155"/><path class="dmap-trace dmap-trace-gas" d="M104 111l20-3 12-15 16 12 18-4 16-12 23 6"/>',
   '<path class="dmap-trace dmap-trace-gas" d="M111 118l17-1 9-25 10 24 20-7 14 6 12-18 11 15 24-5"/><path class="dmap-monitor-scan" d="M148 87V201"/>',
@@ -64,8 +73,13 @@
           '<animateMotion dur="' + duration + 's" begin="' + (-duration * i / 2) + 's" repeatCount="indefinite" rotate="auto" path="' + path + '"/></g>';
       }).join('') + '</g>';
   }
-  var STAGE_KIND="drilling";var drawing=function drawing(){
+  var STAGE_KIND="drilling";var STAGE_PATHS=null;var drawing=function drawing(){
  var parts=[],colors=['#ffab40','#40a7d4','#a18bd6','#8ab578'],well=STAGE_KIND==='welllog';
+ if(STAGE_KIND!=='drilling'&&!well){
+  var motion=STAGE_PATHS,feeds=motion.feeds,returns=motion.returns;
+  for(var k=0;k<4;k++){parts.push(flow(feeds[k],'#58b6ee',3.5+k*.55,TECH[k].id));parts.push(flow(returns[k],colors[k],3.8+k*.4,TECH[k].id));}
+  return '<svg class="dmap-flows" data-dmap-motion="" viewBox="0 0 1448 1086" aria-hidden="true">'+motion.physical.map(function(path,i){return flow(path,i%2?'#58b6ee':'#ffc238',5+i*.5);}).join('')+parts.join('')+'<path class="dmap-depth-scan" d="'+motion.scan+'"/><circle class="dmap-drill-pulse" cx="'+motion.pulse[0]+'" cy="'+motion.pulse[1]+'" r="21"/></svg>';
+ }
  var paths=well?['M335 674C335 719 501 700 609 735','M651 674Q665 718 707 737','M962 679Q924 712 760 738','M1281 680Q1210 732 915 738']:['M360 704C355 753 460 735 568 764','M643 701Q660 741 690 764','M935 705Q920 738 737 764','M1237 710Q1190 755 902 764'];
  for(var i=0;i<4;i++)parts.push(flow(paths[i],colors[i],4+i*.45,TECH[i].id));
  return '<svg class="dmap-flows" data-dmap-motion="" viewBox="0 0 1448 1086" aria-hidden="true">'+

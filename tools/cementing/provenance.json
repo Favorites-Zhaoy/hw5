@@ -1,0 +1,323 @@
+{
+  "version": "2.0.0",
+  "seed": 202611024,
+  "kind": "synthetic-teaching",
+  "provenance": {
+    "generator": "tools/cementing/prepare-models.cjs",
+    "generatorSha256": "bef0c865b32a60dc254e24ce20c90bfef96d0b24e6e6aa907a30264e5e70db0c",
+    "coreSha256": "c6634a29d5b15f5f7fbcc5a4477c5dcd174beae0bb121fffa074b94566cc8c06",
+    "modelTraining": "C1: all 75-12-3 MLP weights fitted by shuffled SGD / softmax cross entropy, 180 epochs. C2: normalized polynomial ridge least squares. C3: logistic full-batch BCE gradient descent, 1200 epochs. C4: explicit geometry plus exact combinatorial search, no neural network.",
+    "featureBoundary": "Synthetic group IDs held apart before fitting. C1 uses spatial adjacent depths, not a temporal forecast. C2 unseen responses only used after search for evaluation. C3 calibration jobs tune threshold; test jobs never tune or fit. C4 is an unfitted idealized geometric model."
+  },
+  "models": {
+    "c1": {
+      "trainGroups": [
+        "BOND-W1",
+        "BOND-W2",
+        "BOND-W3",
+        "BOND-W4",
+        "BOND-W5",
+        "BOND-W6",
+        "BOND-W7",
+        "BOND-W8",
+        "BOND-W9"
+      ],
+      "testGroups": [
+        "BOND-W10",
+        "BOND-W11",
+        "BOND-W12"
+      ],
+      "calibrationGroups": [],
+      "audit": {
+        "fitRows": 648,
+        "heldoutRows": 216,
+        "featureCount": 75,
+        "scope": "Three-depth VDL patches and CBL amplitude; labels are generator classes, not hydraulic isolation truth.",
+        "examples": [
+          {
+            "id": "BOND-W10",
+            "metrics": {
+              "matrix": [
+                [
+                  12,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  26,
+                  9
+                ],
+                [
+                  0,
+                  4,
+                  20
+                ]
+              ],
+              "accuracy": 0.8055555555555556,
+              "count": 72
+            },
+            "baseline": {
+              "matrix": [
+                [
+                  7,
+                  5,
+                  0
+                ],
+                [
+                  0,
+                  27,
+                  9
+                ],
+                [
+                  0,
+                  7,
+                  17
+                ]
+              ],
+              "accuracy": 0.7083333333333334,
+              "count": 72
+            }
+          },
+          {
+            "id": "BOND-W11",
+            "metrics": {
+              "matrix": [
+                [
+                  21,
+                  3,
+                  0
+                ],
+                [
+                  1,
+                  15,
+                  8
+                ],
+                [
+                  0,
+                  0,
+                  24
+                ]
+              ],
+              "accuracy": 0.8333333333333334,
+              "count": 72
+            },
+            "baseline": {
+              "matrix": [
+                [
+                  10,
+                  14,
+                  0
+                ],
+                [
+                  0,
+                  11,
+                  13
+                ],
+                [
+                  0,
+                  1,
+                  23
+                ]
+              ],
+              "accuracy": 0.6111111111111112,
+              "count": 72
+            }
+          },
+          {
+            "id": "BOND-W12",
+            "metrics": {
+              "matrix": [
+                [
+                  22,
+                  2,
+                  0
+                ],
+                [
+                  5,
+                  18,
+                  1
+                ],
+                [
+                  0,
+                  1,
+                  23
+                ]
+              ],
+              "accuracy": 0.875,
+              "count": 72
+            },
+            "baseline": {
+              "matrix": [
+                [
+                  13,
+                  11,
+                  0
+                ],
+                [
+                  2,
+                  17,
+                  5
+                ],
+                [
+                  0,
+                  8,
+                  16
+                ]
+              ],
+              "accuracy": 0.6388888888888888,
+              "count": 72
+            }
+          }
+        ]
+      }
+    },
+    "c2": {
+      "trainGroups": [
+        "PUMP-W1",
+        "PUMP-W2",
+        "PUMP-W3",
+        "PUMP-W4",
+        "PUMP-W5",
+        "PUMP-W6",
+        "PUMP-W7",
+        "PUMP-W8"
+      ],
+      "testGroups": [
+        "PUMP-W9",
+        "PUMP-W10",
+        "PUMP-W11"
+      ],
+      "calibrationGroups": [],
+      "audit": {
+        "fitRows": 560,
+        "heldoutRows": 210,
+        "mae": 0.23031290626704704,
+        "target": "displacement efficiency / percent",
+        "scope": "Group bias is absent from surrogate inputs; candidate scoring never reads the simulated response."
+      }
+    },
+    "c3": {
+      "trainGroups": [
+        "LOSS-JOB1",
+        "LOSS-JOB2",
+        "LOSS-JOB3",
+        "LOSS-JOB4",
+        "LOSS-JOB5",
+        "LOSS-JOB6",
+        "LOSS-JOB7",
+        "LOSS-JOB8",
+        "LOSS-JOB9",
+        "LOSS-JOB10"
+      ],
+      "testGroups": [
+        "LOSS-JOB14",
+        "LOSS-JOB15",
+        "LOSS-JOB16"
+      ],
+      "calibrationGroups": [
+        "LOSS-JOB11",
+        "LOSS-JOB12",
+        "LOSS-JOB13"
+      ],
+      "audit": {
+        "fitRows": 1200,
+        "fitPositive": 156,
+        "calibrationRows": 360,
+        "heldoutRows": 360,
+        "scope": "Original imbalanced sequences retained; no resampling, no test labels used for threshold selection; current and previous four observations only.",
+        "examples": [
+          {
+            "id": "LOSS-JOB14",
+            "cut": 0.1,
+            "metrics": {
+              "tp": 13,
+              "fp": 19,
+              "fn": 0,
+              "tn": 88,
+              "precision": 0.40625,
+              "recall": 1,
+              "f1": 0.5777777777777777,
+              "accuracy": 0.8416666666666667
+            },
+            "baseline": {
+              "tp": 3,
+              "fp": 3,
+              "fn": 10,
+              "tn": 104,
+              "precision": 0.5,
+              "recall": 0.23076923076923078,
+              "f1": 0.3157894736842105,
+              "accuracy": 0.8916666666666667
+            },
+            "positives": 13
+          },
+          {
+            "id": "LOSS-JOB15",
+            "cut": 0.1,
+            "metrics": {
+              "tp": 11,
+              "fp": 14,
+              "fn": 0,
+              "tn": 95,
+              "precision": 0.44,
+              "recall": 1,
+              "f1": 0.6111111111111112,
+              "accuracy": 0.8833333333333333
+            },
+            "baseline": {
+              "tp": 5,
+              "fp": 2,
+              "fn": 6,
+              "tn": 107,
+              "precision": 0.7142857142857143,
+              "recall": 0.45454545454545453,
+              "f1": 0.5555555555555556,
+              "accuracy": 0.9333333333333333
+            },
+            "positives": 11
+          },
+          {
+            "id": "LOSS-JOB16",
+            "cut": 0.1,
+            "metrics": {
+              "tp": 22,
+              "fp": 7,
+              "fn": 1,
+              "tn": 90,
+              "precision": 0.7586206896551724,
+              "recall": 0.9565217391304348,
+              "f1": 0.8461538461538461,
+              "accuracy": 0.9333333333333333
+            },
+            "baseline": {
+              "tp": 11,
+              "fp": 1,
+              "fn": 12,
+              "tn": 96,
+              "precision": 0.9166666666666666,
+              "recall": 0.4782608695652174,
+              "f1": 0.6285714285714286,
+              "accuracy": 0.8916666666666667
+            },
+            "positives": 23
+          }
+        ]
+      }
+    },
+    "c4": {
+      "trainGroups": [],
+      "testGroups": [
+        "STANDOFF-P1",
+        "STANDOFF-P2",
+        "STANDOFF-P3"
+      ],
+      "calibrationGroups": [],
+      "audit": {
+        "scope": "No learned model and no statistical accuracy claim. Simply-supported beam geometry, fixed end supports, nine internal positions, exact bounded enumeration; effective EI is teaching input.",
+        "EIUnits": "N m²",
+        "gapUnits": "m"
+      }
+    }
+  }
+}

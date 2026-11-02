@@ -1,0 +1,17 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "cementing-c4",
+  "sceneId": "c4",
+  "title": "套管扶正器布置优化",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

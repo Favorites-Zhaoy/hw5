@@ -1,0 +1,29 @@
+{
+  "kind": "synthetic-teaching",
+  "seed": 20261102,
+  "modelSha256": "5ce3f4e9877e030169d278c42b802d61c9ff769409fc1159e633135329d637eb",
+  "trainIds": [
+    "PF-T01",
+    "PF-T02",
+    "PF-T03",
+    "PF-T04",
+    "PF-T05",
+    "PF-T06"
+  ],
+  "heldoutIds": [
+    "PF-H01",
+    "PF-H02",
+    "PF-H03"
+  ],
+  "trainRows": 630,
+  "heldoutRows": 315,
+  "audit": {
+    "productivityIndexMAE": 0.01336269508391593,
+    "riskScoreMAE": 0.011109971821650251
+  },
+  "model": "12-term polynomial ridge; lambda 0.04; fit only PF-T conditions",
+  "trainingScript": "tools/shared-perforation/train.cjs",
+  "reference": "Explicit smooth synthetic connectivity and damage-penalty formulas in core.js. No field calibration.",
+  "split": "Six condition groups train; three untouched condition groups evaluate. Shared exactly by CO2 and P1.",
+  "boundary": "High-level geometry only. No energetic material, charge design, or operational sequence."
+}

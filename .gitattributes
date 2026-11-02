@@ -25,3 +25,18 @@ assets/welllog/models.js text eol=lf
 assets/seismic/data.js text eol=lf
 assets/seismic/models.js text eol=lf
 assets/seismic/data/*.js text eol=lf
+
+# Freeze the three new stages' training-source and model payload bytes.
+assets/cementing/*.js text eol=lf
+assets/completion/*.js text eol=lf
+assets/perforation/*.js text eol=lf
+assets/shared-perforation/*.js text eol=lf
+tools/cementing/*.cjs text eol=lf
+tools/cementing/*.json text eol=lf
+tools/completion/*.js text eol=lf
+tools/completion/*.cjs text eol=lf
+tools/completion/*.json text eol=lf
+tools/perforation/*.cjs text eol=lf
+tools/perforation/*.json text eol=lf
+tools/shared-perforation/*.cjs text eol=lf
+tools/shared-perforation/*.json text eol=lf

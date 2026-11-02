@@ -1,0 +1,69 @@
+{
+  "checked": "2026-11-02",
+  "workflow": "nature-academic-search: multi-source-search + citation-verification",
+  "verification": "Primary publisher abstract/pages were checked, then exact DOI, title, journal and publication dates were confirmed with Crossref REST works metadata. No manuscript or figure was copied. These papers motivate the method choices; the lesson does not claim to replicate them.",
+  "academicMCP": "Core academic-search / Crossref MCP tools were not available in this session; fallback used primary publisher web search/open and https://api.crossref.org/works/{doi}.",
+  "papers": [
+    {
+      "case": "c1",
+      "doi": "10.1016/j.geoen.2024.212960",
+      "title": "Transfer learning for acoustic cement bond evaluation: An image classification approach using acoustic variable Density log",
+      "journal": "Geoenergy Science and Engineering",
+      "publishedPrint": "2024-08",
+      "publisher": "https://www.sciencedirect.com/science/article/pii/S2949891024003300",
+      "methodVerified": "VDL -> Continuous Wavelet Transform -> image classification with pretrained CNNs and transfer learning.",
+      "lessonBoundary": "Raw synthetic 3-depth VDL patches and CBL -> trained small MLP; no CWT or transfer learning. No paper accuracy is copied into lesson results."
+    },
+    {
+      "case": "c1",
+      "doi": "10.3390/app15105493",
+      "title": "A Cement Bond Quality Prediction Method Based on a Wide and Deep Neural Network Incorporating Embedded Domain Knowledge",
+      "journal": "Applied Sciences",
+      "publishedOnline": "2025-05-14",
+      "publisher": "https://www.mdpi.com/2076-3417/15/10/5493",
+      "methodVerified": "Wide and Deep neural network incorporating embedded domain knowledge for cement bond quality prediction.",
+      "lessonBoundary": "Illustrates a knowledge/data fusion research direction. The lesson does not implement Wide and Deep or its domain-knowledge branch."
+    },
+    {
+      "case": "c2",
+      "doi": "10.1016/j.geoen.2025.214149",
+      "title": "Optimizing cementing displacement efficiency using a machine learning ensemble Models: Application of fluent simulation and optimization algorithms",
+      "journal": "Geoenergy Science and Engineering",
+      "publishedPrint": "2026-01",
+      "publisher": "https://www.sciencedirect.com/science/article/pii/S294989102500507X",
+      "methodVerified": "Fluent simulations form a response dataset; ML ensembles predict displacement efficiency; optimization algorithms compare cementing parameters.",
+      "lessonBoundary": "Simple synthetic response, fitted polynomial ridge surrogate and constrained grid. No Fluent, stacking ensemble or field validation was run."
+    },
+    {
+      "case": "c3",
+      "doi": "10.1155/gfl/1514125",
+      "title": "Intelligent Prediction of Lost Circulation and Gas Invasion in Cementing Operations Based on ACO-SWXGBoost",
+      "journal": "Geofluids",
+      "publishedOnline": "2025-06-24",
+      "publishedPrintYear": 2025,
+      "publisher": "https://onlinelibrary.wiley.com/doi/full/10.1155/gfl/1514125",
+      "methodVerified": "Flow, pressure, density and slopes; sliding windows; enhanced XGBoost; ACO hyperparameter search; three categories.",
+      "lessonBoundary": "Binary synthetic loss classification by actual fitted logistic regression plus calibration-only threshold search. No ACO/XGBoost or gas-invasion classification."
+    },
+    {
+      "case": "c4",
+      "doi": "10.1016/j.eswa.2025.129547",
+      "title": "Adaptive segmentation and optimization for efficient centralizer selection and placement in oilfield drilling operations",
+      "journal": "Expert Systems with Applications",
+      "publishedPrint": "2026-02",
+      "onlineYearFromPublisher": 2025,
+      "publisher": "https://www.sciencedirect.com/science/article/pii/S0957417425031628",
+      "methodVerified": "Black-box constrained centralizer placement and selection; parallel bisection, adaptive segmentation and approximate type enumeration, not deep learning.",
+      "lessonBoundary": "Ideal simply-supported beam and exact small combinatorial enumeration. No industrial simulator, type search or reported field cost reduction is replicated."
+    }
+  ],
+  "professionalGlossary": [
+    "https://glossary.slb.com/en/terms/c/cement_bond_log",
+    "https://glossary.slb.com/en/terms/c/centralizer",
+    "https://glossary.slb.com/en/terms/d/displacement",
+    "https://glossary.slb.com/en/terms/e/equivalent_circulating_density",
+    "https://glossary.slb.com/en/terms/l/lost_circulation",
+    "https://glossary.slb.com/en/terms/c/casing"
+  ],
+  "glossaryBoundary": "Casing standoff ratio is explicitly defined geometrically in the lesson. The SLB general standoff entry concerns logging/perforating and is deliberately not used as a cementing-ratio authority."
+}

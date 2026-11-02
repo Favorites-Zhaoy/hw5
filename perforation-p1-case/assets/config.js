@@ -1,0 +1,17 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "perforation-p1",
+  "sceneId": "p1",
+  "title": "射孔参数局部优化",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

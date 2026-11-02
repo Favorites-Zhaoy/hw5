@@ -1,0 +1,40 @@
+{
+  "kind": "synthetic-teaching",
+  "seed": 20261102,
+  "modelSha256": "059e903136fc0cd582a36f277645b29522292047738378d59dc9dbaf464b94e5",
+  "co3Audit": {
+    "mae": 0.6610415186282003,
+    "maxError": 3.940901901884672
+  },
+  "co4Audit": [
+    {
+      "id": "RL-H01",
+      "baselineReward": 393.0153301347225,
+      "policyReward": 726.6908882889007,
+      "baselineOil": 1377.1249845678096,
+      "policyOil": 1289.6491996826855,
+      "unseenStates": 0
+    },
+    {
+      "id": "RL-H02",
+      "baselineReward": 632.8147515905237,
+      "policyReward": 632.8147515905237,
+      "baselineOil": 1460.2529774732109,
+      "policyOil": 1460.2529774732109,
+      "unseenStates": 20
+    },
+    {
+      "id": "RL-H03",
+      "baselineReward": 3216.0360884714087,
+      "policyReward": 2606.0968124589244,
+      "baselineOil": 3268.5385409997652,
+      "policyOil": 2664.689132404276,
+      "unseenStates": 4
+    }
+  ],
+  "trainingScript": "tools/completion/train.cjs",
+  "modelTraining": "CO1 expert graph only; CO2 shared fitted ridge; CO3 ridge fit 480 rows from ST-T01..08; CO4 40000 training episodes from RL-T01..08 only.",
+  "split": "Group IDs separated before fit. No heldout record used in fitting or Q updates.",
+  "build": "Static page build reads frozen model parameters; no training.",
+  "reference": "All labels, reservoirs, strengths and capability values are synthetic teaching assumptions; not field accuracy or design validation."
+}

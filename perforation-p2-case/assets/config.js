@@ -1,0 +1,17 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "perforation-p2",
+  "sceneId": "p2",
+  "title": "通道响应预测与工具族比较",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

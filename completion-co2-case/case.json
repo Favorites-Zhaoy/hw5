@@ -1,0 +1,37 @@
+{
+  "id": "completion-co2",
+  "sceneId": "co2",
+  "title": "完井参数协同优化",
+  "version": "2.0.0",
+  "updated": "2026-11-02",
+  "lessonProtocol": "field-pages-v2",
+  "status": "ready",
+  "entry": "demo/background.html",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "html": "demo/background.html",
+      "view": "background",
+      "height": 1040
+    },
+    "workflow": {
+      "label": "案例流程",
+      "html": "demo/workflow.html",
+      "view": "workflow",
+      "height": 1040
+    },
+    "demo": {
+      "label": "可运行示范",
+      "html": "demo/identify.html",
+      "view": "demo",
+      "height": 1040
+    }
+  },
+  "data": {
+    "kind": "synthetic-teaching",
+    "seed": 20261102,
+    "source": "../assets/completion/data.js",
+    "provenance": "../tools/completion/provenance.json"
+  },
+  "template": "m2-gas-case/assets/lesson.css"
+}

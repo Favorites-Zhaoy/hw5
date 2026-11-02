@@ -1,0 +1,96 @@
+{
+  "seed": 20261102,
+  "kind": "synthetic-teaching",
+  "modelSha256": "b3cffc43766f93410e075513ac53c96e40e7ce1ff18aa5e2fc54084a32bbe8f3",
+  "modelTraining": "离线最小二乘岭回归；按标定批次/模拟井整组隔开；浏览器与静态构建不训练。",
+  "groups": {
+    "p2": {
+      "fit": [
+        "CH-T01",
+        "CH-T02",
+        "CH-T03",
+        "CH-T04",
+        "CH-T05",
+        "CH-T06",
+        "CH-T07",
+        "CH-T08"
+      ],
+      "heldout": [
+        "CH-H01",
+        "CH-H02",
+        "CH-H03"
+      ]
+    },
+    "p3": {
+      "knowledgeSource": "SYN-20261102",
+      "heldoutQueries": [
+        "KG-H01",
+        "KG-H02",
+        "KG-H03"
+      ]
+    },
+    "p4": {
+      "fit": [
+        "PT-T01",
+        "PT-T02",
+        "PT-T03",
+        "PT-T04",
+        "PT-T05",
+        "PT-T06",
+        "PT-T07",
+        "PT-T08"
+      ],
+      "heldout": [
+        "PT-H01",
+        "PT-H02",
+        "PT-H03"
+      ]
+    }
+  },
+  "audit": {
+    "p2": {
+      "lengthMAE": 0.0065946935755465475,
+      "diameterMAE": 0.03499677146041738
+    },
+    "p4": {
+      "transferRows": [
+        {
+          "id": "PT-H01",
+          "truth": {
+            "resistance": 0.034482758620689655,
+            "tauMin": 12.5
+          },
+          "prediction": {
+            "resistance": 0.034461325346189044,
+            "tauMin": 12.607331729016934
+          }
+        },
+        {
+          "id": "PT-H02",
+          "truth": {
+            "resistance": 0.03475440222428174,
+            "tauMin": 18
+          },
+          "prediction": {
+            "resistance": 0.03472644377986993,
+            "tauMin": 17.896778005163398
+          }
+        },
+        {
+          "id": "PT-H03",
+          "truth": {
+            "resistance": 0.020712510356255178,
+            "tauMin": 8.5
+          },
+          "prediction": {
+            "resistance": 0.020703793335685377,
+            "tauMin": 8.41022276026667
+          }
+        }
+      ],
+      "resistanceMAE": 0.000019369579827408872,
+      "tauMAE": 0.10011032119562202
+    }
+  },
+  "scope": "All tools, certificates, channel properties and traces are synthetic. No manufacturer specifications or energetic material data."
+}

@@ -1,0 +1,37 @@
+{
+  "id": "cementing-c3",
+  "sceneId": "c3",
+  "title": "固井漏失风险与预警优化",
+  "version": "2.0.0",
+  "updated": "2026-11-02",
+  "lessonProtocol": "field-pages-v2",
+  "status": "ready",
+  "entry": "demo/background.html",
+  "tabs": {
+    "background": {
+      "label": "专业背景",
+      "html": "demo/background.html",
+      "view": "background",
+      "height": 1040
+    },
+    "workflow": {
+      "label": "案例流程",
+      "html": "demo/workflow.html",
+      "view": "workflow",
+      "height": 1040
+    },
+    "demo": {
+      "label": "可运行示范",
+      "html": "demo/identify.html",
+      "view": "demo",
+      "height": 1040
+    }
+  },
+  "data": {
+    "kind": "synthetic-teaching",
+    "seed": 202611024,
+    "source": "../assets/cementing/data.js",
+    "provenance": "../tools/cementing/provenance.json"
+  },
+  "template": "m2-gas-case/assets/lesson.css"
+}

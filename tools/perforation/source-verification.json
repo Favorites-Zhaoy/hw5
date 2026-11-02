@@ -1,0 +1,88 @@
+{
+  "verifiedOn": "2026-11-02",
+  "workflow": "nature-academic-search: multi-source-search + citation-verification",
+  "routing": "Academic MCP was not installed. CrossRef REST supplied DOI/title/journal/date metadata; official publisher pages supplied method and scope. Browser fetch of some publisher/API URLs was blocked, while indexed publisher text and direct CrossRef REST were available.",
+  "papers": [
+    {
+      "doi": "10.2118/218838-MS",
+      "title": "Machine Learning Models to Predict Total Skin Factor in Perforated Wells",
+      "journal": "SPE Western Regional Meeting",
+      "published": "2024-04-09",
+      "metadata": "https://api.crossref.org/works/10.2118%2F218838-MS",
+      "primary": "https://doi.org/10.2118/218838-MS",
+      "verification": "CrossRef 200: exact title, journal and 2024 date. Official OnePetro conference listing confirms title, authors, DOI and April 2024 event. Author-uploaded original paper confirms input variables and supervised total-skin target.",
+      "use": "P1: direct background on data-driven total-skin prediction; NOT geometry optimizer validation."
+    },
+    {
+      "doi": "10.3390/en17225558",
+      "title": "Downhole Camera Runs Validate the Capability of Machine Learning Models to Accurately Predict Perforation Entry Hole Diameter",
+      "journal": "Energies",
+      "published": "2024-11-07",
+      "metadata": "https://api.crossref.org/works/10.3390%2Fen17225558",
+      "primary": "https://www.mdpi.com/1996-1073/17/22/5558",
+      "verification": "CrossRef 200 exact metadata plus official publisher abstract/method text: reservoir/completion/tool inputs, camera EHD targets, supervised regressors.",
+      "use": "P2: direct entry-hole regression example. Synthetic length/equivalent-diameter teaching model is explicitly separate."
+    },
+    {
+      "doi": "10.1038/s41598-025-94764-x",
+      "title": "Research and application of rock fracturing pressure prediction method for deep oil reservoirs",
+      "journal": "Scientific Reports",
+      "published": "2025-03-25",
+      "metadata": "https://api.crossref.org/works/10.1038%2Fs41598-025-94764-x",
+      "primary": "https://www.nature.com/articles/s41598-025-94764-x",
+      "verification": "CrossRef 200 exact metadata and publisher article. Paper uses mechanical/numerical models, NOT trained AI.",
+      "use": "P2: adjacent professional mechanism only; on-page AI role explicitly states no AI in this paper."
+    },
+    {
+      "doi": "10.3390/pr13103230",
+      "title": "Process-Oriented Dual-Layer Knowledge GraphRAG for Reservoir Engineering Decision Support",
+      "journal": "Processes",
+      "published": "2025-10-10",
+      "metadata": "https://api.crossref.org/works/10.3390%2Fpr13103230",
+      "primary": "https://www.mdpi.com/2227-9717/13/10/3230",
+      "verification": "CrossRef 200 exact metadata and publisher abstract describe instance/domain dual graph and retrieval-augmented generation.",
+      "use": "P3: transfers explicit relations/provenance organization; does not claim reproduction of GraphRAG, LLM or GNN."
+    },
+    {
+      "doi": "10.3969/j.issn.2096-1693.2026.02.043",
+      "title": "Research on a standard knowledge graph for oil and gas equipment integrity based on GraphRAG",
+      "journal": "Petroleum Science Bulletin",
+      "published": "2026-10-31",
+      "primary": "https://sykxtb.cup.edu.cn/EN/10.3969/j.issn.2096-1693.2026.02.043",
+      "verification": "Official journal page: 2026 11(5), 1599–1611; online 2026-10-15, published 2026-10-31; title, DOI, method and scope read directly.",
+      "use": "P3: cross-document equipment-standard evidence paths; synthetic A/B/C graph is independent and not an actual standard repository."
+    },
+    {
+      "doi": "10.1111/jpg.70055",
+      "title": "AI-Guided Ensemble Modeling for Optimized Well Test Analysis to Unlock Exploration Targets and Narrow Down Uncertainty in Volumetric Assessment",
+      "journal": "Journal of Petroleum Geology",
+      "published": "2026-03-12",
+      "metadata": "https://api.crossref.org/works/10.1111%2Fjpg.70055",
+      "primary": "https://onlinelibrary.wiley.com/doi/10.1111/jpg.70055",
+      "verification": "CrossRef 200 and full publisher abstract: ensemble pressure matching, neural-network/random-forest assistance, proxy refinement of skin/productivity index. First online March 2026, print July 2026.",
+      "use": "P1/P4: adjacent response matching and non-uniqueness context; not reproduction of the reservoir ensemble."
+    },
+    {
+      "doi": "10.1016/j.aiig.2025.100126",
+      "title": "On the application of machine learning algorithms in predicting the permeability of oil reservoirs",
+      "journal": "Artificial Intelligence in Geosciences",
+      "published": "2025-12",
+      "metadata": "https://api.crossref.org/works/10.1016%2Fj.aiig.2025.100126",
+      "primary": "https://www.sciencedirect.com/science/article/pii/S266654412500022X",
+      "verification": "CrossRef 200 exact metadata and official publisher abstract: well-test/pressure-recovery data, supervised regressors, permeability prediction.",
+      "use": "P4: adjacent well-test parameter regression; independent lumped synthetic forward/inverse model on page."
+    }
+  ],
+  "officialGlossary": [
+    "https://glossary.slb.com/en/terms/p/perforation",
+    "https://glossary.slb.com/en/terms/p/perforation_density",
+    "https://glossary.slb.com/Terms/p/perforation_penetration.aspx",
+    "https://glossary.slb.com/Terms/p/perforation_phasing.aspx",
+    "https://glossary.slb.com/terms/s/skin",
+    "https://glossary.slb.com/en/terms/e/entrance_hole",
+    "https://glossary.slb.com/en/terms/c/crushed_zone",
+    "https://glossary.slb.com/Terms/c/completion.aspx",
+    "https://glossary.slb.com/en/terms/p/pressure_transient_analysis"
+  ],
+  "excluded": "No patents used as scientific validation; no manufacturer claims, energetic-material inputs, internal tool constructions or field-performance metrics were copied into the teaching data."
+}

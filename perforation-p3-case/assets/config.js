@@ -1,0 +1,17 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "perforation-p3",
+  "sceneId": "p3",
+  "title": "工具适配知识图谱",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "kg"
+  ],
+  "dataKind": "synthetic-teaching"
+};

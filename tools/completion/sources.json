@@ -1,0 +1,211 @@
+[
+  {
+    "doi": "10.1016/j.petsci.2025.09.031",
+    "title": "Mechanism-guided data-driven model for optimized completion design",
+    "journal": "Petroleum Science",
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          12
+        ]
+      ]
+    },
+    "print": {
+      "date-parts": [
+        [
+          2025,
+          12
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.1016/j.petsci.2025.09.031",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.1016/j.rineng.2026.110420",
+    "title": "Interpretable mechanism-guided and data-driven model for completion design",
+    "journal": "Results in Engineering",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          6
+        ]
+      ]
+    },
+    "print": {
+      "date-parts": [
+        [
+          2026,
+          6
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.1016/j.rineng.2026.110420",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.3390/en17225558",
+    "title": "Downhole Camera Runs Validate the Capability of Machine Learning Models to Accurately Predict Perforation Entry Hole Diameter",
+    "journal": "Energies",
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          11,
+          7
+        ]
+      ]
+    },
+    "online": {
+      "date-parts": [
+        [
+          2024,
+          11,
+          7
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.3390/en17225558",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.1016/j.petsci.2026.03.049",
+    "title": "Physics-informed machine learning for sustained casing pressure diagnostics and root cause analysis for well integrity",
+    "journal": "Petroleum Science",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          9
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.1016/j.petsci.2026.03.049",
+    "publisherUrl": "https://www.sciencedirect.com/science/article/pii/S1995822626001743",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Primary publisher indexed page/abstract: Petroleum Science 23(9), September 2026, 5636–5647. DOI resolves to publisher PII S1995822626001743. Crossref recheck had connection timeout; full publisher open was restricted. Do not claim full-text verification."
+  },
+  {
+    "doi": "10.3390/app15062899",
+    "title": "Innovative Approach Integrating Machine Learning Models for Coiled Tubing Fatigue Modeling",
+    "journal": "Applied Sciences",
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          7
+        ]
+      ]
+    },
+    "online": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          7
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.3390/app15062899",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.1007/s13202-025-01964-2",
+    "title": "Integrating inflow control valve control with LSTM networks for oil production forecasting in horizontal intelligent well application",
+    "journal": "Journal of Petroleum Exploration and Production Technology",
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          2,
+          25
+        ]
+      ]
+    },
+    "online": {
+      "date-parts": [
+        [
+          2025,
+          2,
+          25
+        ]
+      ]
+    },
+    "print": {
+      "date-parts": [
+        [
+          2025,
+          3
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.1007/s13202-025-01964-2",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.3390/pr12010110",
+    "title": "Oil Production Optimization Using Q-Learning Approach",
+    "journal": "Processes",
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          1,
+          2
+        ]
+      ]
+    },
+    "online": {
+      "date-parts": [
+        [
+          2024,
+          1,
+          2
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.3390/pr12010110",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  },
+  {
+    "doi": "10.1016/j.egyr.2025.108983",
+    "title": "Scalable and adaptive injection-production control in reservoirs via a multi-agent reinforcement learning approach",
+    "journal": "Energy Reports",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          6
+        ]
+      ]
+    },
+    "print": {
+      "date-parts": [
+        [
+          2026,
+          6
+        ]
+      ]
+    },
+    "url": "https://doi.org/10.1016/j.egyr.2025.108983",
+    "type": "journal-article",
+    "verified": "2026-11-02",
+    "method": "Crossref registered metadata + publisher search/abstract. DOI year is not assumed to equal publication year."
+  }
+]

@@ -1,0 +1,18 @@
+/* Generated package metadata. */
+window.LESSON_CONFIG={
+  "id": "completion-co1",
+  "sceneId": "co1",
+  "title": "完井方案智能选择",
+  "version": "2.0.0",
+  "lessonProtocol": "field-pages-v2",
+  "pages": {
+    "background": "background.html",
+    "workflow": "workflow.html",
+    "demo": "identify.html"
+  },
+  "methods": [
+    "kg",
+    "opt"
+  ],
+  "dataKind": "synthetic-teaching"
+};

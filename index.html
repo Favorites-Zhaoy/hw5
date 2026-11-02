@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="course-release" content="20261102-field-templates2">
+<meta name="course-release" content="20261103-three-stages1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>石油勘探开发的智能化可能性地图</title>
 <meta name="description" content="按石油作业链条逐环节展示可被深度学习改造的候选场景，标注 AI 介入点、数据条件与难度等级；带可运行的案例示范。">
@@ -28,6 +28,9 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <link rel="stylesheet" href="assets/geology/reference.css?v=20261102-wide-warm1">
 <link rel="stylesheet" href="assets/drilling/stage-map.css?v=20261102-field-templates2">
 <link rel="stylesheet" href="assets/welllog/stage-map.css?v=20261102-field-templates2">
+<link rel="stylesheet" href="assets/cementing/stage-map.css?v=20261103-three-stages1">
+<link rel="stylesheet" href="assets/completion/stage-map.css?v=20261103-three-stages1">
+<link rel="stylesheet" href="assets/perforation/stage-map.css?v=20261103-three-stages1">
 <link rel="icon" href="assets/images/favicon.svg?v=20261102-wide-warm1" type="image/svg+xml">
 <link rel="stylesheet" href="assets/seismic/seismic.css?v=20261102-seismic5">
 </head>
@@ -60,7 +63,7 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
      10. mudlogging.js  录井环节交互图解
      11. shell.js       外壳，必须最后
      ========================================================= -->
-<script src="assets/data.js?v=20261102-field-templates2"></script>
+<script src="assets/data.js?v=20261103-three-stages1"></script>
 <script src="assets/core/registry.js?v=20261102-wide-warm1"></script>
 <script src="assets/core/kit.js?v=20261102-wide-warm1"></script>
 
@@ -94,6 +97,29 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <script src="assets/welllog/lessons.js?v=20261102-field-templates2"></script>
 <script src="assets/cases/welllog.case.js?v=20261102-field-templates2"></script>
 
+<!-- 固井、完井与射孔：三张图解首页，十二个独立案例包。CO2/P1共享冻结的响应模型。 -->
+<script src="assets/shared-perforation/data.js?v=20261103-three-stages1"></script>
+<script src="assets/shared-perforation/core.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/content.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/core.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/data.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/lesson-figures.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/lessons.js?v=20261103-three-stages1"></script>
+<script src="assets/cementing/stage.js?v=20261103-three-stages1"></script>
+<script src="assets/cases/cementing.case.js?v=20261103-three-stages1"></script>
+<script src="assets/completion/content.js?v=20261103-three-stages1"></script>
+<script src="assets/completion/data.js?v=20261103-three-stages1"></script>
+<script src="assets/completion/core.js?v=20261103-three-stages1"></script>
+<script src="assets/completion/lessons.js?v=20261103-three-stages1"></script>
+<script src="assets/completion/stage.js?v=20261103-three-stages1"></script>
+<script src="assets/cases/completion.case.js?v=20261103-three-stages1"></script>
+<script src="assets/perforation/content.js?v=20261103-three-stages1"></script>
+<script src="assets/perforation/data.js?v=20261103-three-stages1"></script>
+<script src="assets/perforation/core.js?v=20261103-three-stages1"></script>
+<script src="assets/perforation/lessons.js?v=20261103-three-stages1"></script>
+<script src="assets/perforation/stage.js?v=20261103-three-stages1"></script>
+<script src="assets/cases/perforation.case.js?v=20261103-three-stages1"></script>
+
 <!-- 上传的案例包（localStorage）在这里恢复注册，必须在 shell.js 之前 -->
 <script src="assets/seismic/content.js?v=20261102-seismic5"></script>
 <script src="assets/seismic/data.js?v=20261102-seismic5"></script>
@@ -112,7 +138,7 @@ if (/^#\/stage\/mudlogging(?:\?|$)/.test(location.hash)) {
 <script src="assets/core/course-outline.js?v=20261102-arrow-center1"></script>
 <script src="assets/core/home.js?v=20261102-wide-warm1"></script>
 <script src="assets/core/mudlogging.js?v=20261102-wide-warm1"></script>
-<script src="assets/core/shell.js?v=20261102-seismic5"></script>
+<script src="assets/core/shell.js?v=20261103-three-stages1"></script>
 
 </body>
 </html>
