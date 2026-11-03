@@ -1745,20 +1745,208 @@
       "sha256": "e1babcab9c1632c46bb322522718e73b1fcdcb814957098ca554e1ac3cff77f0"
     },
     "lessons.js": {
-      "bytes": 56119,
-      "sha256": "7100746207e4a67300a4c5e451a6153e936cbab5f6965302a9922eecc78ee163"
+      "bytes": 56084,
+      "sha256": "85ecec2ed9b5e553ae5460be02f01b1938b931266f3023f1a3ae632ba6dc69d7"
     },
     "stage.js": {
-      "bytes": 57582,
-      "sha256": "f77625226d0c927e7ef27777049405ba3aee545175df46bb36349653bc9ed695"
+      "bytes": 57648,
+      "sha256": "e668da8b85ab85398a93fe3d64d5dc5a09ec95546f9a83b5b2849c1084aaf987"
     },
     "content.js": {
-      "bytes": 126827,
-      "sha256": "06ac26cc4e8913d037e5ab13b9ff3cdeca2aaaab79cb5c29e9535cee8e5d4dfd"
+      "bytes": 127874,
+      "sha256": "72920d297665e95c46256944b15860d68a0e7ce5e5c12ef54302a1099611576c"
     },
     "operations.css": {
       "bytes": 12986,
       "sha256": "cf64ad22e29fc679bf928f7b85357e048951e13877d417c198b7855b99142b3b"
+    }
+  },
+  "illustrations": {
+    "styleVersion": 2,
+    "tool": "built-in image_gen",
+    "references": [
+      {
+        "file": "assets/images/mudlogging-process.png",
+        "bytes": 2565940,
+        "sha256": "021c8c3ba7975f320d929c20c05b36681602a4e41833a31163d476ee2d00c8e6"
+      },
+      {
+        "file": "assets/images/geology/geology-process-v2.png",
+        "bytes": 3162765,
+        "sha256": "80816fcd1bc45329c3052e12cc7f688407c445f1c3d9ae8323ab802b7451595b"
+      },
+      {
+        "file": "assets/images/seismic/seismic-process-v1.png",
+        "bytes": 3051390,
+        "sha256": "e74955e06b89d762bbd41a2ed80cfb7f84e3aa3cf63080eead637e5998b0e061"
+      }
+    ],
+    "stages": {
+      "production": {
+        "canvas": [
+          1448,
+          1086
+        ],
+        "boxes": [
+          [
+            4,
+            430,
+            294,
+            340
+          ],
+          [
+            306,
+            430,
+            272,
+            340
+          ],
+          [
+            589,
+            430,
+            271,
+            340
+          ],
+          [
+            867,
+            430,
+            286,
+            340
+          ],
+          [
+            1159,
+            430,
+            287,
+            340
+          ]
+        ],
+        "files": [
+          {
+            "file": "assets/images/operations/production-process-v2.png",
+            "bytes": 2007724,
+            "sha256": "d4ae26ccd166caa8e891240270bc51f1fd2c7f627b6a60f4ea64b338132aa4ff"
+          },
+          {
+            "file": "assets/images/operations/production-process-v2.webp",
+            "bytes": 234338,
+            "sha256": "eba15b837bbfa123965df6da0e4c91617ec1cba24ac948bb00ef07a7e519f1f1"
+          },
+          {
+            "file": "assets/images/operations/production-process-v2-small.webp",
+            "bytes": 87084,
+            "sha256": "264039cae35817f84fa053263f56b1de5d480e97d6ecb4819eae768a486511cc"
+          }
+        ]
+      },
+      "workover": {
+        "canvas": [
+          1448,
+          1086
+        ],
+        "boxes": [
+          [
+            4,
+            430,
+            294,
+            360
+          ],
+          [
+            306,
+            430,
+            272,
+            360
+          ],
+          [
+            589,
+            430,
+            271,
+            360
+          ],
+          [
+            867,
+            430,
+            286,
+            360
+          ],
+          [
+            1159,
+            430,
+            287,
+            360
+          ]
+        ],
+        "files": [
+          {
+            "file": "assets/images/operations/workover-process-v2.png",
+            "bytes": 2058344,
+            "sha256": "1a5713a1bff21de45cc949bae021190c9aeb675537bd031dbf61046f9a468070"
+          },
+          {
+            "file": "assets/images/operations/workover-process-v2.webp",
+            "bytes": 267974,
+            "sha256": "6be5c954c46108379b3138b7684330237ef228a56fc9e6b0ea7397a38ad8ab32"
+          },
+          {
+            "file": "assets/images/operations/workover-process-v2-small.webp",
+            "bytes": 94898,
+            "sha256": "f4b4f9e0eab0c21fa0f22469985031a719f037f27b9e1e82881dc82d9c32cfeb"
+          }
+        ]
+      },
+      "eor": {
+        "canvas": [
+          1448,
+          1086
+        ],
+        "boxes": [
+          [
+            4,
+            430,
+            294,
+            345
+          ],
+          [
+            306,
+            430,
+            272,
+            345
+          ],
+          [
+            589,
+            430,
+            271,
+            345
+          ],
+          [
+            867,
+            430,
+            286,
+            345
+          ],
+          [
+            1159,
+            430,
+            287,
+            345
+          ]
+        ],
+        "files": [
+          {
+            "file": "assets/images/operations/eor-process-v2.png",
+            "bytes": 2091770,
+            "sha256": "78dc7cc1849d057be1e60c44f3e29babfeeca5b9d62dfc26460180441fd9a289"
+          },
+          {
+            "file": "assets/images/operations/eor-process-v2.webp",
+            "bytes": 265922,
+            "sha256": "bd24236572a3cd8c49ac59b57266fddac352e5b3f05b1b443c43f7b83fa9ea08"
+          },
+          {
+            "file": "assets/images/operations/eor-process-v2-small.webp",
+            "bytes": 93806,
+            "sha256": "d77f99f598de5b05022462553693df4efba16e4acd84493b86f4423acd475dc1"
+          }
+        ]
+      }
     }
   }
 }

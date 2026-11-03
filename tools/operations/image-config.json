@@ -1,0 +1,121 @@
+{
+  "version": 2,
+  "generationTool": "built-in image_gen",
+  "canvas": [
+    1448,
+    1086
+  ],
+  "style": "录井原图的浅米白留白、微缩等轴设备、橙色小人物、浅彩工位与深蓝文字；结合地质勘察、物探的业务资料关系。",
+  "references": [
+    "assets/images/mudlogging-process.png",
+    "assets/images/geology/geology-process-v2.png",
+    "assets/images/seismic/seismic-process-v1.png"
+  ],
+  "stages": {
+    "production": {
+      "baseName": "production-process-v2",
+      "boxes": [
+        [
+          4,
+          430,
+          294,
+          340
+        ],
+        [
+          306,
+          430,
+          272,
+          340
+        ],
+        [
+          589,
+          430,
+          271,
+          340
+        ],
+        [
+          867,
+          430,
+          286,
+          340
+        ],
+        [
+          1159,
+          430,
+          287,
+          340
+        ]
+      ]
+    },
+    "workover": {
+      "baseName": "workover-process-v2",
+      "boxes": [
+        [
+          4,
+          430,
+          294,
+          360
+        ],
+        [
+          306,
+          430,
+          272,
+          360
+        ],
+        [
+          589,
+          430,
+          271,
+          360
+        ],
+        [
+          867,
+          430,
+          286,
+          360
+        ],
+        [
+          1159,
+          430,
+          287,
+          360
+        ]
+      ]
+    },
+    "eor": {
+      "baseName": "eor-process-v2",
+      "boxes": [
+        [
+          4,
+          430,
+          294,
+          345
+        ],
+        [
+          306,
+          430,
+          272,
+          345
+        ],
+        [
+          589,
+          430,
+          271,
+          345
+        ],
+        [
+          867,
+          430,
+          286,
+          345
+        ],
+        [
+          1159,
+          430,
+          287,
+          345
+        ]
+      ]
+    }
+  }
+}

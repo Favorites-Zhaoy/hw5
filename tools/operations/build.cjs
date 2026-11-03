@@ -1,6 +1,7 @@
 /* Generate only the three operations themes from their reviewed content and retained field template. */
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'../..'),out=path.join(root,'assets/operations');fs.mkdirSync(out,{recursive:true});
+const art=JSON.parse(fs.readFileSync(path.join(__dirname,'image-config.json'),'utf8'));
 const stages={
  production:{name:'采油',en:'PRODUCTION',index:'09',headline:'把每一口井的变化，变成可核对的生产判断',lead:'先理解举升、注水与计量，再看诊断、预测和调配怎样帮助日常生产。',relation:'五项任务共享井号和时间基准，彼此互补；P1—P5是案例编号。配注示例作用于井间总液响应，不代表已完成分层配注。',flow:'生产记录 → 工况候选、预测与约束调配 → 工程复核',top:510,height:304},
  workover:{name:'修井',en:'WORKOVER',index:'10',headline:'围绕同一口井，核对方案、工具与作业风险',lead:'从井筒状态与作业目标出发，认识检索、尺寸匹配、测厚和过程监测的不同任务。',relation:'五项任务围绕同一井筒与作业记录互补，不是必须依次运行的五道工序。W1—W5是案例编号。',flow:'井史与检测资料 → 方案与工具候选 → 现场复核与记录',top:510,height:330},
@@ -9,15 +10,16 @@ const stages={
 const names={cv:['CV','计算机视觉'],ts:['TS','时序分析'],opt:['OPT','约束优化'],nlp:['NLP','自然语言处理'],kg:['KG','知识图谱']};
 const algorithms={pr1:'二维卷积分类＋形状参照',pr2:'因果历史窗口GRU预测',pr3:'非负滞后CRM＋有界配注优化',pr4:'受控工况的时序预测与残差监测',pr5:'正常工况PCA残差监测',wo1:'TF-IDF文本检索＋来源知识关联',wo2:'工具尺寸与可抓取条件图谱',wo3:'超声时频图CNN测厚',wo4:'分工序自回归＋持续残差监测',wo5:'历史申报序列GRU估计',e1:'PKN响应代理＋压力体积约束',e2:'事件密度CNN＋稳健椭圆包络',e3:'高斯过程回归＋浓度约束筛选',e4:'条件GRU＋有限蒸汽方案搜索',e5:'过去传感器窗口GRU软测量'};
 const colors=['#b95739','#497d99','#8b65a0','#6b884b','#3a8c8a'];
-const content=Object.keys(stages).flatMap(stage=>JSON.parse(fs.readFileSync(path.join(__dirname,'content-'+stage+'.json'),'utf8')).map((c,i)=>({...c,algorithm:algorithms[c.id],color:colors[i],artBox:[i*289.6+2,stages[stage].top,285,stages[stage].height]})));
+for(const [id,st] of Object.entries(stages)){const image=art.stages[id];st.image='assets/images/operations/'+image.baseName+'.webp';st.top=image.boxes[0][1];st.height=image.boxes[0][3];}
+const content=Object.keys(stages).flatMap(stage=>JSON.parse(fs.readFileSync(path.join(__dirname,'content-'+stage+'.json'),'utf8')).map((c,i)=>({...c,algorithm:algorithms[c.id],color:colors[i],artImage:stages[stage].image,artBox:art.stages[stage].boxes[i]})));
 fs.writeFileSync(path.join(out,'content.js'),'(function(g){g.OPERATIONS_CONTENT='+JSON.stringify(content)+';g.OPERATIONS_STAGES='+JSON.stringify(stages)+';})(window);\n');
 const source=fs.readFileSync(path.join(root,'assets/seismic/stage.js'),'utf8');
 let result='/* Generated from the retained mudlogging field template. */\nwindow.OperationsStages={};\n';
 for(const [id,st] of Object.entries(stages)){
  const list=content.filter(c=>c.stageId===id),methods=[{id:'',abbr:'ALL',name:'完整关系',note:st.relation},...Object.keys(names).filter(m=>list.some(c=>c.methods.includes(m))).map(m=>({id:m,abbr:names[m][0],name:names[m][1],note:list.filter(c=>c.methods.includes(m)).map(c=>c.id.toUpperCase()+' '+c.short).join(' · ')+'。方法标签解释各任务怎样处理资料，仍需回到业务判断。'}))];
  const tech=list.map((c,i)=>({id:c.id,method:c.methods[0],methods:c.methods,color:c.color,box:c.artBox,art:c.artBox,input:c.input,output:c.output}));
- let s=source.replace(/var IMAGE = [\s\S]*?function relevant/,`var IMAGE='assets/images/operations/${id}-process-v1.webp';\nvar IMAGE_SET='assets/images/operations/${id}-process-v1-small.webp 768w, '+IMAGE+' 1448w';\nvar IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';\nvar WIDTH=1448,HEIGHT=1086;\nvar METHODS=${JSON.stringify(methods)};\nvar TECH=${JSON.stringify(tech)};\nfunction relevant`);
- s=s.replace(/function effect\(t\)\{[\s\S]*?function sceneHref/,`function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 285 ${st.height}" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M32 74H250V${st.height-38}H32Z"/><path class="ml-monitor-scan" d="M33 74V${st.height-38}"/></svg>';}\nfunction sceneHref`);
+ let s=source.replace(/var IMAGE = [\s\S]*?function relevant/,`var IMAGE='assets/images/operations/${art.stages[id].baseName}.webp';\nvar IMAGE_SET='assets/images/operations/${art.stages[id].baseName}-small.webp 768w, '+IMAGE+' 1448w';\nvar IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';\nvar WIDTH=1448,HEIGHT=1086;\nvar METHODS=${JSON.stringify(methods)};\nvar TECH=${JSON.stringify(tech)};\nfunction relevant`);
+ s=s.replace(/function effect\(t\)\{[\s\S]*?function sceneHref/,`function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 '+t.box[2]+' '+t.box[3]+'" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M24 118H'+(t.box[2]-24)+'V'+(t.box[3]-28)+'H24Z"/><path class="ml-monitor-scan" d="M25 118V'+(t.box[3]-28)+'"/></svg>';}\nfunction sceneHref`);
  const paths=tech.map((t,i)=>`flow('M724 ${st.top-52}H${Math.round(t.box[0]+142)}V${st.top}', '${colors[i]}', ${5+i/3}, '${t.id}')`).join('+');
  s=s.replace(/function drawing\(\)\{[\s\S]*?function deck/,`function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+${paths}+'</svg>';}\nfunction deck`);
  s=s.replace('root.dataset.mlMethod = focus;', "root.dataset.mlMethod = focus;root.classList.toggle('has-many-focus', !!focus && TECH.filter(function(t){return relevant(t,focus);}).length>1);");
@@ -37,6 +39,14 @@ fs.writeFileSync(path.join(out,'operations.css'),css.replace(/\r\n/g,'\n'));
 for(const c of content){const file=path.join(out,'data',c.id+'.json');if(!fs.existsSync(file))continue;const d=JSON.parse(fs.readFileSync(file,'utf8'));d.modelSHA256=crypto.createHash('sha256').update(JSON.stringify(d.model)).digest('hex');fs.writeFileSync(file,JSON.stringify(d)+'\n');}
 console.log('Operations: '+content.length+' cases, three stage maps; available data payloads normalized.');
 const integrity={version:1,generated:'2026-11-03',illustrationsUsedForTraining:false,cases:{},assetIntegrity:{}};
+const artifact=file=>{const bytes=fs.readFileSync(path.join(root,file));return {file,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};};
+integrity.illustrations={styleVersion:art.version,tool:art.generationTool,references:art.references.map(artifact),stages:{}};
+for(const [id,image] of Object.entries(art.stages)){
+ const png='assets/images/operations/'+image.baseName+'.png',bytes=fs.readFileSync(path.join(root,png));
+ if(bytes.readUInt32BE(16)!==art.canvas[0]||bytes.readUInt32BE(20)!==art.canvas[1])throw Error('Illustration canvas mismatch: '+png);
+ if(image.boxes.length!==5||image.boxes.some(([x,y,w,h])=>x<0||y<0||w<=0||h<=0||x+w>art.canvas[0]||y+h>art.canvas[1]))throw Error('Invalid illustration hotspots: '+id);
+ integrity.illustrations.stages[id]={canvas:art.canvas,boxes:image.boxes,files:[png,'assets/images/operations/'+image.baseName+'.webp','assets/images/operations/'+image.baseName+'-small.webp'].map(artifact)};
+}
 for(const c of content){const name='data/'+c.id+'.json',file=path.join(out,name);if(!fs.existsSync(file))throw Error('Missing case payload: '+name);const bytes=fs.readFileSync(file),d=JSON.parse(bytes);integrity.cases[c.id]={caseId:c.caseId,methods:c.methods,records:d.records.length,kind:[...new Set(d.records.map(r=>r.kind))],source:d.source,validation:d.validation,modelSHA256:d.modelSHA256};integrity.assetIntegrity[name]={bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};}
 for(const name of ['core.js','experiments.js','lessons.js','stage.js','content.js','operations.css']){const bytes=fs.readFileSync(path.join(out,name));integrity.assetIntegrity[name]={bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};}
 fs.writeFileSync(path.join(out,'provenance.json'),JSON.stringify(integrity,null,2)+'\n');

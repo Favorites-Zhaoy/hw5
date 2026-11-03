@@ -4,12 +4,12 @@ window.OperationsStages={};
 (function (global) {
   'use strict';
 
-  var IMAGE='assets/images/operations/production-process-v1.webp';
-var IMAGE_SET='assets/images/operations/production-process-v1-small.webp 768w, '+IMAGE+' 1448w';
+  var IMAGE='assets/images/operations/production-process-v2.webp';
+var IMAGE_SET='assets/images/operations/production-process-v2-small.webp 768w, '+IMAGE+' 1448w';
 var IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';
 var WIDTH=1448,HEIGHT=1086;
 var METHODS=[{"id":"","abbr":"ALL","name":"完整关系","note":"五项任务共享井号和时间基准，彼此互补；P1—P5是案例编号。配注示例作用于井间总液响应，不代表已完成分层配注。"},{"id":"cv","abbr":"CV","name":"计算机视觉","note":"PR1 示功图诊断。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"ts","abbr":"TS","name":"时序分析","note":"PR2 产量预测 · PR4 电潜泵预警 · PR5 结垢风险。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"opt","abbr":"OPT","name":"约束优化","note":"PR3 注水调配。方法标签解释各任务怎样处理资料，仍需回到业务判断。"}];
-var TECH=[{"id":"pr1","method":"cv","methods":["cv"],"color":"#b95739","box":[2,510,285,304],"art":[2,510,285,304],"input":"同一张示功图的位移—载荷点集及其栅格图；井分组、卡片来源和图形标签随记录保留。","output":"四类形状候选、各类得分和低分复核标记；12张形状示范与全部55张留出图的门槛统计分开展示。"},{"id":"pr2","method":"ts","methods":["ts"],"color":"#497d99","box":[291.6,510,285,304],"art":[291.6,510,285,304],"input":"预测月以前12个月的可销售产油量Sm³/月；日期与原始百万Sm³月总量用于追溯。","output":"下一月产油量预测、实际值、逐月误差，以及相同目标月份的末值与指数递减参照。"},{"id":"pr3","method":"opt","methods":["opt"],"color":"#8b65a0","box":[581.2,510,285,304],"art":[581.2,510,285,304],"input":"5口注水井、4口生产井的对齐合成历史；总配注预算、单井上下限，以及明确给定的代理模型。","output":"各注水井建议量、与均分方案相比的预测总液响应、约束剩余量和可行性状态。"},{"id":"pr4","method":"ts","methods":["ts"],"color":"#6b884b","box":[870.8000000000001,510,285,304],"art":[870.8000000000001,510,285,304],"input":"仿真片段中的时间、电流A、温度°C、压力MPa和频率Hz；每次预测只读取已发生的记录。","output":"下一时刻预测、逐通道残差、汇总异常分数、报警时刻与相对仿真异常起点的检出延迟。"},{"id":"pr5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1160.4,510,285,304],"art":[1160.4,510,285,304],"input":"按时间排列的P-TPT、P-MON-CKP、T-TPT及可用QGL；保留真实井号、原始时间与采样信息。","output":"正常关系的重建残差、异常分数、候选报警，以及相对0/107/7事件阶段的时间对照。"}];
+var TECH=[{"id":"pr1","method":"cv","methods":["cv"],"color":"#b95739","box":[4,430,294,340],"art":[4,430,294,340],"input":"同一张示功图的位移—载荷点集及其栅格图；井分组、卡片来源和图形标签随记录保留。","output":"四类形状候选、各类得分和低分复核标记；12张形状示范与全部55张留出图的门槛统计分开展示。"},{"id":"pr2","method":"ts","methods":["ts"],"color":"#497d99","box":[306,430,272,340],"art":[306,430,272,340],"input":"预测月以前12个月的可销售产油量Sm³/月；日期与原始百万Sm³月总量用于追溯。","output":"下一月产油量预测、实际值、逐月误差，以及相同目标月份的末值与指数递减参照。"},{"id":"pr3","method":"opt","methods":["opt"],"color":"#8b65a0","box":[589,430,271,340],"art":[589,430,271,340],"input":"5口注水井、4口生产井的对齐合成历史；总配注预算、单井上下限，以及明确给定的代理模型。","output":"各注水井建议量、与均分方案相比的预测总液响应、约束剩余量和可行性状态。"},{"id":"pr4","method":"ts","methods":["ts"],"color":"#6b884b","box":[867,430,286,340],"art":[867,430,286,340],"input":"仿真片段中的时间、电流A、温度°C、压力MPa和频率Hz；每次预测只读取已发生的记录。","output":"下一时刻预测、逐通道残差、汇总异常分数、报警时刻与相对仿真异常起点的检出延迟。"},{"id":"pr5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1159,430,287,340],"art":[1159,430,287,340],"input":"按时间排列的P-TPT、P-MON-CKP、T-TPT及可用QGL；保留真实井号、原始时间与采样信息。","output":"正常关系的重建残差、异常分数、候选报警，以及相对0/107/7事件阶段的时间对照。"}];
 function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
  function lessonIntro(t,sc){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===t.id;});return c?c.intro:sc.point;}
   function selected(value) {
@@ -26,7 +26,7 @@ function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
       (WIDTH / box[2] * 100).toFixed(5) + '%;left:' + (-box[0] / box[2] * 100).toFixed(5) +
       '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
   }
-  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 285 304" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M32 74H250V266H32Z"/><path class="ml-monitor-scan" d="M33 74V266"/></svg>';}
+  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 '+t.box[2]+' '+t.box[3]+'" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M24 118H'+(t.box[2]-24)+'V'+(t.box[3]-28)+'H24Z"/><path class="ml-monitor-scan" d="M25 118V'+(t.box[3]-28)+'"/></svg>';}
 function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===id;});return '#/scene/'+id+'?case='+c.caseId+'&amp;tab=bg';}
   function spot(ctx, t, focus) {
     var sc = scene(ctx, t.id), b = t.box, active = focus && relevant(t, focus), esc = ctx.K.esc;
@@ -47,7 +47,7 @@ function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c
           '<animateMotion dur="' + duration + 's" begin="' + (-duration * i / 2) + 's" repeatCount="indefinite" rotate="auto" path="' + path + '"/></g>';
       }).join('') + '</g>';
   }
-  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 458H144V510', '#b95739', 5, 'pr1')+flow('M724 458H434V510', '#497d99', 5.333333333333333, 'pr2')+flow('M724 458H723V510', '#8b65a0', 5.666666666666667, 'pr3')+flow('M724 458H1013V510', '#6b884b', 6, 'pr4')+flow('M724 458H1302V510', '#3a8c8a', 6.333333333333333, 'pr5')+'</svg>';}
+  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 378H146V430', '#b95739', 5, 'pr1')+flow('M724 378H448V430', '#497d99', 5.333333333333333, 'pr2')+flow('M724 378H731V430', '#8b65a0', 5.666666666666667, 'pr3')+flow('M724 378H1009V430', '#6b884b', 6, 'pr4')+flow('M724 378H1301V430', '#3a8c8a', 6.333333333333333, 'pr5')+'</svg>';}
 function deck(ctx, focus) {
     var esc = ctx.K.esc;
     return available(ctx).filter(function (t) { return !focus || relevant(t, focus); }).map(function (t) {
@@ -204,12 +204,12 @@ function deck(ctx, focus) {
 (function (global) {
   'use strict';
 
-  var IMAGE='assets/images/operations/workover-process-v1.webp';
-var IMAGE_SET='assets/images/operations/workover-process-v1-small.webp 768w, '+IMAGE+' 1448w';
+  var IMAGE='assets/images/operations/workover-process-v2.webp';
+var IMAGE_SET='assets/images/operations/workover-process-v2-small.webp 768w, '+IMAGE+' 1448w';
 var IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';
 var WIDTH=1448,HEIGHT=1086;
 var METHODS=[{"id":"","abbr":"ALL","name":"完整关系","note":"五项任务围绕同一井筒与作业记录互补，不是必须依次运行的五道工序。W1—W5是案例编号。"},{"id":"cv","abbr":"CV","name":"计算机视觉","note":"WO3 超声壁厚。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"ts","abbr":"TS","name":"时序分析","note":"WO4 过程预警 · WO5 计划工期。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"nlp","abbr":"NLP","name":"自然语言处理","note":"WO1 修井方案。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"kg","abbr":"KG","name":"知识图谱","note":"WO1 修井方案 · WO2 打捞选型。方法标签解释各任务怎样处理资料，仍需回到业务判断。"}];
-var TECH=[{"id":"wo1","method":"kg","methods":["kg","nlp"],"color":"#b95739","box":[2,510,285,330],"art":[2,510,285,330],"input":"中文或英文查询、已知井况条件，以及真实申报的井号、日期、官方作业代码和简短文本。","output":"有来源链接的候选计划、命中术语、相似度排序，以及约束满足、冲突或缺信息的证据清单。"},{"id":"wo2","method":"kg","methods":["kg"],"color":"#497d99","box":[291.6,510,285,330],"art":[291.6,510,285,330],"input":"落物类别、外径和内径、可接近的抓持面、材料信息；井筒最小通径与课堂指定间隙；有出处的工具规格。","output":"各候选的约束核对卡、排除原因或缺失证据，以及工具与落物的简化几何关系图。"},{"id":"wo3","method":"cv","methods":["cv"],"color":"#8b65a0","box":[581.2,510,285,330],"art":[581.2,510,285,330],"input":"公开仿真的单条超声A扫描、采样间隔和受控几何信息；训练目标为模型已知的壁厚。","output":"回波间隔基线与CNN的壁厚估计（mm）、对同一波形的误差，以及留出管径的整体评估。"},{"id":"wo4","method":"ts","methods":["ts"],"color":"#6b884b","box":[870.8000000000001,510,285,330],"art":[870.8000000000001,510,285,330],"input":"带时间戳的压力、扭矩与已知工序；完整作业段的训练、验证和测试划分。","output":"实时可计算的残差、报警时间和持续区间，以及相对合成异常起点的检出延迟、漏报和误报统计。"},{"id":"wo5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1160.4,510,285,330],"art":[1160.4,510,285,330],"input":"同井严格更早提交的计划日期与预计天数；预测时已经知道的作业上下文另行标明。","output":"下一份申报计划预计天数的中央估计、独立CHECK误差范围、历史基线，以及按日期留出的误差与范围覆盖。"}];
+var TECH=[{"id":"wo1","method":"kg","methods":["kg","nlp"],"color":"#b95739","box":[4,430,294,360],"art":[4,430,294,360],"input":"中文或英文查询、已知井况条件，以及真实申报的井号、日期、官方作业代码和简短文本。","output":"有来源链接的候选计划、命中术语、相似度排序，以及约束满足、冲突或缺信息的证据清单。"},{"id":"wo2","method":"kg","methods":["kg"],"color":"#497d99","box":[306,430,272,360],"art":[306,430,272,360],"input":"落物类别、外径和内径、可接近的抓持面、材料信息；井筒最小通径与课堂指定间隙；有出处的工具规格。","output":"各候选的约束核对卡、排除原因或缺失证据，以及工具与落物的简化几何关系图。"},{"id":"wo3","method":"cv","methods":["cv"],"color":"#8b65a0","box":[589,430,271,360],"art":[589,430,271,360],"input":"公开仿真的单条超声A扫描、采样间隔和受控几何信息；训练目标为模型已知的壁厚。","output":"回波间隔基线与CNN的壁厚估计（mm）、对同一波形的误差，以及留出管径的整体评估。"},{"id":"wo4","method":"ts","methods":["ts"],"color":"#6b884b","box":[867,430,286,360],"art":[867,430,286,360],"input":"带时间戳的压力、扭矩与已知工序；完整作业段的训练、验证和测试划分。","output":"实时可计算的残差、报警时间和持续区间，以及相对合成异常起点的检出延迟、漏报和误报统计。"},{"id":"wo5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1159,430,287,360],"art":[1159,430,287,360],"input":"同井严格更早提交的计划日期与预计天数；预测时已经知道的作业上下文另行标明。","output":"下一份申报计划预计天数的中央估计、独立CHECK误差范围、历史基线，以及按日期留出的误差与范围覆盖。"}];
 function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
  function lessonIntro(t,sc){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===t.id;});return c?c.intro:sc.point;}
   function selected(value) {
@@ -226,7 +226,7 @@ function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
       (WIDTH / box[2] * 100).toFixed(5) + '%;left:' + (-box[0] / box[2] * 100).toFixed(5) +
       '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
   }
-  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 285 330" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M32 74H250V292H32Z"/><path class="ml-monitor-scan" d="M33 74V292"/></svg>';}
+  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 '+t.box[2]+' '+t.box[3]+'" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M24 118H'+(t.box[2]-24)+'V'+(t.box[3]-28)+'H24Z"/><path class="ml-monitor-scan" d="M25 118V'+(t.box[3]-28)+'"/></svg>';}
 function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===id;});return '#/scene/'+id+'?case='+c.caseId+'&amp;tab=bg';}
   function spot(ctx, t, focus) {
     var sc = scene(ctx, t.id), b = t.box, active = focus && relevant(t, focus), esc = ctx.K.esc;
@@ -247,7 +247,7 @@ function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c
           '<animateMotion dur="' + duration + 's" begin="' + (-duration * i / 2) + 's" repeatCount="indefinite" rotate="auto" path="' + path + '"/></g>';
       }).join('') + '</g>';
   }
-  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 458H144V510', '#b95739', 5, 'wo1')+flow('M724 458H434V510', '#497d99', 5.333333333333333, 'wo2')+flow('M724 458H723V510', '#8b65a0', 5.666666666666667, 'wo3')+flow('M724 458H1013V510', '#6b884b', 6, 'wo4')+flow('M724 458H1302V510', '#3a8c8a', 6.333333333333333, 'wo5')+'</svg>';}
+  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 378H146V430', '#b95739', 5, 'wo1')+flow('M724 378H448V430', '#497d99', 5.333333333333333, 'wo2')+flow('M724 378H731V430', '#8b65a0', 5.666666666666667, 'wo3')+flow('M724 378H1009V430', '#6b884b', 6, 'wo4')+flow('M724 378H1301V430', '#3a8c8a', 6.333333333333333, 'wo5')+'</svg>';}
 function deck(ctx, focus) {
     var esc = ctx.K.esc;
     return available(ctx).filter(function (t) { return !focus || relevant(t, focus); }).map(function (t) {
@@ -404,12 +404,12 @@ function deck(ctx, focus) {
 (function (global) {
   'use strict';
 
-  var IMAGE='assets/images/operations/eor-process-v1.webp';
-var IMAGE_SET='assets/images/operations/eor-process-v1-small.webp 768w, '+IMAGE+' 1448w';
+  var IMAGE='assets/images/operations/eor-process-v2.webp';
+var IMAGE_SET='assets/images/operations/eor-process-v2-small.webp 768w, '+IMAGE+' 1448w';
 var IMAGE_SIZES='(max-width:700px) calc(100vw - 28px), 1448px';
 var WIDTH=1448,HEIGHT=1086;
 var METHODS=[{"id":"","abbr":"ALL","name":"完整关系","note":"压裂、化学驱、蒸汽与微生物是不同技术路径；E1—E5是案例编号，不表示依次实施。试验与模拟的范围分别保留。"},{"id":"cv","abbr":"CV","name":"计算机视觉","note":"E2 裂缝形态推断。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"ts","abbr":"TS","name":"时序分析","note":"E4 蒸汽注入情景优化 · E5 微生物产物软测量。方法标签解释各任务怎样处理资料，仍需回到业务判断。"},{"id":"opt","abbr":"OPT","name":"约束优化","note":"E1 压裂参数优化 · E2 裂缝形态推断 · E3 化学驱浓度筛选 · E4 蒸汽注入情景优化。方法标签解释各任务怎样处理资料，仍需回到业务判断。"}];
-var TECH=[{"id":"e1","method":"opt","methods":["opt"],"color":"#b95739","box":[2,520,285,330],"art":[2,520,285,330],"input":"杨氏模量E（GPa）、泊松比ν、固定缝高h（m）、总注入排量Q（m³/s）、注入时间t（s）、流体黏度μ（Pa·s），以及允许的净压力和注入体积上限。","output":"代理预测的裂缝半长（m）、入口开度（mm）和净压力（MPa）；满足约束的参数候选；候选的解析复核结果与代理误差。"},{"id":"e2","method":"cv","methods":["cv","opt"],"color":"#497d99","box":[291.6,520,285,330],"art":[291.6,520,285,330],"input":"模拟事件密度图及其椭圆中心、长短轴和方向标签；真实目录的时间、经纬度、深度与定位标准差，经局部米制坐标转换后形成投影密度图。","output":"模拟留出图上的椭圆参数误差与包络重合度；CNN初值和优化后包络的对照；真实FORGE事件云上的定性包络及定位不确定性提示。"},{"id":"e3","method":"opt","methods":["opt"],"color":"#8b65a0","box":[581.2,520,285,330],"art":[581.2,520,285,330],"input":"聚合物浓度c（mg/L）、岩心渗透率k（10⁻³ μm²），以及希望达到的阻力系数下限；模型输入仅使用c与k。","output":"预测阻力系数及模型不确定性；边界内满足条件的最低浓度候选，或无可行候选提示；按浓度组留出的预测误差。"},{"id":"e4","method":"ts","methods":["ts","opt"],"color":"#6b884b","box":[870.8000000000001,520,285,330],"art":[870.8000000000001,520,285,330],"input":"CSS项目连续月度的产油量Oil（m³/月）与注汽量SteamINJ（15°C冷水当量m³/月），过去的时间顺序，以及明确给定的未来三个月注汽情景和预算。","output":"留出月份的GRU预测、持平基线及误差；各注汽情景下三个月预测产油量与累计值；预算、月间调整和历史范围的可行性检查。"},{"id":"e5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1160.4,520,285,330],"art":[1160.4,520,285,330],"input":"检测时刻t之前24小时的转速（rpm）、温度（°C）和溶氧（%饱和度），按实际时间分别对齐并汇总为24个小时段；不输入当前产物、菌体或其他离线化验。","output":"时刻t的海藻糖脂浓度估计（g/L）、实际检测值与误差；按发酵条件留出的评价；每个输入窗口的观测数量与时间范围。"}];
+var TECH=[{"id":"e1","method":"opt","methods":["opt"],"color":"#b95739","box":[4,430,294,345],"art":[4,430,294,345],"input":"杨氏模量E（GPa）、泊松比ν、固定缝高h（m）、总注入排量Q（m³/s）、注入时间t（s）、流体黏度μ（Pa·s），以及允许的净压力和注入体积上限。","output":"代理预测的裂缝半长（m）、入口开度（mm）和净压力（MPa）；满足约束的参数候选；候选的解析复核结果与代理误差。"},{"id":"e2","method":"cv","methods":["cv","opt"],"color":"#497d99","box":[306,430,272,345],"art":[306,430,272,345],"input":"模拟事件密度图及其椭圆中心、长短轴和方向标签；真实目录的时间、经纬度、深度与定位标准差，经局部米制坐标转换后形成投影密度图。","output":"模拟留出图上的椭圆参数误差与包络重合度；CNN初值和优化后包络的对照；真实FORGE事件云上的定性包络及定位不确定性提示。"},{"id":"e3","method":"opt","methods":["opt"],"color":"#8b65a0","box":[589,430,271,345],"art":[589,430,271,345],"input":"聚合物浓度c（mg/L）、岩心渗透率k（10⁻³ μm²），以及希望达到的阻力系数下限；模型输入仅使用c与k。","output":"预测阻力系数及模型不确定性；边界内满足条件的最低浓度候选，或无可行候选提示；按浓度组留出的预测误差。"},{"id":"e4","method":"ts","methods":["ts","opt"],"color":"#6b884b","box":[867,430,286,345],"art":[867,430,286,345],"input":"CSS项目连续月度的产油量Oil（m³/月）与注汽量SteamINJ（15°C冷水当量m³/月），过去的时间顺序，以及明确给定的未来三个月注汽情景和预算。","output":"留出月份的GRU预测、持平基线及误差；各注汽情景下三个月预测产油量与累计值；预算、月间调整和历史范围的可行性检查。"},{"id":"e5","method":"ts","methods":["ts"],"color":"#3a8c8a","box":[1159,430,287,345],"art":[1159,430,287,345],"input":"检测时刻t之前24小时的转速（rpm）、温度（°C）和溶氧（%饱和度），按实际时间分别对齐并汇总为24个小时段；不输入当前产物、菌体或其他离线化验。","output":"时刻t的海藻糖脂浓度估计（g/L）、实际检测值与误差；按发酵条件留出的评价；每个输入窗口的观测数量与时间范围。"}];
 function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
  function lessonIntro(t,sc){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===t.id;});return c?c.intro:sc.point;}
   function selected(value) {
@@ -426,7 +426,7 @@ function relevant(t,focus){return t.methods.indexOf(focus)>=0;}
       (WIDTH / box[2] * 100).toFixed(5) + '%;left:' + (-box[0] / box[2] * 100).toFixed(5) +
       '%;top:' + (-box[1] / box[3] * 100).toFixed(5) + '%"></span>';
   }
-  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 285 330" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M32 74H250V292H32Z"/><path class="ml-monitor-scan" d="M33 74V292"/></svg>';}
+  function effect(t){return '<svg class="ml-tech-effect" viewBox="0 0 '+t.box[2]+' '+t.box[3]+'" aria-hidden="true"><path class="ml-trace ml-trace-vision" d="M24 118H'+(t.box[2]-24)+'V'+(t.box[3]-28)+'H24Z"/><path class="ml-monitor-scan" d="M25 118V'+(t.box[3]-28)+'"/></svg>';}
 function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c.id===id;});return '#/scene/'+id+'?case='+c.caseId+'&amp;tab=bg';}
   function spot(ctx, t, focus) {
     var sc = scene(ctx, t.id), b = t.box, active = focus && relevant(t, focus), esc = ctx.K.esc;
@@ -447,7 +447,7 @@ function sceneHref(id){var c=global.OPERATIONS_CONTENT.find(function(c){return c
           '<animateMotion dur="' + duration + 's" begin="' + (-duration * i / 2) + 's" repeatCount="indefinite" rotate="auto" path="' + path + '"/></g>';
       }).join('') + '</g>';
   }
-  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 468H144V520', '#b95739', 5, 'e1')+flow('M724 468H434V520', '#497d99', 5.333333333333333, 'e2')+flow('M724 468H723V520', '#8b65a0', 5.666666666666667, 'e3')+flow('M724 468H1013V520', '#6b884b', 6, 'e4')+flow('M724 468H1302V520', '#3a8c8a', 6.333333333333333, 'e5')+'</svg>';}
+  function drawing(){return '<svg class="ml-flows" data-ml-motion viewBox="0 0 1448 1086" aria-hidden="true">'+flow('M724 378H146V430', '#b95739', 5, 'e1')+flow('M724 378H448V430', '#497d99', 5.333333333333333, 'e2')+flow('M724 378H731V430', '#8b65a0', 5.666666666666667, 'e3')+flow('M724 378H1009V430', '#6b884b', 6, 'e4')+flow('M724 378H1301V430', '#3a8c8a', 6.333333333333333, 'e5')+'</svg>';}
 function deck(ctx, focus) {
     var esc = ctx.K.esc;
     return available(ctx).filter(function (t) { return !focus || relevant(t, focus); }).map(function (t) {
