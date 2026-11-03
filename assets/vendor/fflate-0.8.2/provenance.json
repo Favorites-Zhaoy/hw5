@@ -1,0 +1,9 @@
+{
+  "name": "fflate",
+  "version": "0.8.2",
+  "repository": "https://github.com/101arrowz/fflate",
+  "license": "MIT",
+  "tarball": "https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz",
+  "integrity": "sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==",
+  "bundleSHA256": "c3b34f2e9f5e74d4d7d64e01cac7a0c01954c6c406414d42185c7b53d6875ddf"
+}

@@ -1,5 +1,5 @@
 /* =========================================================
-   案例包导入 Case Import（v2：多文件 / 文件夹）
+   案例包导入 Case Import（v2：ZIP / 多文件 / 文件夹）
    ---------------------------------------------------------
    一个「案例包」= 一个文件夹，最少一个清单，其余随便：
 
@@ -11,7 +11,7 @@
                                 「模块模式」的挂载脚本
        demo/*.png|svg|json… 可选。示范用到的素材，自动转 data URL
 
-   流程：下载模板 → 改内容 → 把整个文件夹拖进弹窗 → 校验 → 添加。
+   流程：准备案例包 → 上传ZIP或拖入文件夹 → 校验 → 添加。
    添加后案例存进 localStorage 并注册进 Cases，全站立即可见。
    ========================================================= */
 
@@ -48,6 +48,7 @@
     files: [],        /* 除清单外的示范文件 */
     raw: [],          /* 全部文件（含清单） */
     loading: false,
+    loadSeq: 0,       /* 忽略关闭、清空或重新选择后才完成的读取 */
     el: null,
     pv: null,         /* 预览弹窗 */
     pvHandle: null
@@ -113,19 +114,20 @@
     return new Promise(function (resolve, reject) {
       var name = file.webkitRelativePath || file.name;
       var text = isTextName(name);
+      var mime = file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream');
       var fr = new FileReader();
       fr.onload = function () {
         resolve({
           name: name,
           size: file.size,
-          mime: file.type || MIME[extOf(name)] || (text ? 'text/plain' : 'application/octet-stream'),
+          mime: mime,
           enc: text ? 'text' : 'dataurl',
           data: String(fr.result)
         });
       };
       fr.onerror = function () { reject(new Error('读取失败：' + name)); };
       if (text) fr.readAsText(file, 'utf-8');
-      else fr.readAsDataURL(file);
+      else fr.readAsDataURL(file.type ? file : new Blob([file], { type: mime }));
     });
   }
 
@@ -317,7 +319,7 @@
     files = files || [];
 
     if (!pkg) {
-      err('还没有案例包', '把整个案例文件夹拖进左边，或点「选择文件夹」；最快的方式是先下载模板');
+      err('还没有案例包', '上传一个ZIP，或拖入完整案例文件夹；也可先下载模板');
       return out;
     }
 
@@ -699,7 +701,7 @@
     '怎么用：',
     '',
     '  1. 解压这个包，用编辑器改 case.json 里的 id / sceneId / title 和两块正文。',
-    '  2. 打开网站首页右上角「＋ 添加案例」，把 my-case 整个文件夹拖进弹窗。',
+    '  2. 打开网站「＋ 添加案例」，重新压缩后直接上传ZIP，也可拖入 my-case 整个文件夹。',
     '  3. 右侧会逐项校验，红色错误改完再提交。',
     '',
     '示范的两种写法：',
@@ -880,8 +882,8 @@
 
       '<div class="mdl-b">' +
       '<ol class="imp-flow">' +
-      '<li><b>01</b><span>下载模板，改内容与示范</span></li>' +
-      '<li><b>02</b><span>拖入整个案例文件夹</span></li>' +
+      '<li><b>01</b><span>准备完整案例包</span></li>' +
+      '<li><b>02</b><span>上传ZIP或拖入案例文件夹</span></li>' +
       '<li><b>03</b><span>校验通过后添加</span></li>' +
       '</ol>' +
 
@@ -891,10 +893,12 @@
       '<div class="imp-drop" id="imp-drop">' +
       '<input type="file" id="imp-file" multiple hidden>' +
       '<input type="file" id="imp-dir" webkitdirectory directory multiple hidden>' +
+      '<input type="file" id="imp-zip" accept=".zip,application/zip,application/x-zip-compressed" hidden>' +
       '<span class="imp-ic">↑</span>' +
-      '<b>拖入案例文件夹，或点击选择</b>' +
-      '<span class="imp-sub">清单 case.json + 示范页 + 脚本 + 素材，上限 6 MB。推荐把整个文件夹<b>直接拖进虚线框</b>；若点按钮弹出的仍是文件选择框（浏览器不支持选文件夹），可点「选择文件」后 Ctrl+A 全选包内文件</span>' +
+      '<b>拖入ZIP压缩包或案例文件夹</b>' +
+      '<span class="imp-sub">ZIP无需手动解压，也可选择文件夹或包内文件。请保留 case.json、示范页、脚本与素材，解压后全部文件上限6 MB。</span>' +
       '<span class="imp-choose">' +
+      '<button class="btn sm primary" id="imp-pick-zip" type="button">上传压缩包（ZIP）</button>' +
       '<button class="btn sm" id="imp-pick-files" type="button">选择文件</button>' +
       '<button class="btn sm ghost" id="imp-pick-dir" type="button">选择文件夹</button>' +
       '</span>' +
@@ -965,7 +969,7 @@
   function paintResults(list) {
     var res = q('#imp-res'), cnt = q('#imp-count');
     if (!list.length) {
-      res.innerHTML = '<div class="imp-empty">把案例文件夹拖进来后，这里会逐项显示检查结果。<br>只有 0 项错误才能添加。</div>';
+      res.innerHTML = '<div class="imp-empty">上传ZIP或拖入案例文件夹后，这里会逐项显示检查结果。<br>只有 0 项错误才能添加。</div>';
       cnt.textContent = '未开始';
       cnt.className = 'mono';
       return;
@@ -1041,23 +1045,58 @@
     }).join('');
   }
 
-  /* ---- 载入一组文件 ---- */
+  function beginLoad(message) {
+    var seq = ++S.loadSeq;
+    S.loading = true;
+    S.pkg = null; S.manifest = null; S.files = []; S.raw = [];
+    if (S.pv && !S.pv.hidden) closePreview();
+    document.documentElement.classList.add('mdl-open');
+    paintFiles();
+    paintResults([]);
+    tip(message, '');
+    return seq;
+  }
+  function received(seq, arrs) {
+    if (seq !== S.loadSeq) return;
+    S.loading = false;
+    stripRoot(arrs);
+    adopt(arrs);
+  }
+  function readFailed(seq, title, error) {
+    if (seq !== S.loadSeq) return;
+    S.loading = false;
+    paintResults([{ level: 'error', msg: title, hint: error.message || String(error) }]);
+    tip('读取失败，请按右侧提示重新选择案例包', 'is-err');
+  }
+  function loadZip(file) {
+    var seq = beginLoad('正在解压「' + file.name + '」…');
+    if (!global.CaseZip) { readFailed(seq, 'ZIP组件未加载', new Error('请刷新页面后重试，或先解压再选择文件夹。')); return; }
+    global.CaseZip.read(file).then(function (files) {
+      if (seq !== S.loadSeq) return null;
+      return Promise.all(files.map(readOne));
+    }).then(function (arrs) {
+      if (arrs) received(seq, arrs);
+    }).catch(function (error) { readFailed(seq, 'ZIP读取失败', error); });
+  }
+
+  /* ---- ZIP选择、普通多选和拖入均走同一套校验 / 试跑 / 添加 ---- */
   function loadFiles(fileList) {
     var files = [].slice.call(fileList || []).filter(function (f) { return f && f.name && f.name !== '.DS_Store'; });
     if (!files.length) return;
 
-    if (S.loading) return;
-    S.loading = true;
-    tip('正在读取 ' + files.length + ' 个文件…', '');
+    var zips = files.filter(function (f) { return extOf(f.name) === 'zip'; });
+    if (zips.length === 1 && files.length === 1) { loadZip(zips[0]); return; }
+    if (zips.length && !files.some(function (f) { return /^(case|[a-z0-9._-]+\.case)\.json$/i.test(f.name); })) {
+      var invalid = beginLoad('正在检查选择的文件…');
+      readFailed(invalid, '请一次上传一个案例ZIP', new Error('请选择一个ZIP压缩包，或选择含case.json的完整案例文件夹。'));
+      return;
+    }
+    var seq = beginLoad('正在读取 ' + files.length + ' 个文件…');
 
     Promise.all(files.map(readOne)).then(function (arrs) {
-      S.loading = false;
-      stripRoot(arrs);
-      adopt(arrs);
+      received(seq, arrs);
     }).catch(function (e) {
-      S.loading = false;
-      paintResults([{ level: 'error', msg: '读取文件失败', hint: e.message }]);
-      tip('读取失败，换一个文件夹再试', 'is-err');
+      readFailed(seq, '读取文件失败', e);
     });
   }
 
@@ -1146,7 +1185,7 @@
         { name: 'my-case/demo/demo.js', text: TPL_JS }
       ]);
       download('案例包模板.zip', zip);
-      tip('模板已下载：解压后改内容，再把 my-case 文件夹整个拖回这里', 'is-ok');
+      tip('模板已下载：解压修改后，可重新压缩上传ZIP，也可拖入完整文件夹', 'is-ok');
     } catch (e) {
       tip('打包失败：' + e.message, 'is-err');
     }
@@ -1200,12 +1239,13 @@
 
   /* ---- 提交 ---- */
   function commit() {
+    if (S.loading) { tip('案例包仍在读取，请稍候再添加', ''); return; }
     var meta = metaNow();
     var list = checkAll(S.pkg, meta, S.files);
     paintResults(list);
     var sum = summarize(list);
 
-    if (!S.pkg) { tip('请先拖入案例文件夹', 'is-err'); return; }
+    if (!S.pkg) { tip('请先上传ZIP或选择案例文件夹', 'is-err'); return; }
     if (sum.errors) { tip(sum.errors + ' 项不符合要求，按右侧红色提示修改后再添加', 'is-err'); return; }
 
     saved = saved.filter(function (r) { return r.meta && r.meta.id !== meta.id; });
@@ -1234,7 +1274,7 @@
       if (e.target.closest('[data-close]')) { close(); }
     });
 
-    var drop = q('#imp-drop'), fileIn = q('#imp-file'), dirIn = q('#imp-dir');
+    var drop = q('#imp-drop'), fileIn = q('#imp-file'), dirIn = q('#imp-dir'), zipIn = q('#imp-zip');
 
     /* 有些环境（国产浏览器兼容模式等）解析 innerHTML 时会丢非标准属性，
        或压根不支持 webkitdirectory —— 弹出的仍是普通文件框。这里补一次属性，
@@ -1258,7 +1298,7 @@
     function pickDir() {
       if (HAS_DIR_ATTR) { dirIn.click(); return; }
       if (HAS_FSA) { pickDirFSA(); return; }
-      tip('当前浏览器不支持「选择文件夹」按钮。三个替代办法：' +
+      tip('当前浏览器不支持「选择文件夹」按钮，可直接上传ZIP，或使用三个替代办法：' +
         '① 把整个文件夹直接拖进虚线框（推荐）；' +
         '② 点「选择文件」，在弹出的对话框里进入案例文件夹后 Ctrl+A 全选所有文件；' +
         '③ 改用 Chrome 或 Edge 浏览器。', 'is-err');
@@ -1307,6 +1347,7 @@
        双保险：① 输入框层面拦截冒泡；② 虚线框只响应真实用户点击。 */
     fileIn.addEventListener('click', function (e) { e.stopPropagation(); });
     dirIn.addEventListener('click', function (e) { e.stopPropagation(); });
+    zipIn.addEventListener('click', function (e) { e.stopPropagation(); });
     drop.addEventListener('click', function (e) {
       if (!e.isTrusted) return;
       if (e.target.closest('.btn')) return;
@@ -1315,9 +1356,11 @@
     });
     q('#imp-pick-files').addEventListener('click', function (e) { e.stopPropagation(); fileIn.click(); });
     q('#imp-pick-dir').addEventListener('click', function (e) { e.stopPropagation(); pickDir(); });
+    q('#imp-pick-zip').addEventListener('click', function (e) { e.stopPropagation(); zipIn.click(); });
 
     fileIn.addEventListener('change', function () { loadFiles(fileIn.files); fileIn.value = ''; });
     dirIn.addEventListener('change', function () { loadFiles(dirIn.files); dirIn.value = ''; });
+    zipIn.addEventListener('change', function () { loadFiles(zipIn.files); zipIn.value = ''; });
 
     ['dragenter', 'dragover'].forEach(function (ev) {
       drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('on'); });
@@ -1376,6 +1419,7 @@
     q('#imp-ok').addEventListener('click', commit);
 
     q('#imp-clear').addEventListener('click', function () {
+      S.loadSeq++; S.loading = false;
       S.pkg = null; S.manifest = null; S.files = []; S.raw = [];
       paintFiles();
       paintResults([]);
@@ -1428,9 +1472,11 @@
   }
 
   function reset(opts) {
+    S.loadSeq++; S.loading = false;
     S.pkg = null; S.manifest = null; S.files = []; S.raw = [];
     q('#imp-file').value = '';
     q('#imp-dir').value = '';
+    q('#imp-zip').value = '';
     q('#imp-pack').hidden = true;
     q('#imp-title-in').value = '';
     q('#imp-id').value = '';
@@ -1454,6 +1500,7 @@
 
   function close() {
     if (!S.el) return;
+    S.loadSeq++; S.loading = false;
     closePreview();
     S.el.hidden = true;
     document.documentElement.classList.remove('mdl-open');
