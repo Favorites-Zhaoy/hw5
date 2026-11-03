@@ -48,3 +48,15 @@ assets/operations/*.json text eol=lf
 tools/operations/*.py text eol=lf
 tools/operations/source-data/** -text
 tools/operations/source-data/** whitespace=cr-at-eol
+
+# Stable downstream model, runtime and source snapshot bytes.
+assets/downstream/data/*.json text eol=lf
+assets/downstream/*.js text eol=lf
+assets/downstream/*.css text eol=lf
+assets/downstream/*.json text eol=lf
+tools/downstream/*.py text eol=lf
+tools/downstream/*.js text eol=lf
+tools/downstream/*.cjs text eol=lf
+tools/downstream/*.json text eol=lf
+tools/downstream/source-data/** -text
+tools/downstream/source-data/** whitespace=cr-at-eol

@@ -1,0 +1,550 @@
+{
+  "date": "2026-11-03",
+  "scope": "Transport five cases, original CV/TS/OPT categories retained; fast bounded primary-source research, actual smallCPU models/solvers.",
+  "cases": [
+    {
+      "id": "t1",
+      "source": {
+        "title": "受控压力流量时序；GPLA-12仅提供实测声学研究背景",
+        "url": "https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12",
+        "license": "GPLA代码库EPL-2.0；本课时序独立生成、参数公开"
+      },
+      "scope": "分类与定位都在可复现仿真片段上检验，真实GPLA没有正常/位置真值",
+      "records": 12,
+      "unit": "MPa / m³/h / s / m",
+      "validation": {
+        "split": {
+          "trainEpisodes": 120,
+          "checkEpisodes": 24,
+          "testEpisodes": 36
+        },
+        "metric": "accuracy（仿真事件）",
+        "baseline": 0.83333333,
+        "model": 0.80555556,
+        "n": 36,
+        "modelMetrics": {
+          "accuracy": 0.80555556,
+          "macroF1": 0.80504748,
+          "confusion": [
+            [
+              7,
+              5,
+              0
+            ],
+            [
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              1,
+              11
+            ]
+          ]
+        },
+        "baselineMetrics": {
+          "accuracy": 0.83333333,
+          "macroF1": 0.82909091,
+          "confusion": [
+            [
+              12,
+              0,
+              0
+            ],
+            [
+              0,
+              10,
+              2
+            ],
+            [
+              1,
+              3,
+              8
+            ]
+          ]
+        },
+        "localizationMAE_m": 6.6352297,
+        "baselineLocalizationMAE_m": 12.23850084,
+        "boundary": "定位误差只在12个真实标签为泄漏的受控片段统计，不称现场定位精度；波速和同步被设为已知"
+      },
+      "parityCount": 3,
+      "schema": {
+        "model": "contract GRU,input96x5,hidden8,output3logits; feature order P_left/P_right/Q_in/Q_out/acousticEnergy",
+        "display": "x seconds,channels rows96x5; trueLeakPositionM independent reference,localization predicted separately",
+        "localization": "a=diff(P_left),b=diff(P_right); lag maximizes sum_k a[k]*b[k-lag] over abs(lag)<=floor(L/(c*dt)); x=clip((L+c*lag*dt)/2,0,L)",
+        "defaults": {
+          "recordIndex": 2,
+          "confidence": 0.6,
+          "waveSpeedMPerS": 1000,
+          "pipelineLengthM": 1200,
+          "dtSeconds": 0.05
+        },
+        "boundary": "GPLA is background only; main detector and position validation controlled-synthetic."
+      }
+    },
+    {
+      "id": "t2",
+      "source": {
+        "title": "公开管道缺陷位置地图＋独立受控检测/减薄实验",
+        "url": "https://zenodo.org/records/10809418",
+        "license": "地图CC BY4.0；灰度响应与壁厚时间史为本课受控派生"
+      },
+      "scope": "CV识别与TS减薄预测均实际训练；物理壁厚和时间标签来自明确仿真，不是地图作者实测",
+      "records": 12,
+      "unit": "像素/相对灰度；mm；year",
+      "validation": {
+        "split": {
+          "trainPatchGroups": 18,
+          "checkPatchGroups": 6,
+          "testPatchGroups": 12,
+          "trainMap": 1,
+          "testMap": 2,
+          "trainTimeGroups": 48,
+          "checkTimeGroups": 8,
+          "testTimeGroups": 12
+        },
+        "metric": "accuracy（受控检测图）",
+        "baseline": 0.64583333,
+        "model": 0.96875,
+        "n": 96,
+        "secondaryMAE_mm": 0.04620862,
+        "secondaryBaselineMAE_mm": 0.2664556,
+        "secondaryN": 120,
+        "boundary": "位置地图无壁厚/时间；独立仿真阈值4mm仅供比较剩余时间，不能作为管道安全/维修期限"
+      },
+      "parityCount": 3,
+      "schema": {
+        "model": "contract CNN dims[1,32,32],2logits; secondaryModel contract GRU I2/H8/O1,physical outputmm",
+        "record": "inputflat image,secondaryInput6x2[thicknessmm,timeyear],secondaryTarget nextyear true thickness; no target in corresponding input",
+        "remainingTime": "rate=currentThicknessMm-secondaryPrediction; remaining=(current-threshold)/rate if rate>0 and current>threshold else null; horizon1year",
+        "defaults": {
+          "recordIndex": 0,
+          "confidence": 0.6,
+          "scenarioThresholdMm": 4,
+          "secondaryHorizonYears": 1
+        },
+        "boundary": "Published coordinate maps only. Synthetic grayscale and independent thickness trajectories are not actual repeatedILI."
+      }
+    },
+    {
+      "id": "t3",
+      "source": {
+        "title": "GasLib-11公开测试网络的声明简化代理",
+        "url": "https://gaslib.zib.de/testData.html",
+        "license": "CC BY3.0；按源注释引用Pfetsch等Gas Network Optimization"
+      },
+      "scope": "仅借用GasLib两站编号/流量界限；并联拓扑与压降/能耗关系是显式教学代理，非原11节点全网求解",
+      "records": 7,
+      "unit": "10³m³/h / bar / proxy kW",
+      "validation": {
+        "split": "7个预设需求情景，其中6个可行；不是训练/测试准确率",
+        "metric": "mean feasible proxy power kW",
+        "baseline": 1588.37903213,
+        "model": 1523.00151959,
+        "n": 6,
+        "boundary": "独立二分导数法与SciPy有界求解相互核对；能耗为代理目标，保留不可行情景"
+      },
+      "parityCount": 3,
+      "schema": {
+        "model": "compressor-dispatch,2stations; input[demand,pressureCeiling]",
+        "capacity": "cap_i=min(flowCap_i,sqrt(max(0,ceiling-inletBar_i)/pressureK_i))",
+        "objective": "sum_i idle_i(if q_i>0)+linear_i*q_i+cubic_i*q_i^3; q1+q2=demand,0<=q<=cap",
+        "solver": "Enumerate on/off modes; for bothon q1 in[max(0,D-cap2),min(cap1,D)],q2=D-q1. Derivative=linear1+3cubic1*q1²-linear2-3cubic2*(D-q1)²; use80bisections,checkendpoints. Keep infeasible if D>sumcap.",
+        "defaults": {
+          "recordIndex": 4,
+          "demand": 900,
+          "pressureCeilingBar": 70
+        },
+        "boundary": "Declared parallel proxy, not full GasLib11 hydraulics; coefficients are labelled assumptions,unitkW is proxy."
+      }
+    },
+    {
+      "id": "t4",
+      "source": {
+        "title": "受控漂移/标定时序；NIST仅作可溯源校准原则背景",
+        "url": "https://www.nist.gov/publications/gas-flow-standards-and-their-uncertainty",
+        "license": "本课数据独立生成；NIST页面仅引用研究背景"
+      },
+      "scope": "实际递推校正；不给出交接计量认证或现场仪表精度",
+      "records": 12,
+      "unit": "m³/h；min",
+      "validation": {
+        "split": {
+          "trainEpisodes": 30,
+          "testEpisodes": 12,
+          "minutesPerEpisode": 120,
+          "calibrationEveryMinutes": 25
+        },
+        "metric": "MAE（未标定时刻）",
+        "baseline": 0.75326719,
+        "model": 0.45354374,
+        "n": 1380,
+        "rawMAE": 3.30672041,
+        "boundary": "评价排除正在提供参考值的标定点；训练估计q/r，未用留出真值校正或选参"
+      },
+      "parityCount": 3,
+      "schema": {
+        "model": "kalman-drift,state[bias,slope],q/r fitted training episodes",
+        "prediction": "F=[[1,dt],[0,1]],Q=q[[dt³/3,dt²/2],[dt²/2,dt]]; x=Fx,P=FPFᵀ+Q",
+        "update": "if z!=null:H=[1,0],K=P Hᵀ/(P00+r);x=x+K(z-x0);P=(I-KH)P;corrected=reading-x0",
+        "input": "{dtMinutes:1,reading[120],calibrationResidual[120:null_or_reading-reference]}",
+        "defaults": {
+          "recordIndex": 0,
+          "selectedIndex": 119,
+          "dtMinutes": 1,
+          "calibrationEveryMinutes": 25,
+          "q": 9.2e-06,
+          "r": 0.06393247,
+          "initialP": [
+            [
+              4,
+              0
+            ],
+            [
+              0,
+              0.04
+            ]
+          ]
+        },
+        "parity": "expected final[bias,slope,corrected]; independent matrix/scalar implementations",
+        "boundary": "Only calibration residual supplied. Continuous truth is outside inputs; evaluation excludes calibration points."
+      }
+    },
+    {
+      "id": "t5",
+      "source": {
+        "title": "Glasses-in-the-Wild · real visible liquid-level keypoints",
+        "url": "https://zenodo.org/records/17288503",
+        "license": "CC BY4.0；Adriaens、Lips、De Coster、Verleysen、wyffels，2025"
+      },
+      "scope": "真实照片像素→液面位置，手动标定上缘/底缘换算高度；无储罐泄漏标签",
+      "records": 12,
+      "unit": "px（原256px）/ 可见高度比例",
+      "validation": {
+        "split": {
+          "trainSession": "2024-12-16 08h",
+          "checkSessions": [
+            "14h",
+            "16h"
+          ],
+          "testSession": "13h",
+          "trainImages": 227,
+          "checkImages": 15,
+          "testImages": 68
+        },
+        "metric": "liquid-row MAE",
+        "unit": "original256px",
+        "baseline": 25.68676399,
+        "model": 23.95143127,
+        "n": 68,
+        "boundary": "同一公开val源子集重新按拍摄时段分组，非原作者benchmark或跨设备/跨储罐验证；不得把高度比叫体积比"
+      },
+      "parityCount": 3,
+      "schema": {
+        "model": "contract RGB CNN dims[3,32,32],scalar liquidY/256 after outputMean/Scale",
+        "preprocessing": "Real64RGB snapshot pixels0..255 ->bilinear32 ->CHW /255; do not render reference lines into input.",
+        "height": "fill=clip((calibrationBottom-predY)/(calibrationBottom-calibrationTop),0,1); endpoints are manual source keypoints/256",
+        "baseline": "gray=meanRGB;within rows top..bottom, choose max mean(abs(diff_y(gray[:,16:48]))),return(row+.5)/64",
+        "defaults": {
+          "recordIndex": 5,
+          "illumination": 1,
+          "lowHeightThreshold": 0.3,
+          "selection": "Reference fill height closest to0.5 among already fixed12 display records; no score/correctness filter."
+        },
+        "boundary": "Real drinkingglass visiblelevel proxy; no invisible tanklevel,volume,leak or fieldgeneralization labels."
+      }
+    }
+  ],
+  "additionalSchemas": {
+    "t1": {
+      "model": "contract GRU,input96x5,hidden8,output3logits; feature order P_left/P_right/Q_in/Q_out/acousticEnergy",
+      "display": "x seconds,channels rows96x5; trueLeakPositionM independent reference,localization predicted separately",
+      "localization": "a=diff(P_left),b=diff(P_right); lag maximizes sum_k a[k]*b[k-lag] over abs(lag)<=floor(L/(c*dt)); x=clip((L+c*lag*dt)/2,0,L)",
+      "defaults": {
+        "recordIndex": 2,
+        "confidence": 0.6,
+        "waveSpeedMPerS": 1000,
+        "pipelineLengthM": 1200,
+        "dtSeconds": 0.05
+      },
+      "boundary": "GPLA is background only; main detector and position validation controlled-synthetic."
+    },
+    "t2": {
+      "model": "contract CNN dims[1,32,32],2logits; secondaryModel contract GRU I2/H8/O1,physical outputmm",
+      "record": "inputflat image,secondaryInput6x2[thicknessmm,timeyear],secondaryTarget nextyear true thickness; no target in corresponding input",
+      "remainingTime": "rate=currentThicknessMm-secondaryPrediction; remaining=(current-threshold)/rate if rate>0 and current>threshold else null; horizon1year",
+      "defaults": {
+        "recordIndex": 0,
+        "confidence": 0.6,
+        "scenarioThresholdMm": 4,
+        "secondaryHorizonYears": 1
+      },
+      "boundary": "Published coordinate maps only. Synthetic grayscale and independent thickness trajectories are not actual repeatedILI."
+    },
+    "t3": {
+      "model": "compressor-dispatch,2stations; input[demand,pressureCeiling]",
+      "capacity": "cap_i=min(flowCap_i,sqrt(max(0,ceiling-inletBar_i)/pressureK_i))",
+      "objective": "sum_i idle_i(if q_i>0)+linear_i*q_i+cubic_i*q_i^3; q1+q2=demand,0<=q<=cap",
+      "solver": "Enumerate on/off modes; for bothon q1 in[max(0,D-cap2),min(cap1,D)],q2=D-q1. Derivative=linear1+3cubic1*q1²-linear2-3cubic2*(D-q1)²; use80bisections,checkendpoints. Keep infeasible if D>sumcap.",
+      "defaults": {
+        "recordIndex": 4,
+        "demand": 900,
+        "pressureCeilingBar": 70
+      },
+      "boundary": "Declared parallel proxy, not full GasLib11 hydraulics; coefficients are labelled assumptions,unitkW is proxy."
+    },
+    "t4": {
+      "model": "kalman-drift,state[bias,slope],q/r fitted training episodes",
+      "prediction": "F=[[1,dt],[0,1]],Q=q[[dt³/3,dt²/2],[dt²/2,dt]]; x=Fx,P=FPFᵀ+Q",
+      "update": "if z!=null:H=[1,0],K=P Hᵀ/(P00+r);x=x+K(z-x0);P=(I-KH)P;corrected=reading-x0",
+      "input": "{dtMinutes:1,reading[120],calibrationResidual[120:null_or_reading-reference]}",
+      "defaults": {
+        "recordIndex": 0,
+        "selectedIndex": 119,
+        "dtMinutes": 1,
+        "calibrationEveryMinutes": 25,
+        "q": 9.2e-06,
+        "r": 0.06393247,
+        "initialP": [
+          [
+            4,
+            0
+          ],
+          [
+            0,
+            0.04
+          ]
+        ]
+      },
+      "parity": "expected final[bias,slope,corrected]; independent matrix/scalar implementations",
+      "boundary": "Only calibration residual supplied. Continuous truth is outside inputs; evaluation excludes calibration points."
+    },
+    "t5": {
+      "model": "contract RGB CNN dims[3,32,32],scalar liquidY/256 after outputMean/Scale",
+      "preprocessing": "Real64RGB snapshot pixels0..255 ->bilinear32 ->CHW /255; do not render reference lines into input.",
+      "height": "fill=clip((calibrationBottom-predY)/(calibrationBottom-calibrationTop),0,1); endpoints are manual source keypoints/256",
+      "baseline": "gray=meanRGB;within rows top..bottom, choose max mean(abs(diff_y(gray[:,16:48]))),return(row+.5)/64",
+      "defaults": {
+        "recordIndex": 5,
+        "illumination": 1,
+        "lowHeightThreshold": 0.3,
+        "selection": "Reference fill height closest to0.5 among already fixed12 display records; no score/correctness filter."
+      },
+      "boundary": "Real drinkingglass visiblelevel proxy; no invisible tanklevel,volume,leak or fieldgeneralization labels."
+    }
+  },
+  "sourceIndex": "tools/downstream/source-data/transport/source-index.json",
+  "preparationScript": "tools/downstream/prepare-transport.py",
+  "observedSourceFindings": [
+    {
+      "case": "t1",
+      "primaryUrl": "https://arxiv.org/html/2106.10277v1",
+      "finding": "GPLA684x1460,each5s,12conditions=3pressures x2noise x2microphones. Every category collected under leakage; no normal or location truth.",
+      "decision": "Do not fabricate binary ground truth or coordinates. Use it as acquisition-condition background only."
+    },
+    {
+      "case": "t2",
+      "primaryUrl": "https://zenodo.org/records/10809418",
+      "finding": "Archive contains x,y defect/seeds/navigation-map CSVs, not measuredthickness or photographs; API metadata CC BY4.0.",
+      "decision": "Preserve maps as spatialtemplates and label image/time derivatives explicitly controlled."
+    },
+    {
+      "case": "t3",
+      "primaryUrl": "https://gaslib.zib.de/testData.html",
+      "finding": "GasLib11 explicitly artificial testnetwork; CC BY3.0; bothcompressor flowMax1100 in1000m³/h.",
+      "decision": "Use declared reduced parallelproxy, not claim full network solution."
+    },
+    {
+      "case": "t4",
+      "primaryUrl": "https://www.nist.gov/publications/gas-flow-standards-and-their-uncertainty",
+      "finding": "Primary calibration methods and uncertainty background; no public field drift-time truth verified.",
+      "decision": "Controlled calibration episodes, actualKalman, disclose q/r source and no accreditation claim."
+    },
+    {
+      "case": "t5",
+      "primaryUrl": "https://zenodo.org/records/17288503",
+      "finding": "Realphotos and five keypoints; sourceval310. CC BY4.0. Originalshipped annotations.json agrees image filenames; use this instead of CVAT XML oldnames.",
+      "decision": "ActualpixelCNN; splitcapture hours227/15/68; do not equate drinkingglassheight with tankvolume/leaktruth."
+    }
+  ],
+  "verification": {
+    "finitePayloads": true,
+    "requiredRecordFields": true,
+    "cases": {
+      "t1": {
+        "bytes": 164246,
+        "records": 12,
+        "parityMaxDifferences": [
+          1.2321698106276813e-08,
+          7.378089250664743e-09,
+          4.055079383391558e-09
+        ],
+        "validation": {
+          "split": {
+            "trainEpisodes": 120,
+            "checkEpisodes": 24,
+            "testEpisodes": 36
+          },
+          "metric": "accuracy（仿真事件）",
+          "baseline": 0.83333333,
+          "model": 0.80555556,
+          "n": 36,
+          "modelMetrics": {
+            "accuracy": 0.80555556,
+            "macroF1": 0.80504748,
+            "confusion": [
+              [
+                7,
+                5,
+                0
+              ],
+              [
+                1,
+                11,
+                0
+              ],
+              [
+                0,
+                1,
+                11
+              ]
+            ]
+          },
+          "baselineMetrics": {
+            "accuracy": 0.83333333,
+            "macroF1": 0.82909091,
+            "confusion": [
+              [
+                12,
+                0,
+                0
+              ],
+              [
+                0,
+                10,
+                2
+              ],
+              [
+                1,
+                3,
+                8
+              ]
+            ]
+          },
+          "localizationMAE_m": 6.6352297,
+          "baselineLocalizationMAE_m": 12.23850084,
+          "boundary": "定位误差只在12个真实标签为泄漏的受控片段统计，不称现场定位精度；波速和同步被设为已知"
+        }
+      },
+      "t2": {
+        "bytes": 363559,
+        "records": 12,
+        "parityMaxDifferences": [
+          2.9797571077239127e-08,
+          1.3741315002535615e-08,
+          1.8923781208712853e-08
+        ],
+        "validation": {
+          "split": {
+            "trainPatchGroups": 18,
+            "checkPatchGroups": 6,
+            "testPatchGroups": 12,
+            "trainMap": 1,
+            "testMap": 2,
+            "trainTimeGroups": 48,
+            "checkTimeGroups": 8,
+            "testTimeGroups": 12
+          },
+          "metric": "accuracy（受控检测图）",
+          "baseline": 0.64583333,
+          "model": 0.96875,
+          "n": 96,
+          "secondaryMAE_mm": 0.04620862,
+          "secondaryBaselineMAE_mm": 0.2664556,
+          "secondaryN": 120,
+          "boundary": "位置地图无壁厚/时间；独立仿真阈值4mm仅供比较剩余时间，不能作为管道安全/维修期限"
+        }
+      },
+      "t3": {
+        "bytes": 9775,
+        "records": 7,
+        "parityMaxDifferences": [
+          4.9891468734131195e-09,
+          1.9630874703580048e-10,
+          0.0
+        ],
+        "validation": {
+          "split": "7个预设需求情景，其中6个可行；不是训练/测试准确率",
+          "metric": "mean feasible proxy power kW",
+          "baseline": 1588.37903213,
+          "model": 1523.00151959,
+          "n": 6,
+          "boundary": "独立二分导数法与SciPy有界求解相互核对；能耗为代理目标，保留不可行情景"
+        }
+      },
+      "t4": {
+        "bytes": 195614,
+        "records": 12,
+        "parityMaxDifferences": [
+          2.8735200885421364e-09,
+          3.332860785965064e-09,
+          2.5209345722032594e-09
+        ],
+        "validation": {
+          "split": {
+            "trainEpisodes": 30,
+            "testEpisodes": 12,
+            "minutesPerEpisode": 120,
+            "calibrationEveryMinutes": 25
+          },
+          "metric": "MAE（未标定时刻）",
+          "baseline": 0.75326719,
+          "model": 0.45354374,
+          "n": 1380,
+          "rawMAE": 3.30672041,
+          "boundary": "评价排除正在提供参考值的标定点；训练估计q/r，未用留出真值校正或选参"
+        }
+      },
+      "t5": {
+        "bytes": 1001035,
+        "records": 12,
+        "parityMaxDifferences": [
+          4.624385430140876e-09,
+          3.804532466844535e-09,
+          1.9619452729102704e-09
+        ],
+        "validation": {
+          "split": {
+            "trainSession": "2024-12-16 08h",
+            "checkSessions": [
+              "14h",
+              "16h"
+            ],
+            "testSession": "13h",
+            "trainImages": 227,
+            "checkImages": 15,
+            "testImages": 68
+          },
+          "metric": "liquid-row MAE",
+          "unit": "original256px",
+          "baseline": 25.68676399,
+          "model": 23.95143127,
+          "n": 68,
+          "boundary": "同一公开val源子集重新按拍摄时段分组，非原作者benchmark或跨设备/跨储罐验证；不得把高度比叫体积比"
+        }
+      }
+    },
+    "independentParityChecks": 21,
+    "contentStructure": "all5:3concepts,6steps,10terms,5chapters",
+    "snapshotHashesVerified": 9,
+    "hashStage": "Payload bytes are before owner canonicalization/modelSHA packaging; no final whole-file hash claim."
+  },
+  "preparationDependencies": [
+    "numpy",
+    "torch",
+    "scipy",
+    "scikit-learn",
+    "Pillow"
+  ]
+}

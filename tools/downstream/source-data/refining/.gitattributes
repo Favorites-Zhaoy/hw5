@@ -1,0 +1,5 @@
+*.csv -text
+*.txt text eol=lf
+*.json text eol=lf
+README.md text eol=lf
+FCC-LICENSE text eol=lf

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "generationTool": "built-in image_gen",
+  "canvas": [
+    1448,
+    1086
+  ],
+  "style": "沿用录井、物探、地质勘察及已统一采油图的浅色微缩风格",
+  "references": [
+    "assets/images/operations/production-process-v2.png"
+  ],
+  "stages": {
+    "transport": {
+      "baseName": "transport-process-v1",
+      "boxes": [
+        [
+          4,
+          430,
+          290,
+          340
+        ],
+        [
+          306,
+          430,
+          272,
+          340
+        ],
+        [
+          589,
+          430,
+          271,
+          340
+        ],
+        [
+          867,
+          430,
+          286,
+          340
+        ],
+        [
+          1159,
+          430,
+          287,
+          340
+        ]
+      ]
+    },
+    "refining": {
+      "baseName": "refining-process-v1",
+      "boxes": [
+        [
+          4,
+          430,
+          290,
+          340
+        ],
+        [
+          306,
+          430,
+          272,
+          340
+        ],
+        [
+          589,
+          430,
+          271,
+          340
+        ],
+        [
+          867,
+          430,
+          286,
+          340
+        ],
+        [
+          1159,
+          430,
+          287,
+          340
+        ]
+      ],
+      "nativeCanvas": [
+        1449,
+        1086
+      ]
+    }
+  }
+}

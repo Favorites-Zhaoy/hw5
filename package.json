@@ -4,11 +4,12 @@
   "version": "2.0.3",
   "description": "Buildless static teaching site; npm dependencies are for DOM regression checks only.",
   "scripts": {
-    "build": "node tools/build-m1-case.cjs && node tools/build-mudlogging-cases.cjs && node tools/build-drilling-lessons.cjs && node tools/build-welllog.cjs && node tools/build-field-stage-pages.cjs && node tools/build-drilling-case-pages.cjs && node tools/build-welllog-case-pages.cjs && node tools/seismic/rebuild-stage.cjs && node tools/seismic/package-data.cjs && node tools/build-cementing-case-pages.cjs && node tools/build-completion-case-pages.cjs && node tools/build-perforation-case-pages.cjs && node tools/operations/build.cjs",
-    "test": "node --test tests/course-outline.cjs tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs tests/v2-experiments.cjs tests/v2-dom.cjs tests/geology.cjs tests/drilling.cjs tests/welllog.cjs tests/field-integration.cjs tests/drilling-pages.cjs tests/welllog-pages.cjs tests/seismic.cjs tests/cementing-models.cjs tests/cementing-pages.cjs tests/completion.cjs tests/completion-pages.cjs tests/perforation.cjs tests/perforation-pages.cjs tests/three-stages-integration.cjs tests/operations.cjs",
+    "build": "node tools/build-m1-case.cjs && node tools/build-mudlogging-cases.cjs && node tools/build-drilling-lessons.cjs && node tools/build-welllog.cjs && node tools/build-field-stage-pages.cjs && node tools/build-drilling-case-pages.cjs && node tools/build-welllog-case-pages.cjs && node tools/seismic/rebuild-stage.cjs && node tools/seismic/package-data.cjs && node tools/build-cementing-case-pages.cjs && node tools/build-completion-case-pages.cjs && node tools/build-perforation-case-pages.cjs && node tools/operations/build.cjs && node tools/downstream/build.cjs",
+    "test": "node --test tests/course-outline.cjs tests/regression.cjs tests/m1-preview.cjs tests/routes-assets.cjs tests/mudlogging-cases.cjs tests/v2-experiments.cjs tests/v2-dom.cjs tests/geology.cjs tests/drilling.cjs tests/welllog.cjs tests/field-integration.cjs tests/drilling-pages.cjs tests/welllog-pages.cjs tests/seismic.cjs tests/cementing-models.cjs tests/cementing-pages.cjs tests/completion.cjs tests/completion-pages.cjs tests/perforation.cjs tests/perforation-pages.cjs tests/three-stages-integration.cjs tests/operations.cjs tests/downstream.cjs",
     "seismic:prepare": "python tools/seismic/fetch-data.py && python tools/seismic/prepare.py && node tools/seismic/package-data.cjs",
     "seismic:build": "node tools/seismic/rebuild-stage.cjs && node tools/seismic/package-data.cjs",
-    "operations:build": "node tools/operations/build.cjs"
+    "operations:build": "node tools/operations/build.cjs",
+    "downstream:build": "node tools/downstream/build.cjs"
   },
   "devDependencies": {
     "jsdom": "26.1.0"

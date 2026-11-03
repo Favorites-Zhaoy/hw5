@@ -1,0 +1,374 @@
+{
+  "checkedAt": "2026-11-03",
+  "cases": [
+    {
+      "id": "r1",
+      "methods": [
+        "opt"
+      ],
+      "primarySource": {
+        "title": "原创受控馏分分割模型；IDAES蒸馏约束建模背景",
+        "url": "https://idaes-examples.readthedocs.io/en/latest/docs/flowsheets/hda_flowsheet_with_distillation_doc.html",
+        "license": "原创教学模拟，无外部数据复制；IDAES仅作方法背景，未复现其流程模型。"
+      },
+      "research": {
+        "title": "IDAES HDA Flowsheet Simulation and Optimization",
+        "url": "https://idaes-examples.readthedocs.io/en/latest/docs/flowsheets/hda_flowsheet_with_distillation_doc.html",
+        "summary": "官方示例展示如何用蒸馏单元、物性、变量边界及附加约束构建流程优化问题，为本例的目标与约束表达提供方法背景。",
+        "boundary": "该示例分离苯与甲苯，并非本站常减压教学数据。本例未复制或复现其物性与完整流程，只使用独立声明的简化方程。"
+      },
+      "dataBoundary": [
+        "这是常减压背景下的简化教学模型，不含真空系统、塔板MESH、炉管结焦或真实原油物性标定，没有现场验证。",
+        "交叠与相对热负荷都是声明过的教学指标，不是化验不合格率或kWh。所得差值不能称为炼厂实际节能收益。",
+        "参数搜索必须留在样本范围内；最终候选需要独立方程复核，模型预测可行不等于解析复核可行。"
+      ],
+      "columns": {
+        "file": "运行时独立生成的受控分割样本",
+        "input": {
+          "input[0:4]": "cut1°C、cut2°C、回流比、重端分布指数"
+        },
+        "target": {
+          "target[0:5]": "轻/中/重质量百分数、交叠指标、相对热负荷"
+        },
+        "meta": {
+          "group": "完整进料分布组；不是同组点随机拆分"
+        },
+        "excludeFromFeatures": [
+          "目标响应",
+          "优化结果",
+          "分组标签"
+        ],
+        "derived": "physics字段给出全部伪组分与方程；质量分数按守恒构造。"
+      },
+      "actualValidation": {
+        "split": "6 feed-heavy-index groups train720; group.40 validate120; groups.25/.55 test240; all operating samples in a feed group stay together",
+        "metric": "mean absolute normalized response error (%)",
+        "baseline": 0,
+        "model": 3.34895134,
+        "perOutputMAE": [
+          0.183059039,
+          0.26892731,
+          0.2288161,
+          0.229309634,
+          0.00450432871
+        ],
+        "n": 240,
+        "training": {
+          "epochsRun": 1100,
+          "selectedEpoch": 1100,
+          "validationNormalizedMSE": 0.00195076165
+        },
+        "boundary": "Labels come from the declared toy equations; exact reference has zero label error by construction."
+      },
+      "sourceKind": "controlled-synthetic"
+    },
+    {
+      "id": "r2",
+      "methods": [
+        "opt",
+        "ts"
+      ],
+      "primarySource": {
+        "title": "ML-PSE · FCCU normal-operation simulation trajectories",
+        "url": "https://github.com/ML-PSE/Fluid-Catalytic-Cracking-Unit-Dataset-for-Process-Monitoring-Evaluation",
+        "license": "MIT; Copyright2023 Ankur Kumar; LICENSE snapshot retained."
+      },
+      "research": {
+        "title": "An open source fluid catalytic cracker–fractionator model",
+        "url": "https://doi.org/10.1016/j.compchemeng.2022.107900",
+        "summary": "原研究提供集成催化裂化、分馏和调节控制的动态模型。ML-PSE据此生成有明确分钟采样和变量单位的正常与异常运行基准。",
+        "boundary": "本课只用两条正常仿真轨迹训练五产品GRU，不复现完整机理模型，不借用论文或其他模型的成绩。"
+      },
+      "dataBoundary": [
+        "来源是公开流程仿真，不是炼厂实测。两条轨迹共用同一模型及部分初始条件，完整留出轨迹也不能代表跨炼厂验证。",
+        "LN、HN表示轻和重石脑油，不等于已达到出厂标准的成品汽油；该数据没有给出本例可用的干气收率，不补造这一标签。",
+        "候选只是在给定历史下改变当前工况的代理条件响应，不等于装置能瞬时达到该状态。目标权重是教学值，不能当作真实价格或已证实收益。",
+        "所用五个公开信号没有原料密度、残炭或进料组成标签，因此不声称已学习或验证这些原料性质的影响。"
+      ],
+      "columns": {
+        "file": "FCC-NOC_varyingFeedFlow_outputs.csv / FCC-NOC_stableFeedFlow_outputs.csv",
+        "input": {
+          "CSV[1,10,11,24,39]": "feed、Tr、Treg、再生催化剂、回流；序号从0开始"
+        },
+        "target": {
+          "CSV[34:39]": "五产品lb/min，除以CSV[1]*60并乘100"
+        },
+        "meta": {
+          "CSV[0]": "真实仿真minute索引",
+          "sourceRow": "保留源行号；文件名定义运行组"
+        },
+        "excludeFromFeatures": [
+          "五产品流量或收率",
+          "未来产品",
+          "运行组标签"
+        ],
+        "derived": "输入8点每5分钟一条含当前；不补造子分钟记录或干气标签。"
+      },
+      "actualValidation": {
+        "split": {
+          "train": "varying-feed first4days",
+          "validation": "varying-feed day5",
+          "test": "varying-feed days6-7",
+          "transfer": "entire separate stable-feed2day simulation",
+          "counts": [
+            1145,
+            288,
+            576,
+            569
+          ]
+        },
+        "metric": "MAE across5 product yields in percentage points",
+        "baseline": 0.022714399,
+        "model": 0.0872082058,
+        "n": 576,
+        "perOutputMAE": [
+          0.186442459,
+          0.198113213,
+          0.0167783849,
+          0.0113124667,
+          0.0233945052
+        ],
+        "details": {
+          "timeTest": {
+            "n": 576,
+            "modelMAE": 0.0872082058,
+            "baselineMAE": 0.022714399
+          },
+          "separateTrajectory": {
+            "n": 569,
+            "modelMAE": 0.0793132221,
+            "baselineMAE": 0.0212260183
+          }
+        },
+        "training": {
+          "epochsRun": 600,
+          "selectedEpoch": 600,
+          "validationNormalizedMSE": 0.0443150364
+        },
+        "boundary": "Actual simulation minute indices retained. No random windows, no product flows in network inputs; current process conditions are available for same-time soft prediction."
+      },
+      "sourceKind": "published-simulation"
+    },
+    {
+      "id": "r3",
+      "methods": [
+        "ts"
+      ],
+      "primarySource": {
+        "title": "Karapalidou et al. · Bearing vibration metrics",
+        "url": "https://zenodo.org/records/7589904",
+        "license": "CC BY4.0; DOI10.5281/zenodo.7589904"
+      },
+      "research": {
+        "title": "Vibration analysis metrics of a ball bearing during different operational states",
+        "url": "https://zenodo.org/records/7589904",
+        "summary": "原作者公开了6204 2RS轴承的振动与温度指标，注明传感器、名义2分钟间隔以及三种安装润滑条件，适合检查监测方法在条件改变时的表现。",
+        "boundary": "状态标签不是失效时间，本课GRU另行训练。没有把试验台数据当炼厂故障，也不沿用原多分类实验的成绩。"
+      },
+      "dataBoundary": [
+        "真实来源是轴承试验台；迁移到炼化旋转设备只能说明方法，未得到炼厂故障验证。密封与润滑条件同时变化，也不能把差异只归因于润滑。",
+        "原文件只有记录顺序和名义间隔，没有失效时刻、修复记录或完整退化试验，因此不计算剩余寿命。",
+        "评价为减少重复窗口而隔4个源点取一次目标；连续3个评价点不是固定6分钟。门槛只能描述预测失配，需要结合设备工况与人工检查。"
+      ],
+      "columns": {
+        "file": "bearing_vibration_metrics.csv",
+        "input": {
+          "V-RMS": "过去速度RMS m/s",
+          "a-RMS": "过去加速度RMS m/s²",
+          "Temperature": "过去温度°C"
+        },
+        "target": {
+          "next V-RMS": "待到来源观测的速度RMS"
+        },
+        "meta": {
+          "Bearing State": "1/2/3条件标签，仅分块与说明",
+          "sourceRow": "原CSV行号",
+          "relative time": "块内顺序乘名义2分钟，无实际日期"
+        },
+        "excludeFromFeatures": [
+          "当前目标V-RMS",
+          "Bearing State",
+          "跨状态窗口",
+          "失效日期或RUL伪标签"
+        ],
+        "derived": "12点过去窗口，目标每4个源点取一次；正常分区间设置12点净空。"
+      },
+      "actualValidation": {
+        "split": {
+          "train": "state1 positions<2000, windows12, stride4",
+          "validation": "state1 positions2012..2599",
+          "test": "state1 positions>=2612",
+          "transfer": "states2/3 never used to train or set threshold",
+          "counts": [
+            497,
+            147,
+            171
+          ]
+        },
+        "metric": "normal-test next-vibration MAE m/s",
+        "baseline": 9.70695613e-06,
+        "model": 1.51536506e-05,
+        "n": 171,
+        "normalTestThresholdExceedanceRate": 0.0526315789,
+        "training": {
+          "epochsRun": 281,
+          "selectedEpoch": 196,
+          "validationNormalizedMSE": 0.201986328
+        },
+        "boundary": "Grease-state labels are operating-condition labels, not failure-time labels. No RUL or refinery field sensitivity claim."
+      },
+      "sourceKind": "laboratory-measured"
+    },
+    {
+      "id": "r4",
+      "methods": [
+        "nlp",
+        "opt"
+      ],
+      "primarySource": {
+        "title": "原创受控LIMS审核文本、规则与分配任务",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/12123149/",
+        "license": "原创受控教学语料；链接为否定范围方法背景，非现场LIMS数据，未复制论文文本。"
+      },
+      "research": {
+        "title": "NegEx否定范围与带容量的任务指派",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/12123149/",
+        "summary": "NegEx展示了否定触发词与有限作用范围的重要性；OR-Tools官方任务容量示例说明如何把任务大小和人员容量写成约束。本例独立实现字符模型、规则及小规模穷举。",
+        "boundary": "原否定研究来自临床文本，不能直接把其成绩迁移到化验语料。本例仅在原创受控语料上评价，没有现场LIMS准确率证据。"
+      },
+      "dataBoundary": [
+        "审核线、风险值、任务时长和人员容量均为课堂假设，不是法规标准、产品放行条件或真实员工绩效指标。",
+        "断言分类识别文字如何表述，不是证明产品合格。未见超限与一个偏高数值可以同时存在，系统应保留冲突交给复核。",
+        "未知缩写、复杂否定范围和新格式可能解析失败。零匹配、低分与未分配都需明确显示，不能用默认示例的解析结果替代新文本运行。"
+      ],
+      "columns": {
+        "file": "lims-controlled-corpus.json；词表和权重在r4.json",
+        "input": {
+          "display.text": "当前可改文本，必须重新NFKC、转小写、去空白、生成字符1/2-gram",
+          "textPipeline": "训练词表、IDF与L2归一化，未知字符组合忽略"
+        },
+        "target": {
+          "label": "文字断言类别，不是产品是否合格"
+        },
+        "meta": {
+          "family": "整个表达家族一起划分",
+          "id": "源报告编号，不作为额外特征"
+        },
+        "excludeFromFeatures": [
+          "类别字段",
+          "表达家族ID",
+          "默认解析结果",
+          "默认分配结果"
+        ],
+        "derived": "字段抽取保留空白；按单位规则转换后形成任务，再求解当前容量下的分配。"
+      },
+      "actualValidation": {
+        "split": "template-family groups train5×3×16=240; validate1×3×16=48; heldout2×3×16=96; no row-random split",
+        "metric": "assertion accuracy on unseen wording families",
+        "baseline": 0.333333333,
+        "model": 0.5625,
+        "n": 96,
+        "selectedEpoch": 12,
+        "confusion": [
+          [
+            3,
+            5,
+            24
+          ],
+          [
+            12,
+            20,
+            0
+          ],
+          [
+            0,
+            1,
+            31
+          ]
+        ],
+        "boundary": "Synthetic wording and cases; status label is textual assertion, not numeric quality truth. Numeric contradictions intentionally remain review tasks."
+      },
+      "sourceKind": "controlled-synthetic"
+    },
+    {
+      "id": "r5",
+      "methods": [
+        "ts"
+      ],
+      "primarySource": {
+        "title": "Kim & Kwon · Synthetic29-day debutanizer demonstration",
+        "url": "https://github.com/Danny-Taehyun-Kim/debutanizer-hybrid-model",
+        "license": "MIT; original LICENSE and explicit synthetic-data documentation retained."
+      },
+      "research": {
+        "title": "Differentiable Hybrid Model for Debutanizer Distillation · synthetic data",
+        "url": "https://github.com/Danny-Taehyun-Kim/debutanizer-hybrid-model",
+        "summary": "原作者公开混合蒸馏建模代码和29日合成示例，数据说明列出进料、LPG组成、塔压、流量、回流比与真蒸气压单位，并明确区分示例与真实工厂数据。",
+        "boundary": "本课只从该合成示例另建小GRU和Ridge软测量，不复现其完整混合模型，不借用其物理模型成绩，也没有真实LPG厂测验证。"
+      },
+      "dataBoundary": [
+        "来源是物性和操作范围受控的公开合成示例，源作者明确说明没有真实厂测。日样本按设定分布生成，日期排列本身不证明真实过程动力学。",
+        "只有18条训练与5条降负荷测试样本，不足以支撑部署。历史网络与当前工况回归的差异不能自动归因于记忆机制。",
+        "质量目标始终是LPG真蒸气压kgf/cm²；没有辛烷值、闪点或真实化验延迟标签，也不推荐真实产品放行。"
+      ],
+      "columns": {
+        "file": "debutanizer_synthetic_29days.csv",
+        "input": {
+          "Feed_C2_mol%,Feed_C3_mol%,Feed_nC4_mol%": "给定进料摩尔百分数",
+          "F_kmolh": "进料kmol/h",
+          "PIC3000_barg": "塔顶表压barg",
+          "RD_ratio": "回流比"
+        },
+        "target": {
+          "LPG_TVP_kgcm2": "LPG真蒸气压kgf/cm²，保持原名与含义"
+        },
+        "meta": {
+          "Date": "原模拟日期",
+          "Regime": "normal/turndown，仅分区和说明"
+        },
+        "excludeFromFeatures": [
+          "LPG产品组成",
+          "LPG_TVP标签",
+          "Regime类别",
+          "伪造的辛烷值或闪点"
+        ],
+        "derived": "过去两日加当前输入，共3×6；当前质量软测量，不声称提前一天预报。"
+      },
+      "actualValidation": {
+        "split": {
+          "train": "source dates2025-03-03..20,18 windows",
+          "validation": "2025-03-21..24,4 windows",
+          "test": "2025-03-25..29 turndown,5 windows",
+          "counts": [
+            18,
+            4,
+            5
+          ]
+        },
+        "metric": "TVP MAE kgf/cm²",
+        "baseline": 1.20629524,
+        "model": 0.55910548,
+        "n": 5,
+        "training": {
+          "epochsRun": 494,
+          "selectedEpoch": 404,
+          "validationNormalizedMSE": 0.952056825
+        },
+        "boundary": "Only29 independently generated demonstration days; no proof of plant dynamics or out-of-domain generalization. No LPG composition or TVP target is used as input."
+      },
+      "sourceKind": "published-simulation"
+    }
+  ],
+  "sourceIndex": "tools/downstream/source-data/refining/source-index.json",
+  "assetContract": "tools/operations/asset-contract.json",
+  "rejectedSources": [
+    {
+      "source": "Fortuna debutanizer benchmark redistributed in third-party repositories",
+      "reason": "Original data license not clearly established; selected explicitly MIT public synthetic example and preserved its TVP label instead."
+    },
+    {
+      "source": "Processes2018 FCC waste-feed PCA paper",
+      "reason": "Suitable scientific background but no verified small downloadable numerical supplement found quickly; selected directly licensed dynamic FCC benchmark."
+    }
+  ]
+}

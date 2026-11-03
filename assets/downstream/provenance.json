@@ -1,0 +1,623 @@
+{
+  "version": 1,
+  "generated": "2026-11-03",
+  "illustrationsUsedForTraining": false,
+  "cases": {
+    "t1": {
+      "caseId": "t1-pipeline-leak",
+      "methods": [
+        "ts"
+      ],
+      "records": 12,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "受控压力流量时序；GPLA-12仅提供实测声学研究背景",
+        "url": "https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12",
+        "license": "GPLA代码库EPL-2.0；本课时序独立生成、参数公开"
+      },
+      "validation": {
+        "split": {
+          "trainEpisodes": 120,
+          "checkEpisodes": 24,
+          "testEpisodes": 36
+        },
+        "metric": "accuracy（仿真事件）",
+        "baseline": 0.83333333,
+        "model": 0.80555556,
+        "n": 36,
+        "modelMetrics": {
+          "accuracy": 0.80555556,
+          "macroF1": 0.80504748,
+          "confusion": [
+            [
+              7,
+              5,
+              0
+            ],
+            [
+              1,
+              11,
+              0
+            ],
+            [
+              0,
+              1,
+              11
+            ]
+          ]
+        },
+        "baselineMetrics": {
+          "accuracy": 0.83333333,
+          "macroF1": 0.82909091,
+          "confusion": [
+            [
+              12,
+              0,
+              0
+            ],
+            [
+              0,
+              10,
+              2
+            ],
+            [
+              1,
+              3,
+              8
+            ]
+          ]
+        },
+        "localizationMAE_m": 6.6352297,
+        "baselineLocalizationMAE_m": 12.23850084,
+        "boundary": "定位误差只在12个真实标签为泄漏的受控片段统计，不称现场定位精度；波速和同步被设为已知"
+      },
+      "modelSHA256": "273a3560d98c2a40571505ae0c58402c7eea77073a7fa6f860ddb02c41c74cb5"
+    },
+    "t2": {
+      "caseId": "t2-corrosion-assessment",
+      "methods": [
+        "cv",
+        "ts"
+      ],
+      "records": 12,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "公开管道缺陷位置地图＋独立受控检测/减薄实验",
+        "url": "https://zenodo.org/records/10809418",
+        "license": "地图CC BY4.0；灰度响应与壁厚时间史为本课受控派生"
+      },
+      "validation": {
+        "split": {
+          "trainPatchGroups": 18,
+          "checkPatchGroups": 6,
+          "testPatchGroups": 12,
+          "trainMap": 1,
+          "testMap": 2,
+          "trainTimeGroups": 48,
+          "checkTimeGroups": 8,
+          "testTimeGroups": 12
+        },
+        "metric": "accuracy（受控检测图）",
+        "baseline": 0.64583333,
+        "model": 0.96875,
+        "n": 96,
+        "secondaryMAE_mm": 0.04620862,
+        "secondaryBaselineMAE_mm": 0.2664556,
+        "secondaryN": 120,
+        "boundary": "位置地图无壁厚/时间；独立仿真阈值4mm仅供比较剩余时间，不能作为管道安全/维修期限"
+      },
+      "modelSHA256": "226d6920e6d98e3ad14aced578fd771b00cd35637303d09cddce2b3879534ca6"
+    },
+    "t3": {
+      "caseId": "t3-gathering-optimization",
+      "methods": [
+        "opt"
+      ],
+      "records": 7,
+      "kind": [
+        "published-simulation"
+      ],
+      "source": {
+        "title": "GasLib-11公开测试网络的声明简化代理",
+        "url": "https://gaslib.zib.de/testData.html",
+        "license": "CC BY3.0；按源注释引用Pfetsch等Gas Network Optimization"
+      },
+      "validation": {
+        "split": "7个预设需求情景，其中6个可行；不是训练/测试准确率",
+        "metric": "mean feasible proxy power kW",
+        "baseline": 1588.37903213,
+        "model": 1523.00151959,
+        "n": 6,
+        "boundary": "独立二分导数法与SciPy有界求解相互核对；能耗为代理目标，保留不可行情景"
+      },
+      "modelSHA256": "eea4c3e9fb37c7477d4170a05c10c2f1acd367fc8033143f42bfc634fbe79415"
+    },
+    "t4": {
+      "caseId": "t4-meter-drift",
+      "methods": [
+        "ts"
+      ],
+      "records": 12,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "受控漂移/标定时序；NIST仅作可溯源校准原则背景",
+        "url": "https://www.nist.gov/publications/gas-flow-standards-and-their-uncertainty",
+        "license": "本课数据独立生成；NIST页面仅引用研究背景"
+      },
+      "validation": {
+        "split": {
+          "trainEpisodes": 30,
+          "testEpisodes": 12,
+          "minutesPerEpisode": 120,
+          "calibrationEveryMinutes": 25
+        },
+        "metric": "MAE（未标定时刻）",
+        "baseline": 0.75326719,
+        "model": 0.45354374,
+        "n": 1380,
+        "rawMAE": 3.30672041,
+        "boundary": "评价排除正在提供参考值的标定点；训练估计q/r，未用留出真值校正或选参"
+      },
+      "modelSHA256": "592d1184b0b4ec93797a8f25767e9c43b568ce40c5416b4ba476ae34ce2b6334"
+    },
+    "t5": {
+      "caseId": "t5-tank-visible-level",
+      "methods": [
+        "cv"
+      ],
+      "records": 12,
+      "kind": [
+        "field"
+      ],
+      "source": {
+        "title": "Glasses-in-the-Wild · real visible liquid-level keypoints",
+        "url": "https://zenodo.org/records/17288503",
+        "license": "CC BY4.0；Adriaens、Lips、De Coster、Verleysen、wyffels，2025"
+      },
+      "validation": {
+        "split": {
+          "trainSession": "2024-12-16 08h",
+          "checkSessions": [
+            "14h",
+            "16h"
+          ],
+          "testSession": "13h",
+          "trainImages": 227,
+          "checkImages": 15,
+          "testImages": 68
+        },
+        "metric": "liquid-row MAE",
+        "unit": "original256px",
+        "baseline": 25.68676399,
+        "model": 23.95143127,
+        "n": 68,
+        "boundary": "同一公开val源子集重新按拍摄时段分组，非原作者benchmark或跨设备/跨储罐验证；不得把高度比叫体积比"
+      },
+      "modelSHA256": "2fe0258c7403e2439e3282df6af081826657852d0574251de77a8786208ee50d"
+    },
+    "r1": {
+      "caseId": "r1-distillation",
+      "methods": [
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "原创受控馏分分割模型；IDAES蒸馏约束建模背景",
+        "url": "https://idaes-examples.readthedocs.io/en/latest/docs/flowsheets/hda_flowsheet_with_distillation_doc.html",
+        "license": "原创教学模拟，无外部数据复制；IDAES仅作方法背景，未复现其流程模型。"
+      },
+      "validation": {
+        "split": "6 feed-heavy-index groups train720; group.40 validate120; groups.25/.55 test240; all operating samples in a feed group stay together",
+        "metric": "mean absolute normalized response error (%)",
+        "baseline": 0,
+        "model": 3.34895134,
+        "perOutputMAE": [
+          0.183059039,
+          0.26892731,
+          0.2288161,
+          0.229309634,
+          0.00450432871
+        ],
+        "n": 240,
+        "training": {
+          "epochsRun": 1100,
+          "selectedEpoch": 1100,
+          "validationNormalizedMSE": 0.00195076165
+        },
+        "boundary": "Labels come from the declared toy equations; exact reference has zero label error by construction."
+      },
+      "modelSHA256": "feca4b3a7d73a56ef07262e6cb381b1500c29ca23ee7f2456919ede8245452e5"
+    },
+    "r2": {
+      "caseId": "r2-fcc",
+      "methods": [
+        "opt",
+        "ts"
+      ],
+      "records": 6,
+      "kind": [
+        "published-simulation"
+      ],
+      "source": {
+        "title": "ML-PSE · FCCU normal-operation simulation trajectories",
+        "url": "https://github.com/ML-PSE/Fluid-Catalytic-Cracking-Unit-Dataset-for-Process-Monitoring-Evaluation",
+        "license": "MIT; Copyright2023 Ankur Kumar; LICENSE snapshot retained."
+      },
+      "validation": {
+        "split": {
+          "train": "varying-feed first4days",
+          "validation": "varying-feed day5",
+          "test": "varying-feed days6-7",
+          "transfer": "entire separate stable-feed2day simulation",
+          "counts": [
+            1145,
+            288,
+            576,
+            569
+          ]
+        },
+        "metric": "MAE across5 product yields in percentage points",
+        "baseline": 0.022714399,
+        "model": 0.0872082058,
+        "n": 576,
+        "perOutputMAE": [
+          0.186442459,
+          0.198113213,
+          0.0167783849,
+          0.0113124667,
+          0.0233945052
+        ],
+        "details": {
+          "timeTest": {
+            "n": 576,
+            "modelMAE": 0.0872082058,
+            "baselineMAE": 0.022714399
+          },
+          "separateTrajectory": {
+            "n": 569,
+            "modelMAE": 0.0793132221,
+            "baselineMAE": 0.0212260183
+          }
+        },
+        "training": {
+          "epochsRun": 600,
+          "selectedEpoch": 600,
+          "validationNormalizedMSE": 0.0443150364
+        },
+        "boundary": "Actual simulation minute indices retained. No random windows, no product flows in network inputs; current process conditions are available for same-time soft prediction."
+      },
+      "modelSHA256": "2bba3da5f29194bdfa44b42b4a7c5622ede6fccfbbbc3a118453d3015811f6ff"
+    },
+    "r3": {
+      "caseId": "r3-bearing",
+      "methods": [
+        "ts"
+      ],
+      "records": 5,
+      "kind": [
+        "laboratory-measured"
+      ],
+      "source": {
+        "title": "Karapalidou et al. · Bearing vibration metrics",
+        "url": "https://zenodo.org/records/7589904",
+        "license": "CC BY4.0; DOI10.5281/zenodo.7589904"
+      },
+      "validation": {
+        "split": {
+          "train": "state1 positions<2000, windows12, stride4",
+          "validation": "state1 positions2012..2599",
+          "test": "state1 positions>=2612",
+          "transfer": "states2/3 never used to train or set threshold",
+          "counts": [
+            497,
+            147,
+            171
+          ]
+        },
+        "metric": "normal-test next-vibration MAE m/s",
+        "baseline": 0.00000970695613,
+        "model": 0.0000151536506,
+        "n": 171,
+        "normalTestThresholdExceedanceRate": 0.0526315789,
+        "training": {
+          "epochsRun": 281,
+          "selectedEpoch": 196,
+          "validationNormalizedMSE": 0.201986328
+        },
+        "boundary": "Grease-state labels are operating-condition labels, not failure-time labels. No RUL or refinery field sensitivity claim."
+      },
+      "modelSHA256": "d5cc2b6326a2742f950e0333af836df19b8aac132e07c992c3d72f30923fed1f"
+    },
+    "r4": {
+      "caseId": "r4-lims",
+      "methods": [
+        "nlp",
+        "opt"
+      ],
+      "records": 6,
+      "kind": [
+        "controlled-synthetic"
+      ],
+      "source": {
+        "title": "原创受控LIMS审核文本、规则与分配任务",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/12123149/",
+        "license": "原创受控教学语料；链接为否定范围方法背景，非现场LIMS数据，未复制论文文本。"
+      },
+      "validation": {
+        "split": "template-family groups train5×3×16=240; validate1×3×16=48; heldout2×3×16=96; no row-random split",
+        "metric": "assertion accuracy on unseen wording families",
+        "baseline": 0.333333333,
+        "model": 0.5625,
+        "n": 96,
+        "selectedEpoch": 12,
+        "confusion": [
+          [
+            3,
+            5,
+            24
+          ],
+          [
+            12,
+            20,
+            0
+          ],
+          [
+            0,
+            1,
+            31
+          ]
+        ],
+        "boundary": "Synthetic wording and cases; status label is textual assertion, not numeric quality truth. Numeric contradictions intentionally remain review tasks."
+      },
+      "modelSHA256": "ed48c2ff54ddea9542b594784b584a27eba628dc8dcacac16a70fe9db8689a49"
+    },
+    "r5": {
+      "caseId": "r5-quality",
+      "methods": [
+        "ts"
+      ],
+      "records": 5,
+      "kind": [
+        "published-simulation"
+      ],
+      "source": {
+        "title": "Kim & Kwon · Synthetic29-day debutanizer demonstration",
+        "url": "https://github.com/Danny-Taehyun-Kim/debutanizer-hybrid-model",
+        "license": "MIT; original LICENSE and explicit synthetic-data documentation retained."
+      },
+      "validation": {
+        "split": {
+          "train": "source dates2025-03-03..20,18 windows",
+          "validation": "2025-03-21..24,4 windows",
+          "test": "2025-03-25..29 turndown,5 windows",
+          "counts": [
+            18,
+            4,
+            5
+          ]
+        },
+        "metric": "TVP MAE kgf/cm²",
+        "baseline": 1.20629524,
+        "model": 0.55910548,
+        "n": 5,
+        "training": {
+          "epochsRun": 494,
+          "selectedEpoch": 404,
+          "validationNormalizedMSE": 0.952056825
+        },
+        "boundary": "Only29 independently generated demonstration days; no proof of plant dynamics or out-of-domain generalization. No LPG composition or TVP target is used as input."
+      },
+      "modelSHA256": "f1db1b4d7024f1e561560f426921c0a634a549d9629df3f4a66bcc726046a4d2"
+    }
+  },
+  "assetIntegrity": {
+    "data/t1.json": {
+      "bytes": 164328,
+      "sha256": "e8b9554ffd6eb258cdec0142d47c734539a4b750b97fc9e574043c1db002e6b8"
+    },
+    "data/t2.json": {
+      "bytes": 338728,
+      "sha256": "b14fee856dd5552984c25f443897e0a4f5e885b196ff6b16638130781c296880"
+    },
+    "data/t3.json": {
+      "bytes": 9904,
+      "sha256": "da213bcedcfc8515e24f9c6e2b29bebeb10e8e19c7c5c9c64f0465cba4b2cac4"
+    },
+    "data/t4.json": {
+      "bytes": 195786,
+      "sha256": "1fb03409a12263b9278c592cff4760a51d70cd116b631ca5d251a8c0ad0e31d3"
+    },
+    "data/t5.json": {
+      "bytes": 1001217,
+      "sha256": "057c8999ee8bbcd5969b4911cb4e9b2fe3ffbabf518288379be77a2f3e8338b3"
+    },
+    "data/r1.json": {
+      "bytes": 14706,
+      "sha256": "a9b7e98b1605a0ac3c8c612176b479c30bcb0f06420e571e6ae1327686a38415"
+    },
+    "data/r2.json": {
+      "bytes": 30502,
+      "sha256": "897436d849cfd8eccfb55aac16a7fe56e6e401a706241b040476d9b125b1e873"
+    },
+    "data/r3.json": {
+      "bytes": 26855,
+      "sha256": "0f9110d539bb24ee8082c8c5b3eecd4b3d98bcc5c6d6d65193a617a0c91ec076"
+    },
+    "data/r4.json": {
+      "bytes": 131273,
+      "sha256": "106233cc241820bab5f74de115bd1bb652a200f06c05967ef2427e42e04bfa40"
+    },
+    "data/r5.json": {
+      "bytes": 18015,
+      "sha256": "17c9e640efec55d9f4271b313c86a84351b81a92af4d46d7fb53369ad6865b70"
+    },
+    "core.js": {
+      "bytes": 765,
+      "sha256": "cf9a07d33d3bace5948c206955d2a90e0962179cd7949c24b8588b3b35302a7c"
+    },
+    "nlp.js": {
+      "bytes": 6895,
+      "sha256": "906b178aaf71f32fe3b548c5a4b62544a9feeaacd2d4f2265de9eaece578bd72"
+    },
+    "experiments.js": {
+      "bytes": 9175,
+      "sha256": "cedcefddf22459698d250b6e30ba48f3581f6a16fd146970db5901aab4854a63"
+    },
+    "lessons.js": {
+      "bytes": 50555,
+      "sha256": "86cf9d8f7e027a9712327735cedaf8a63483be2431069f50a25d418f6dd03eb3"
+    },
+    "stage.js": {
+      "bytes": 38660,
+      "sha256": "d5aecf640fc28966ce36d4fad3b5c74f1c63a7584fc8d7eed622ec88562c2f09"
+    },
+    "content.js": {
+      "bytes": 76033,
+      "sha256": "4f5e5893b4763e49b819fde93e2c390afc46a628464955cca110a253cc4875d0"
+    },
+    "downstream.css": {
+      "bytes": 12986,
+      "sha256": "c809374d1fd07249421b6500386439c3262d3304912d0f179f06e01b5e8aa631"
+    }
+  },
+  "illustrations": {
+    "styleVersion": 1,
+    "tool": "built-in image_gen",
+    "references": [
+      {
+        "file": "assets/images/operations/production-process-v2.png",
+        "bytes": 2007724,
+        "sha256": "d4ae26ccd166caa8e891240270bc51f1fd2c7f627b6a60f4ea64b338132aa4ff"
+      }
+    ],
+    "stages": {
+      "transport": {
+        "canvas": [
+          1448,
+          1086
+        ],
+        "nativeCanvas": [
+          1448,
+          1086
+        ],
+        "boxes": [
+          [
+            4,
+            430,
+            290,
+            340
+          ],
+          [
+            306,
+            430,
+            272,
+            340
+          ],
+          [
+            589,
+            430,
+            271,
+            340
+          ],
+          [
+            867,
+            430,
+            286,
+            340
+          ],
+          [
+            1159,
+            430,
+            287,
+            340
+          ]
+        ],
+        "files": [
+          {
+            "file": "assets/images/downstream/transport-process-v1.png",
+            "bytes": 2124094,
+            "sha256": "7f41d97948614d16d8b2b7d56b4e92fcb51e5ebcb127fd6ffbc5b4905df299c7"
+          },
+          {
+            "file": "assets/images/downstream/transport-process-v1.webp",
+            "bytes": 256636,
+            "sha256": "07c9b6ff2dcdadbf75d4f628345946cc236af29ecda977594a634ead28e4960f"
+          },
+          {
+            "file": "assets/images/downstream/transport-process-v1-small.webp",
+            "bytes": 84932,
+            "sha256": "a6c62df268e2d25532836bb1009843615332ad41d6a94c6d8033c8ea19ff0d44"
+          }
+        ]
+      },
+      "refining": {
+        "canvas": [
+          1448,
+          1086
+        ],
+        "nativeCanvas": [
+          1449,
+          1086
+        ],
+        "boxes": [
+          [
+            4,
+            430,
+            290,
+            340
+          ],
+          [
+            306,
+            430,
+            272,
+            340
+          ],
+          [
+            589,
+            430,
+            271,
+            340
+          ],
+          [
+            867,
+            430,
+            286,
+            340
+          ],
+          [
+            1159,
+            430,
+            287,
+            340
+          ]
+        ],
+        "files": [
+          {
+            "file": "assets/images/downstream/refining-process-v1.png",
+            "bytes": 1977579,
+            "sha256": "27fe7d6ac1d8438fc4def47cfcc251945a5ee0e99492a68bc264493cfeadf01b"
+          },
+          {
+            "file": "assets/images/downstream/refining-process-v1.webp",
+            "bytes": 231100,
+            "sha256": "baac52bd552e38b460f445ddbf3a33ad8f1c1863fe7ccc1c731e0b924c7858b4"
+          },
+          {
+            "file": "assets/images/downstream/refining-process-v1-small.webp",
+            "bytes": 82472,
+            "sha256": "7e443f393a7e41ca33cf79b39fd9d4ee3e196fa460df15573798a76c55f5bdc5"
+          }
+        ]
+      }
+    }
+  }
+}

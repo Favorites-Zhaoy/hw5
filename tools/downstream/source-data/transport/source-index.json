@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-03",
+  "purpose": "Reproducible transport sources and explicit context-only research evidence; no mudlogging data.",
+  "requiredInputBytes": 3167673,
+  "entries": [
+    {
+      "file": "GasLib-11.net",
+      "originalUrl": "https://gaslib.zib.de/download/testData/GasLib-11-v1-20211130.net",
+      "license": "CC BY3.0; source copyright/citation notice retained",
+      "sourceSHA256": "80b97b511e67446d0c4c5a349177702bd1ad17986864b31434f8e2816752b2b4",
+      "snapshotSHA256": "80b97b511e67446d0c4c5a349177702bd1ad17986864b31434f8e2816752b2b4",
+      "bytes": 11664,
+      "requiredBy": [
+        "t3"
+      ],
+      "transformation": "Exact network XML; no original station performance curves reused as toy energy coefficients."
+    },
+    {
+      "file": "gpla-data.csv",
+      "originalUrl": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/data/data_v1/data.csv",
+      "license": "Repository EPL-2.0; no separate CSV licence located",
+      "sourceSHA256": "00135bf5f4a417d07219dd9cd340dd3834dd2cbb75aea7b11fdacfba2f0fcba1",
+      "snapshotSHA256": "00135bf5f4a417d07219dd9cd340dd3834dd2cbb75aea7b11fdacfba2f0fcba1",
+      "bytes": 3702331,
+      "requiredBy": [],
+      "transformation": "Research evidence: verified684×1460 acoustic rows; all leakage conditions. Not required for model training."
+    },
+    {
+      "file": "gpla-label.csv",
+      "originalUrl": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/data/data_v1/label.csv",
+      "license": "Repository EPL-2.0",
+      "sourceSHA256": "97235dd9abdb0abf3082bb310c96ca300f276b948e15dacf9465b4ef20997332",
+      "snapshotSHA256": "97235dd9abdb0abf3082bb310c96ca300f276b948e15dacf9465b4ef20997332",
+      "bytes": 2223,
+      "requiredBy": [
+        "t1"
+      ],
+      "transformation": "Exact labels1..12,57 each; used for context count only, never normal/leak or location truth."
+    },
+    {
+      "file": "GPLA-LICENSE",
+      "originalUrl": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/LICENSE",
+      "license": "EPL-2.0",
+      "sourceSHA256": "8c349f80764d0648e645f41ef23772a70c995a0924b5235f735f4a3d09df127c",
+      "snapshotSHA256": "8c349f80764d0648e645f41ef23772a70c995a0924b5235f735f4a3d09df127c",
+      "bytes": 14197,
+      "requiredBy": [
+        "t1"
+      ],
+      "transformation": "Original licence notice."
+    },
+    {
+      "file": "GPLA-README.md",
+      "originalUrl": "https://raw.githubusercontent.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12/main/README.md",
+      "license": "EPL-2.0 repository",
+      "sourceSHA256": "be7d2dadb75a3ea565983e92ba6b93dcec838bd46c23f4eab4fa186de4f7ba9f",
+      "snapshotSHA256": "be7d2dadb75a3ea565983e92ba6b93dcec838bd46c23f4eab4fa186de4f7ba9f",
+      "bytes": 946,
+      "requiredBy": [],
+      "transformation": "Original author description."
+    },
+    {
+      "file": "corrosion-coordinate-snapshot.json",
+      "originalUrl": "https://zenodo.org/api/records/10809418/files/data.zip/content",
+      "license": "CC BY4.0",
+      "sourceSHA256": "c21cdaa58954cc2936af3273f5930ca3fcb5dcf8aa7a062a16d02d418bcf2d73",
+      "snapshotSHA256": "8fb641cc3934879cff4bb7719499d297aa7ee9fc117923434ca8c335eac3a666",
+      "bytes": 126706,
+      "requiredBy": [
+        "t2"
+      ],
+      "transformation": "36 source CSV coordinate instances selected by fixed map/level/instance IDs; no physical thickness/time in source.",
+      "attribution": "Faten Aljalaud and Yousef Alohali, King Saud University,2024,DOI10.5281/zenodo.10809418"
+    },
+    {
+      "file": "liquid-pixels-64.npz",
+      "originalUrl": "https://zenodo.org/api/records/17288503/files/glasses_in_the_wild_1000_val.zip/content",
+      "license": "CC BY4.0; Adriaens et al.,2025,Glasses-in-the-Wild",
+      "sourceSHA256": "803731be8727c18166d3bd78bcee61ee9bee80acd9f742f89e510e6b440f9e5d",
+      "snapshotSHA256": "7442aa62789807f93fb364f783d3fb2c190f83aef051ba7cff136795b98a1fae",
+      "bytes": 2902318,
+      "requiredBy": [
+        "t5"
+      ],
+      "transformation": "310 real sourceRGB images bilinearly resized256→64; no model-based filtering or drawn labels. Per-image originalSHA in index."
+    },
+    {
+      "file": "liquid-snapshot-index.json",
+      "originalUrl": "https://zenodo.org/api/records/17288503/files/glasses_in_the_wild_1000_val.zip/content",
+      "license": "CC BY4.0; Adriaens et al.,2025",
+      "sourceSHA256": "803731be8727c18166d3bd78bcee61ee9bee80acd9f742f89e510e6b440f9e5d",
+      "snapshotSHA256": "f62592402c3a4620c7ad2193742929009bdb6f6de641987da920e9141fcbc9c7",
+      "bytes": 110565,
+      "requiredBy": [
+        "t5"
+      ],
+      "transformation": "Source filenames/keypoints/hashes; validity selection uses geometry only."
+    },
+    {
+      "file": "liquid-annotation-source.json",
+      "originalUrl": "https://zenodo.org/api/records/17288503/files/glasses_in_the_wild_1000_val.zip/content",
+      "license": "CC BY4.0; Adriaens et al.,2025",
+      "sourceSHA256": "803731be8727c18166d3bd78bcee61ee9bee80acd9f742f89e510e6b440f9e5d",
+      "snapshotSHA256": "5ba46cc2383380aaec35ee3ce5a2aaac9a3609d02664a18618532fbdec73d5ae",
+      "bytes": 84525,
+      "requiredBy": [],
+      "transformation": "Original author annotations.json from val archive, retained as provenance evidence."
+    }
+  ],
+  "generator": {
+    "file": "tools/downstream/prepare-transport.py",
+    "sha256": "724a0f4785731cb935efeac45c18825a7a88b9b8f45bc109893526856410910a",
+    "scope": "t1 multichannel response,t2 grayscale response and thickness trajectories,t4 meter drift are explicitly project-authored controlled simulations. External data licences do not turn them into field measurements."
+  },
+  "optionalResearchEvidence": "gpla-data.csv,GPLA-README.md,and liquid-annotation-source.json are retained source research evidence,not required by prep; do not confuse them with model inputs."
+}

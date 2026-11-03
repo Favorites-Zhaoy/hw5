@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "requiredInputs": [
+    {
+      "file": "FCC-NOC_stableFeedFlow_outputs.csv",
+      "bytes": 882907,
+      "sha256": "c2f554caff1ed8d6150341e78c86a51c347bc4ef604f8e3fc83ec470076da82c",
+      "originalURL": "https://raw.githubusercontent.com/ML-PSE/Fluid-Catalytic-Cracking-Unit-Dataset-for-Process-Monitoring-Evaluation/main/NOC_stableFeedFlow_outputs.csv",
+      "license": "MIT",
+      "authors": "Ankur Kumar / ML-PSE",
+      "scope": "2880 actual simulation minute rows;47 columns; no header; retain source order."
+    },
+    {
+      "file": "FCC-NOC_varyingFeedFlow_outputs.csv",
+      "bytes": 3090564,
+      "sha256": "2b6f590a5deaef44f70851d42a6c0bb72386ee77fb1520e478b1876f01e988cb",
+      "originalURL": "https://raw.githubusercontent.com/ML-PSE/Fluid-Catalytic-Cracking-Unit-Dataset-for-Process-Monitoring-Evaluation/main/NOC_varyingFeedFlow_outputs.csv",
+      "license": "MIT",
+      "authors": "Ankur Kumar / ML-PSE",
+      "scope": "10080 actual simulation minute rows;47 columns; no header; retain source order."
+    },
+    {
+      "file": "bearing_vibration_metrics.csv",
+      "bytes": 752629,
+      "sha256": "6e016d02af48d0f409e30bf84e6e631593fc6bdaf07db34c840ffad8839a0457",
+      "originalURL": "https://zenodo.org/api/records/7589904/files/bearing_vibration_metrics.csv/content",
+      "license": "CC BY4.0",
+      "authors": "Elisavet Karapalidou; Agisilaos Efraimidis; Stavros Vologiannidis; Efstathios Antoniou",
+      "scope": "8569 laboratory rows,3 contiguous grease-state blocks; nominal2-minute interval; no timestamps."
+    },
+    {
+      "file": "debutanizer_synthetic_29days.csv",
+      "bytes": 5185,
+      "sha256": "7223e2d0ab9f4ac2cd5695bac54ab37885d5fdeab0cbe3d7bc4e95b8094247b2",
+      "originalURL": "https://raw.githubusercontent.com/Danny-Taehyun-Kim/debutanizer-hybrid-model/main/data/debutanizer_synthetic_29days.csv",
+      "license": "MIT",
+      "authors": "Tae Hyun Kim; Joseph Sang-Il Kwon",
+      "scope": "29 explicitly synthetic dated rows;24 normal and5 turndown; no real plant data."
+    }
+  ],
+  "inputBytes": 4731285,
+  "generator": "tools/downstream/prepare-refining.py",
+  "licenses": [
+    "FCC-LICENSE",
+    "debutanizer-MIT-LICENSE.txt"
+  ],
+  "referenceFiles": [
+    "debutanizer-data-format.txt",
+    "debutanizer-source-generator.txt",
+    "README.md"
+  ],
+  "generatedCases": {
+    "r1": "Independent declared pseudo-component fraction-split toy model, no vacuum system or plant validation.",
+    "r4": "Independent controlled bilingual LIMS corpus and classroom review constraints, not actual lab reports."
+  },
+  "fccUnitSource": "https://mlforpse.com/fccu-dataset/",
+  "fccUnitTable": "https://i0.wp.com/mlforpse.com/wp-content/uploads/2023/12/VariableDescription.jpg",
+  "fccColumnMap": {
+    "time": 0,
+    "feed_lb_s": 1,
+    "reactor_F": 10,
+    "regenerator_F": 11,
+    "regenerated_catalyst_lb_min": 24,
+    "reflux_lb_min": 39,
+    "LPG_lb_min": 34,
+    "LN_lb_min": 35,
+    "HN_lb_min": 36,
+    "LCO_lb_min": 37,
+    "Slurry_lb_min": 38
+  },
+  "fccYieldFormula": "100*product_lb_min/(60*feed_lb_s)",
+  "bearingUnitsAsDeposited": {
+    "V-RMS": "m/s",
+    "a-RMS": "m/s2",
+    "a-Peak": "m/s2",
+    "Temperature": "degreeC",
+    "Crest": "dimensionless"
+  },
+  "r5TargetUnit": "LPG_TVP_kgcm2 = true vapor pressure in kgf/cm2; not octane",
+  "allInputFilesUnmodified": true
+}

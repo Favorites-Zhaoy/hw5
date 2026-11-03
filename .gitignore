@@ -7,3 +7,5 @@ tools/operations/**/__pycache__/
 *.log
 .DS_Store
 Thumbs.db
+tools/downstream/__pycache__/
+tools/downstream/**/__pycache__/

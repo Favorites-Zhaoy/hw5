@@ -176,6 +176,9 @@
      五、环节页
      ========================================================= */
   function stageHTML(st, q) {
+    if (global.DownstreamStage && global.DownstreamStage.supports(st.id)) {
+      return global.DownstreamStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
+    }
     if (global.OperationsStage && global.OperationsStage.supports(st.id)) {
       return global.OperationsStage.render({ stage: st, atlas: A, cases: Cases, K: K, query: q });
     }
@@ -1031,7 +1034,9 @@
 
     // 页面级交互
     if (p[0] === 'stage') {
-      if (global.OperationsStage && global.OperationsStage.supports(p[1])) {
+      if (global.DownstreamStage && global.DownstreamStage.supports(p[1])) {
+        stageHandle = global.DownstreamStage.bind(view.querySelector('[data-downstream-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
+      } else if (global.OperationsStage && global.OperationsStage.supports(p[1])) {
         stageHandle = global.OperationsStage.bind(view.querySelector('[data-operations-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });
       } else if (p[1] === 'seismic' && global.SeismicStage) {
         stageHandle = global.SeismicStage.bind(view.querySelector('[data-seismic-stage]'), { stage: A.index.byStage[p[1]], atlas: A, cases: Cases, K: K, query: r.q });

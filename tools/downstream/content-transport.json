@@ -1,0 +1,1283 @@
+[
+  {
+    "id": "t1",
+    "caseId": "t1-pipeline-leak",
+    "stageId": "transport",
+    "short": "泄漏检测",
+    "title": "压力同时下降，是调阀还是管道泄漏？",
+    "question": "多通道时序能否区分泄漏与工况扰动，双端波到时又怎样给出位置？",
+    "methods": [
+      "ts"
+    ],
+    "intro": "一段管道的压力、进出流量和声学能量会一起变化。本例先识别受控事件片段，再用双端压力变化的时间差定位候选；声学筛查与定位各自需要什么证据，放在同一条时间轴上核对。",
+    "problem": "调阀也会引起压力下降和短时流量不平衡。只看一个压力门槛或一个声学尖峰，会把运行变化与泄漏混淆；波速或时钟不准，又会把检测到的异常放错位置。",
+    "why": "GRU把同一片段的多通道变化组合成事件候选，互相关再比较两端压力变化的相对迟到。分类与定位是两步独立计算；有泄漏候选并不自动意味着位置可靠。",
+    "input": "96点×5通道：双端压力MPa、进出流量m³/h和相对声学能量；每0.05s采样，另保留管长和波速假设。",
+    "output": "正常、调阀扰动、泄漏三类得分，以及泄漏候选的互相关迟到、位置与复核信息。",
+    "data": "主实验是180段受控液体管道响应，120段训练、24段检查、36段整段留出，页面展示12段。管长1200m、波速1000m/s为公开生成设定。另核对GPLA-12的684段实测压缩空气声学信号；其12类表示压力、噪声与麦克风组合，全部是泄漏条件，不能提供本课的正常类或位置真值。",
+    "limits": [
+      "检测和定位指标来自受控生成器，不代表现场油气管道误报率或定位精度。",
+      "互相关依赖相近波形、时间同步和已知波速。低幅度事件与工况变化都可能破坏这些条件。",
+      "本次GRU没有保证优于流量平衡规则。保留分错片段，不能把公开GPLA论文成绩当作本课成绩。"
+    ],
+    "experiment": "固定同一泄漏片段，只改变定位使用的波速假设：分类得分会变吗，位置偏差又怎样变化？再切换调阀片段，检查压力下降为何不能单独证明泄漏。",
+    "professional": [
+      {
+        "title": "流量不平衡要与管内储存一起看",
+        "text": "进出流量差可能来自泄漏，也可能来自瞬态压力变化造成的管内储存变化。短时间内不平衡并不唯一指向泄漏，需要同时查看压力和操作背景。"
+      },
+      {
+        "title": "双端时间差怎样变成位置",
+        "text": "若泄漏波以波速c分别到达间距L的两端，左、右到时差Δt与位置x满足x=(L+cΔt)/2。本例只在已知管段和同步采样假设下演示这一关系。"
+      },
+      {
+        "title": "声学类别与泄漏标签不同",
+        "text": "GPLA-12记录了不同压力、环境噪声和麦克风条件下的泄漏声音。它说明声学响应会受采集条件影响，但没有无泄漏对照或泄漏坐标，不能据其类别自行补出检测定位真值。"
+      }
+    ],
+    "steps": [
+      {
+        "name": "约定事件与位置任务",
+        "do": "先区分正常、工况扰动和泄漏；仅对泄漏候选解释双端定位。",
+        "output": "事件字典与定位适用条件。",
+        "blockId": "01"
+      },
+      {
+        "name": "对齐双端与多通道",
+        "do": "核对压力、流量、声学能量和0.05s采样；整段分组，保留1200m管长及波速设定。",
+        "output": "有共同时间轴的96点片段。",
+        "blockId": "02"
+      },
+      {
+        "name": "传统：平衡与压降规则",
+        "do": "按进出流量差和平均压降给候选，观察调阀对简单规则的影响。",
+        "output": "同一事件的规则类别。",
+        "blockId": "03traditional"
+      },
+      {
+        "name": "智能：时序筛查并定位",
+        "do": "固定GRU权重读取多通道；计算双端压力差分的互相关迟到，再将时间差换成位置。",
+        "output": "事件得分、候选位置和迟到。",
+        "blockId": "03intelligent"
+      },
+      {
+        "name": "核对分歧与位置误差",
+        "do": "对照同一片段的生成器类别和位置；区分检测错误、定位错误及波速假设误差。",
+        "output": "整段留出指标与可解释错例。",
+        "blockId": "04"
+      },
+      {
+        "name": "保存事件记录",
+        "do": "导出源种子、波形、候选、波速、管长与定位值，保留受控实验标记。",
+        "output": "可重现的泄漏候选表。",
+        "blockId": "05"
+      }
+    ],
+    "glossary10": [
+      [
+        "负压波",
+        "Negative pressure wave",
+        "局部流动变化产生并传播的压力扰动。"
+      ],
+      [
+        "流量平衡",
+        "Flow balance",
+        "比较进出流量，瞬态时还受管内储存影响。"
+      ],
+      [
+        "声学能量",
+        "Acoustic energy",
+        "本例为相对通道量，不等于实测声压Pa。"
+      ],
+      [
+        "工况扰动",
+        "Operational transient",
+        "调阀或启停等运行变化，可与异常相似。"
+      ],
+      [
+        "互相关",
+        "Cross-correlation",
+        "比较两段波形在不同时移下的相似性。"
+      ],
+      [
+        "迟到差",
+        "Time difference of arrival",
+        "同一变化到达两个测点的时间差。"
+      ],
+      [
+        "波速",
+        "Wave speed",
+        "把迟到换算为距离的传播速度假设。"
+      ],
+      [
+        "时钟同步",
+        "Clock synchronization",
+        "双端记录需要相同时间基准。"
+      ],
+      [
+        "GRU",
+        "Gated recurrent unit",
+        "通过门控状态读取连续多通道变化。"
+      ],
+      [
+        "整段留出",
+        "Episode holdout",
+        "完整事件不跨训练与测试分区。"
+      ]
+    ],
+    "primarySource": {
+      "title": "GPLA-12实测声学背景；主时序独立受控生成",
+      "url": "https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12",
+      "license": "代码库EPL-2.0；主实验生成参数公开。"
+    },
+    "research": {
+      "title": "GPLA-12: An Acoustic Signal Dataset of Gas Pipeline Leakage",
+      "url": "https://arxiv.org/abs/2106.10277",
+      "summary": "作者在压缩空气管路中采集泄漏声音，以压力、噪声与麦克风条件形成12类公开片段。",
+      "boundary": "研究提供声学条件分类资料；本课正常/扰动/泄漏与位置标签来自独立受控液体管道实验。"
+    },
+    "columnMap": {
+      "input": [
+        "P_left MPa",
+        "P_right MPa",
+        "Q_in m³/h",
+        "Q_out m³/h",
+        "acousticEnergy relative"
+      ],
+      "target": "受控事件0正常/1扰动/2泄漏，不入模型",
+      "location": "仅泄漏有生成器位置m；互相关预测另算"
+    },
+    "backgroundChapters": [
+      {
+        "id": "context",
+        "title": "真实背景",
+        "fields": [
+          "intro",
+          "problem",
+          "professional",
+          "why"
+        ]
+      },
+      {
+        "id": "research",
+        "title": "研究与开放资料",
+        "fields": [
+          "research",
+          "primarySource"
+        ]
+      },
+      {
+        "id": "data",
+        "title": "数据与实验",
+        "fields": [
+          "data",
+          "input",
+          "output",
+          "columnMap"
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "难度与边界",
+        "fields": [
+          "limits"
+        ]
+      },
+      {
+        "id": "glossary",
+        "title": "中英术语对照",
+        "fields": [
+          "glossary10"
+        ]
+      }
+    ],
+    "terms": [
+      [
+        "负压波",
+        "Negative pressure wave",
+        "局部流动变化产生并传播的压力扰动。"
+      ],
+      [
+        "流量平衡",
+        "Flow balance",
+        "比较进出流量，瞬态时还受管内储存影响。"
+      ],
+      [
+        "声学能量",
+        "Acoustic energy",
+        "本例为相对通道量，不等于实测声压Pa。"
+      ],
+      [
+        "工况扰动",
+        "Operational transient",
+        "调阀或启停等运行变化，可与异常相似。"
+      ],
+      [
+        "互相关",
+        "Cross-correlation",
+        "比较两段波形在不同时移下的相似性。"
+      ],
+      [
+        "迟到差",
+        "Time difference of arrival",
+        "同一变化到达两个测点的时间差。"
+      ],
+      [
+        "波速",
+        "Wave speed",
+        "把迟到换算为距离的传播速度假设。"
+      ],
+      [
+        "时钟同步",
+        "Clock synchronization",
+        "双端记录需要相同时间基准。"
+      ],
+      [
+        "GRU",
+        "Gated recurrent unit",
+        "通过门控状态读取连续多通道变化。"
+      ],
+      [
+        "整段留出",
+        "Episode holdout",
+        "完整事件不跨训练与测试分区。"
+      ]
+    ],
+    "refs": [
+      {
+        "title": "GPLA-12实测声学背景；主时序独立受控生成",
+        "url": "https://github.com/Deep-AI-Application-DAIP/acoustic-leakage-dataset-GPLA-12",
+        "license": "代码库EPL-2.0；主实验生成参数公开。"
+      },
+      {
+        "title": "GPLA-12: An Acoustic Signal Dataset of Gas Pipeline Leakage",
+        "url": "https://arxiv.org/abs/2106.10277",
+        "summary": "作者在压缩空气管路中采集泄漏声音，以压力、噪声与麦克风条件形成12类公开片段。",
+        "boundary": "研究提供声学条件分类资料；本课正常/扰动/泄漏与位置标签来自独立受控液体管道实验。"
+      }
+    ]
+  },
+  {
+    "id": "t2",
+    "caseId": "t2-corrosion-assessment",
+    "stageId": "transport",
+    "short": "腐蚀评估",
+    "title": "先找缺陷，再问它是否真的在变薄。",
+    "question": "检测图上的缺陷候选，怎样与有时间和单位的壁厚记录连接？",
+    "methods": [
+      "cv",
+      "ts"
+    ],
+    "intro": "管道内检测产生局部缺陷图和尺寸记录；重复检测还要判断同一位置的变化。本例分开计算图像筛查和壁厚预测：CNN读取受控灰度检测图，GRU读取独立受控壁厚历史，避免把颜色直接当作寿命。",
+    "problem": "单次图像只能说明此刻的响应，不能给出增长速度。重复检测的定位、分辨率和误差又会影响减薄量；若没有可靠对应关系，两个相似斑点未必是同一个缺陷。",
+    "why": "CNN接手大量局部图像的候选筛查，时序模型接手已配对壁厚历史的下一次预测。两者各自保留输入和参考，只有真实的定位匹配与尺寸验证才能把它们连接成工程评估。",
+    "input": "32×32灰度检测图；另有过去6次的[壁厚mm,时间year]记录。参考位置、掩膜和未来壁厚均不进入对应模型输入。",
+    "output": "缺陷候选得分、下一年壁厚，以及在声明4mm阈值下的剩余时间情景。",
+    "data": "Zenodo公开资料提供两张管网图上的缺陷坐标，本课选36个实例作为空间模板，并派生288张受控灰度响应图；地图1的18/6个实例训练/检查，地图2的12个实例留出。壁厚历时另生成68组，按48/8/12组分区；这不是原地图作者的实测超声图或多次内检测壁厚。",
+    "limits": [
+      "地图坐标没有已核实的物理距离单位，不能由坐标图推断缺陷深度mm。",
+      "灰度响应和壁厚时间史是受控派生，页面配对仅供教学，不声称同一现场缺陷被匹配成功。",
+      "4mm阈值和线性外推只构成剩余时间情景；缺少材料、直径、压力及缺陷相互作用资料，不能称为安全寿命或剩余强度。"
+    ],
+    "experiment": "固定检测图提高接受门槛，观察候选是否转交复核；再保持同一壁厚历史，改变情景阈值，查看剩余时间如何变化。图像得分较高，是否就能让减薄速度更确定？",
+    "professional": [
+      {
+        "title": "内检测图不是管壁照片",
+        "text": "超声或漏磁等仪器把材料和几何响应转换为信号图，颜色与强度需要通过仪器标定解释。本课灰度由生成器控制，只演示读取局部响应，不冒充实测检测仪输出。"
+      },
+      {
+        "title": "增长率需要同位置和同量纲",
+        "text": "减薄速度来自同一缺陷在不同时间的尺寸差。定位配准、探头误差和尺寸定义不同，都可能让小差值失去意义；没有对应记录时不能从单张图估计增长率。"
+      },
+      {
+        "title": "时间阈值与强度评定不同",
+        "text": "本例用当前壁厚与下一年预测的差估计情景减薄率，再计算达到指定阈值所需时间。强度评定还要考虑材料、载荷和缺陷几何；一个时间比值不能替代这些计算。"
+      }
+    ],
+    "steps": [
+      {
+        "name": "拆开识别与减薄问题",
+        "do": "先约定图像候选类别，再明确时序目标为下一年壁厚。",
+        "output": "两项输入、参考和成果定义。",
+        "blockId": "01"
+      },
+      {
+        "name": "整理图像与时间记录",
+        "do": "按源地图实例分组；壁厚历史按独立轨迹分组，保存mm与year。",
+        "output": "不混入参考掩膜和未来点的输入。",
+        "blockId": "02"
+      },
+      {
+        "name": "传统：灰度与末值参照",
+        "do": "用低灰度规则筛查检测图，以最近一次壁厚作为下一年参照。",
+        "output": "两种可解释基线。",
+        "blockId": "03traditional"
+      },
+      {
+        "name": "智能：CNN与时序预测",
+        "do": "CNN读取像素得到缺陷候选；GRU读取过去6次壁厚和时间，预测下一年。",
+        "output": "视觉得分和带单位的壁厚候选。",
+        "blockId": "03intelligent"
+      },
+      {
+        "name": "分别核对两类误差",
+        "do": "图像只与坐标派生类别比较，时序只与受控壁厚参考比较；不把前者准确率当寿命可靠性。",
+        "output": "地图留出分类与轨迹留出误差。",
+        "blockId": "04"
+      },
+      {
+        "name": "形成评估记录",
+        "do": "导出源实例、候选、壁厚历史、预测与情景阈值，保留人工配准和验证需求。",
+        "output": "有证据范围的缺陷复核表。",
+        "blockId": "05"
+      }
+    ],
+    "glossary10": [
+      [
+        "内检测",
+        "In-line inspection / ILI",
+        "仪器沿管道内部采集检测信息。"
+      ],
+      [
+        "超声检测",
+        "Ultrasonic testing",
+        "利用声传播响应检查材料与厚度。"
+      ],
+      [
+        "漏磁检测",
+        "Magnetic flux leakage",
+        "通过磁场扰动寻找局部缺陷线索。"
+      ],
+      [
+        "缺陷配准",
+        "Defect registration",
+        "把不同检测批次的同一位置对应起来。"
+      ],
+      [
+        "壁厚",
+        "Wall thickness",
+        "具有mm等物理单位的尺寸，本例为受控值。"
+      ],
+      [
+        "减薄速度",
+        "Thinning rate",
+        "相同位置壁厚随时间减少的速率。"
+      ],
+      [
+        "灰度候选",
+        "Intensity-based candidate",
+        "按局部检测图响应筛出的待复核区域。"
+      ],
+      [
+        "CNN",
+        "Convolutional neural network",
+        "本例实际读取32×32像素，而非坐标标签。"
+      ],
+      [
+        "阈值情景",
+        "Threshold scenario",
+        "假设达到指定厚度需要多少时间。"
+      ],
+      [
+        "剩余强度",
+        "Remaining strength",
+        "还需材料、压力和几何等工程计算的承载能力。"
+      ]
+    ],
+    "primarySource": {
+      "title": "A Dataset for Corrosion Defects in Pipelines",
+      "url": "https://zenodo.org/records/10809418",
+      "license": "公开地图CC BY4.0；检测灰度与壁厚历时为明确受控派生。"
+    },
+    "research": {
+      "title": "公开管道腐蚀缺陷坐标资料",
+      "url": "https://zenodo.org/records/10809418",
+      "summary": "作者提供缺陷与种子坐标、不同复杂程度实例和地图，用于管道缺陷空间建模与导航研究。",
+      "boundary": "源文件没有实测厚度或重复检测时间。本课不把这些缺失量补写成实测数据。"
+    },
+    "columnMap": {
+      "imageInput": "灰度像素32²；来自公开坐标模板与受控响应",
+      "imageTarget": "局部是否包含源缺陷坐标",
+      "secondaryInput": [
+        "过去6次thickness mm",
+        "对应time year"
+      ],
+      "secondaryTarget": "下一年受控真实壁厚；不入输入",
+      "scenario": "thresholdMm默认4，不是工程规范值"
+    },
+    "backgroundChapters": [
+      {
+        "id": "context",
+        "title": "真实背景",
+        "fields": [
+          "intro",
+          "problem",
+          "professional",
+          "why"
+        ]
+      },
+      {
+        "id": "research",
+        "title": "研究与开放资料",
+        "fields": [
+          "research",
+          "primarySource"
+        ]
+      },
+      {
+        "id": "data",
+        "title": "数据与实验",
+        "fields": [
+          "data",
+          "input",
+          "output",
+          "columnMap"
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "难度与边界",
+        "fields": [
+          "limits"
+        ]
+      },
+      {
+        "id": "glossary",
+        "title": "中英术语对照",
+        "fields": [
+          "glossary10"
+        ]
+      }
+    ],
+    "terms": [
+      [
+        "内检测",
+        "In-line inspection / ILI",
+        "仪器沿管道内部采集检测信息。"
+      ],
+      [
+        "超声检测",
+        "Ultrasonic testing",
+        "利用声传播响应检查材料与厚度。"
+      ],
+      [
+        "漏磁检测",
+        "Magnetic flux leakage",
+        "通过磁场扰动寻找局部缺陷线索。"
+      ],
+      [
+        "缺陷配准",
+        "Defect registration",
+        "把不同检测批次的同一位置对应起来。"
+      ],
+      [
+        "壁厚",
+        "Wall thickness",
+        "具有mm等物理单位的尺寸，本例为受控值。"
+      ],
+      [
+        "减薄速度",
+        "Thinning rate",
+        "相同位置壁厚随时间减少的速率。"
+      ],
+      [
+        "灰度候选",
+        "Intensity-based candidate",
+        "按局部检测图响应筛出的待复核区域。"
+      ],
+      [
+        "CNN",
+        "Convolutional neural network",
+        "本例实际读取32×32像素，而非坐标标签。"
+      ],
+      [
+        "阈值情景",
+        "Threshold scenario",
+        "假设达到指定厚度需要多少时间。"
+      ],
+      [
+        "剩余强度",
+        "Remaining strength",
+        "还需材料、压力和几何等工程计算的承载能力。"
+      ]
+    ],
+    "refs": [
+      {
+        "title": "A Dataset for Corrosion Defects in Pipelines",
+        "url": "https://zenodo.org/records/10809418",
+        "license": "公开地图CC BY4.0；检测灰度与壁厚历时为明确受控派生。"
+      },
+      {
+        "title": "公开管道腐蚀缺陷坐标资料",
+        "url": "https://zenodo.org/records/10809418",
+        "summary": "作者提供缺陷与种子坐标、不同复杂程度实例和地图，用于管道缺陷空间建模与导航研究。",
+        "boundary": "源文件没有实测厚度或重复检测时间。本课不把这些缺失量补写成实测数据。"
+      }
+    ]
+  },
+  {
+    "id": "t3",
+    "caseId": "t3-gathering-optimization",
+    "stageId": "transport",
+    "short": "集输优化",
+    "title": "同样的输量，压气站怎样分担更省能？",
+    "question": "改变需求与压力上限，怎样找到满足约束的压气分配，并识别无解情景？",
+    "methods": [
+      "opt"
+    ],
+    "intro": "管网调度同时受到输量、压力和设备能力限制。本例借用GasLib-11的公开设备编号与流量边界，构建明确的两站并联代理，实际求解启停和流量分配，逐项显示可行性。",
+    "problem": "均分流量容易操作，但设备能耗曲线不同，均分未必经济。需求增加或压力上限收紧时，原方案可能已经不可行；只给一个低能耗数值而不检查约束没有意义。",
+    "why": "枚举两站启停，再求解每个组合的凸分配问题，把设备容量、压力和总量同时纳入计算。求解器回答的是声明代理下的最优分配，并不代替完整管网的水力校核。",
+    "input": "需求输量10³m³/h、压力上限bar，以及两站的流量边界和声明的压降/能耗系数。",
+    "output": "各站开停与流量、代理能耗kW、压力、容量剩余和不可行时的输量缺口。",
+    "data": "GasLib-11是公开人工测试网络，含11个节点、8条管道、2座压气站等，数据许可CC BY3.0。本课保留两站编号和1100×10³m³/h流量边界，显式改为并联代理；压力和能耗函数另行声明。预设7个需求情景，保留1个不可行情景。",
+    "limits": [
+      "没有复现GasLib原11节点的所有管道方程、站场配置或压缩机性能图。",
+      "代理kW依赖声明系数，不能称为实测节能量或现场能耗承诺。",
+      "最优方案只对当前目标和约束成立；缺少启停时间、可用性等条件时，仍需补充工程调度约束。"
+    ],
+    "experiment": "逐步提高需求，再降低压力上限：哪座站先触及容量边界？当总能力不足时，求解器应显示缺口，还是继续给出看似漂亮的低能耗方案？",
+    "professional": [
+      {
+        "title": "压力边界会改变可输送能力",
+        "text": "压气与沿程损失共同决定输量和压力。压力上限收紧可能使某支路不能继续增流；本例用公开说明的二次压降代理把这一关系显式写出来。"
+      },
+      {
+        "title": "启停是离散选择，分流是连续选择",
+        "text": "站是否运行改变固定能耗，运行后流量又连续影响能耗。先枚举启停，再计算各组合的最优分配，可以同时解释两类决策。"
+      },
+      {
+        "title": "无解也是必须保留的结果",
+        "text": "如果需求超过所有可用支路的能力，调整分流比例无法满足总量。此时应报告缺口和约束，不能靠截断或偷偷归一化掩盖不可行。"
+      }
+    ],
+    "steps": [
+      {
+        "name": "约定需求与目标",
+        "do": "指定需求输量和压力上限，目标限定为声明代理的总能耗。",
+        "output": "明确的调度问题。",
+        "blockId": "01"
+      },
+      {
+        "name": "核对站与参数",
+        "do": "读取GasLib设备标识和边界，单独列出教学压降及能耗系数。",
+        "output": "来源参数与情景假设表。",
+        "blockId": "02"
+      },
+      {
+        "name": "传统：同约束均分",
+        "do": "均分需求并按容量补足；总能力不足就保留不可行标记。",
+        "output": "满足同样限制的参照分配。",
+        "blockId": "03traditional"
+      },
+      {
+        "name": "优化：枚举与凸求解",
+        "do": "枚举两站启停，在每个可行组合内求能耗极小分流；用独立导数二分核对。",
+        "output": "最优候选或明确无解。",
+        "blockId": "03intelligent"
+      },
+      {
+        "name": "核对每项约束",
+        "do": "并列查看流量和、压力、单站能力与能耗，检查任何一项违反。",
+        "output": "可行性与目标值同屏。",
+        "blockId": "04"
+      },
+      {
+        "name": "保存调度情景",
+        "do": "导出需求、压力上限、系数、启停与流量，注明简化代理范围。",
+        "output": "能复算的情景调度表。",
+        "blockId": "05"
+      }
+    ],
+    "glossary10": [
+      [
+        "集输",
+        "Gathering and transportation",
+        "把多源流体送往处理或输送节点。"
+      ],
+      [
+        "压气站",
+        "Compressor station",
+        "为气体增加压力以满足输送条件。"
+      ],
+      [
+        "需求输量",
+        "Flow nomination",
+        "本例要满足的总流量。"
+      ],
+      [
+        "启停组合",
+        "On/off combination",
+        "设备运行与否的离散方案。"
+      ],
+      [
+        "分流",
+        "Flow allocation",
+        "把总量分配给可用支路。"
+      ],
+      [
+        "压力上限",
+        "Pressure ceiling",
+        "当前情景允许的最高压力。"
+      ],
+      [
+        "凸优化",
+        "Convex optimization",
+        "本例固定启停组合后的能耗分流问题。"
+      ],
+      [
+        "固定能耗",
+        "Fixed operating load",
+        "开机才计入的代理能耗项。"
+      ],
+      [
+        "可行性",
+        "Feasibility",
+        "所有总量与边界都满足。"
+      ],
+      [
+        "输量缺口",
+        "Flow shortfall",
+        "需求超过总能力时尚未满足的部分。"
+      ]
+    ],
+    "primarySource": {
+      "title": "GasLib-11公开测试网络",
+      "url": "https://gaslib.zib.de/testData.html",
+      "license": "CC BY3.0；保留源文件引用说明。"
+    },
+    "research": {
+      "title": "GasLib—A Library of Gas Network Instances",
+      "url": "https://doi.org/10.3390/data2040040",
+      "summary": "公开网络拓扑、设备边界及提名文件，使气体输送优化可以在同一实例上比较。",
+      "boundary": "本课是两站并联代理，不声称复现原网络MINLP或工业全网水力结果。"
+    },
+    "columnMap": {
+      "input": [
+        "demand 10³m³/h",
+        "pressureCeiling bar"
+      ],
+      "source": "GasLib .net中的compressorStation id与flowMax",
+      "assumptions": "pressureK/idle/linear/cubic逐项公开",
+      "target": "新调度无实测反事实真值；只比较代理目标和可行性"
+    },
+    "backgroundChapters": [
+      {
+        "id": "context",
+        "title": "真实背景",
+        "fields": [
+          "intro",
+          "problem",
+          "professional",
+          "why"
+        ]
+      },
+      {
+        "id": "research",
+        "title": "研究与开放资料",
+        "fields": [
+          "research",
+          "primarySource"
+        ]
+      },
+      {
+        "id": "data",
+        "title": "数据与实验",
+        "fields": [
+          "data",
+          "input",
+          "output",
+          "columnMap"
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "难度与边界",
+        "fields": [
+          "limits"
+        ]
+      },
+      {
+        "id": "glossary",
+        "title": "中英术语对照",
+        "fields": [
+          "glossary10"
+        ]
+      }
+    ],
+    "terms": [
+      [
+        "集输",
+        "Gathering and transportation",
+        "把多源流体送往处理或输送节点。"
+      ],
+      [
+        "压气站",
+        "Compressor station",
+        "为气体增加压力以满足输送条件。"
+      ],
+      [
+        "需求输量",
+        "Flow nomination",
+        "本例要满足的总流量。"
+      ],
+      [
+        "启停组合",
+        "On/off combination",
+        "设备运行与否的离散方案。"
+      ],
+      [
+        "分流",
+        "Flow allocation",
+        "把总量分配给可用支路。"
+      ],
+      [
+        "压力上限",
+        "Pressure ceiling",
+        "当前情景允许的最高压力。"
+      ],
+      [
+        "凸优化",
+        "Convex optimization",
+        "本例固定启停组合后的能耗分流问题。"
+      ],
+      [
+        "固定能耗",
+        "Fixed operating load",
+        "开机才计入的代理能耗项。"
+      ],
+      [
+        "可行性",
+        "Feasibility",
+        "所有总量与边界都满足。"
+      ],
+      [
+        "输量缺口",
+        "Flow shortfall",
+        "需求超过总能力时尚未满足的部分。"
+      ]
+    ],
+    "refs": [
+      {
+        "title": "GasLib-11公开测试网络",
+        "url": "https://gaslib.zib.de/testData.html",
+        "license": "CC BY3.0；保留源文件引用说明。"
+      },
+      {
+        "title": "GasLib—A Library of Gas Network Instances",
+        "url": "https://doi.org/10.3390/data2040040",
+        "summary": "公开网络拓扑、设备边界及提名文件，使气体输送优化可以在同一实例上比较。",
+        "boundary": "本课是两站并联代理，不声称复现原网络MINLP或工业全网水力结果。"
+      }
+    ]
+  },
+  {
+    "id": "t4",
+    "caseId": "t4-meter-drift",
+    "stageId": "transport",
+    "short": "计量校正",
+    "title": "两次标定之间，仪表偏差会怎样继续积累？",
+    "question": "只在少量时刻有参考值，能否同时估计当前偏差和持续漂移？",
+    "methods": [
+      "ts"
+    ],
+    "intro": "流量计读数会受到偏差、漂移与测量噪声影响。本例给定稀疏标定时刻，实际递推估计偏差和漂移速度，在没有参考值的时刻校正读数，再与受控真值核对。",
+    "problem": "把最近一次标定偏差一直扣下去，等于假设偏差此后不再变化。若仪表继续漂移，偏差会在两次标定之间累积；若把每个非标定时刻的真值也送入模型，则失去了实际意义。",
+    "why": "Kalman状态同时保存偏差及其变化速度；每分钟先外推，有标定参考才更新。它让“何时真的获得新证据”和“何时只在推算”成为可以核查的两种状态。",
+    "input": "受控流量计读数m³/h、标定时刻的读数减参考值、1min时间步；非标定时刻没有参考输入。",
+    "output": "偏差与漂移状态、校正后流量、与最近标定偏差保持法的误差对照。",
+    "data": "独立生成30段训练和12段留出计量记录，每段120min，每25min给一次有噪声参考。训练资料估计过程与观测噪声参数；误差只统计留出段1380个非标定时刻。NIST资料用于解释可溯源标定与不确定度，不作为本课实测时间序列。",
+    "limits": [
+      "全部漂移成绩来自受控生成器，不代表现场交接计量精度或认证结果。",
+      "本例只处理加性偏差与缓慢漂移，没有处理多相流、组分和标准体积换算。",
+      "如果参考本身偏移，更新也会受影响。校正后曲线更平滑不证明计量已经可溯源。"
+    ],
+    "experiment": "取消最近一次标定观测，再让滤波器从已有信息向后推：估计偏差、后续校正误差和最近偏差保持法分别怎样变化？不要把评价用的真实流量补进输入。",
+    "professional": [
+      {
+        "title": "标定参考和评价真值要分开",
+        "text": "标定是在有限时刻把仪表与有依据的参考比较。示范可以保留连续真值评价算法，但运行时不能假设每分钟都能访问它；本例明确把参考开放限定在标定点。"
+      },
+      {
+        "title": "偏差与漂移是两种状态",
+        "text": "偏差描述当前读数整体偏了多少，漂移描述这种偏差每分钟怎样改变。两者共同传播，才能解释一次标定之后为何还可能继续偏离。"
+      },
+      {
+        "title": "不确定度贯穿参考与更新",
+        "text": "参考值也有噪声，算法需要权衡状态外推与新观测。NIST标定资料强调标准和仪表等环节的不确定度；本课噪声参数只是已说明生成器内的估计。"
+      }
+    ],
+    "steps": [
+      {
+        "name": "约定校正对象",
+        "do": "目标限定为加性偏差和漂移，注明m³/h及min。",
+        "output": "状态、观测与单位定义。",
+        "blockId": "01"
+      },
+      {
+        "name": "隔开可用参考与真值",
+        "do": "只向模型提供标定时刻的残差，连续受控真值另作评价。",
+        "output": "不会逐点泄漏真值的时序输入。",
+        "blockId": "02"
+      },
+      {
+        "name": "传统：保持最近偏差",
+        "do": "在下一次标定以前一直使用上一次偏差，不估计漂移速度。",
+        "output": "校正参照与其累积误差。",
+        "blockId": "03traditional"
+      },
+      {
+        "name": "时序：预测再更新",
+        "do": "按偏差—漂移状态传播，每到标定点才以新残差更新；输出当前校正值。",
+        "output": "因果递推的偏差和流量。",
+        "blockId": "03intelligent"
+      },
+      {
+        "name": "只核对未标定时刻",
+        "do": "比较两法在没有参考输入时的误差，检查误差随标定间隔变化。",
+        "output": "1380个留出非标定点的MAE。",
+        "blockId": "04"
+      },
+      {
+        "name": "输出校正与依据",
+        "do": "保存原读数、开放参考点、参数、估计状态和校正值，保留来源性质。",
+        "output": "可复核的受控计量校正记录。",
+        "blockId": "05"
+      }
+    ],
+    "glossary10": [
+      [
+        "计量偏差",
+        "Measurement bias",
+        "读数相对参考的系统性偏离。"
+      ],
+      [
+        "漂移",
+        "Drift",
+        "偏差随时间缓慢变化。"
+      ],
+      [
+        "标定",
+        "Calibration",
+        "在明确条件下与参考量比较。"
+      ],
+      [
+        "可溯源性",
+        "Metrological traceability",
+        "通过记录清楚的校准链联系到参考标准。"
+      ],
+      [
+        "状态估计",
+        "State estimation",
+        "由有限观测推算当前偏差等量。"
+      ],
+      [
+        "Kalman滤波",
+        "Kalman filtering",
+        "先传播状态，再用可用观测更新。"
+      ],
+      [
+        "过程噪声",
+        "Process noise",
+        "状态变化模型未确定的部分。"
+      ],
+      [
+        "观测噪声",
+        "Measurement noise",
+        "标定残差中不等于真实偏差的随机误差。"
+      ],
+      [
+        "最近偏差保持",
+        "Last-calibration hold",
+        "把上次偏差一直沿用到下一次标定。"
+      ],
+      [
+        "非标定评价",
+        "Non-calibration evaluation",
+        "只在未给参考值时检查校正误差。"
+      ]
+    ],
+    "primarySource": {
+      "title": "NIST · Gas Flow Standards and Their Uncertainty（原理背景）",
+      "url": "https://www.nist.gov/publications/gas-flow-standards-and-their-uncertainty",
+      "license": "只引用研究背景；主数据为独立受控生成。"
+    },
+    "research": {
+      "title": "Gas Flow Standards and Their Uncertainty",
+      "url": "https://doi.org/10.1088/1681-7575/ac8c99",
+      "summary": "NIST作者说明多种气体流量标准的工作原理、性能边界与不确定度组成。",
+      "boundary": "本课不是NIST计量记录或标准实现，不使用该文不确定度数值充当模型测试精度。"
+    },
+    "columnMap": {
+      "input": "reading[120]与calibrationResidual[120]；非标定残差为null",
+      "state": [
+        "bias m³/h",
+        "slope m³/h/min"
+      ],
+      "target": "连续生成器真流量，仅用于评价",
+      "default": "dt1min，25min标定；q/r仅由训练段估计"
+    },
+    "backgroundChapters": [
+      {
+        "id": "context",
+        "title": "真实背景",
+        "fields": [
+          "intro",
+          "problem",
+          "professional",
+          "why"
+        ]
+      },
+      {
+        "id": "research",
+        "title": "研究与开放资料",
+        "fields": [
+          "research",
+          "primarySource"
+        ]
+      },
+      {
+        "id": "data",
+        "title": "数据与实验",
+        "fields": [
+          "data",
+          "input",
+          "output",
+          "columnMap"
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "难度与边界",
+        "fields": [
+          "limits"
+        ]
+      },
+      {
+        "id": "glossary",
+        "title": "中英术语对照",
+        "fields": [
+          "glossary10"
+        ]
+      }
+    ],
+    "terms": [
+      [
+        "计量偏差",
+        "Measurement bias",
+        "读数相对参考的系统性偏离。"
+      ],
+      [
+        "漂移",
+        "Drift",
+        "偏差随时间缓慢变化。"
+      ],
+      [
+        "标定",
+        "Calibration",
+        "在明确条件下与参考量比较。"
+      ],
+      [
+        "可溯源性",
+        "Metrological traceability",
+        "通过记录清楚的校准链联系到参考标准。"
+      ],
+      [
+        "状态估计",
+        "State estimation",
+        "由有限观测推算当前偏差等量。"
+      ],
+      [
+        "Kalman滤波",
+        "Kalman filtering",
+        "先传播状态，再用可用观测更新。"
+      ],
+      [
+        "过程噪声",
+        "Process noise",
+        "状态变化模型未确定的部分。"
+      ],
+      [
+        "观测噪声",
+        "Measurement noise",
+        "标定残差中不等于真实偏差的随机误差。"
+      ],
+      [
+        "最近偏差保持",
+        "Last-calibration hold",
+        "把上次偏差一直沿用到下一次标定。"
+      ],
+      [
+        "非标定评价",
+        "Non-calibration evaluation",
+        "只在未给参考值时检查校正误差。"
+      ]
+    ],
+    "refs": [
+      {
+        "title": "NIST · Gas Flow Standards and Their Uncertainty（原理背景）",
+        "url": "https://www.nist.gov/publications/gas-flow-standards-and-their-uncertainty",
+        "license": "只引用研究背景；主数据为独立受控生成。"
+      },
+      {
+        "title": "Gas Flow Standards and Their Uncertainty",
+        "url": "https://doi.org/10.1088/1681-7575/ac8c99",
+        "summary": "NIST作者说明多种气体流量标准的工作原理、性能边界与不确定度组成。",
+        "boundary": "本课不是NIST计量记录或标准实现，不使用该文不确定度数值充当模型测试精度。"
+      }
+    ]
+  },
+  {
+    "id": "t5",
+    "caseId": "t5-tank-visible-level",
+    "stageId": "transport",
+    "short": "可见液位",
+    "title": "先找到可见液面，再把像素换成高度。",
+    "question": "真实照片中的反光和背景会怎样影响液面读数，CNN究竟从哪些像素得到结果？",
+    "methods": [
+      "cv"
+    ],
+    "intro": "储罐监控需要可见的液位窗、刻度或其他可观测目标。为实际检验从像素读液面这一步，本例使用公开透明容器照片，CNN直接读取RGB像素，输出液面纵坐标，再按已知上下缘标定换算高度比例。",
+    "problem": "杯沿、反光和背景都可能形成明显边缘，最强边缘未必是液面。看不见内部液体的不透明罐壁也不会因为用了CNN就提供内部液位；必须先明确相机真的观察到了什么。",
+    "why": "CNN组合局部颜色与形状来回归液面行，固定边缘规则提供参照。原照片、目标关键点和预测线并排，才能检查算法是否读到了液面，而非仅画出一个预设高度。",
+    "input": "真实照片的32×32 RGB像素，按CHW顺序除255；人工已知的口沿和底缘仅用于输出高度换算。",
+    "output": "液面纵坐标候选、与标注的像素偏差，以及在已知上下缘下的可见高度比例。",
+    "data": "Glasses-in-the-Wild公开validation部分提供310张真实透明饮用容器照片及液面关键点。快照将原256px图缩为64px，模型再读取32px像素。按拍摄时段分为08h的227张训练、14h/16h的15张检查、13h的68张留出；页面展示12张留出图，不按预测正确性选图。",
+    "limits": [
+      "这是透明饮用容器的可见液面代理，不是储罐现场、雷达液位或罐区泄漏验证。",
+      "液面高度比例不等于容积比例，需要容器几何和标定才能换成体积。",
+      "留出按拍摄时段分组，但仍来自同一参与者和容器资料域；未确认跨时段实体容器身份，因此不是整容器或跨油库、跨天气泛化验证。"
+    ],
+    "experiment": "固定同一照片，改变输入亮度后重新从像素推断液面：CNN线和边缘基线是否跟着反光移动？再调整低液位提示阈值，区分“读数发生变化”与“同一读数触发不同提示”。",
+    "professional": [
+      {
+        "title": "可见目标决定能测什么",
+        "text": "相机可以读可见液面或液位窗，不能穿过不透明罐壁。本例真实照片用于验证视觉读数动作，工程储罐仍要具备相应观察窗口与独立测量依据。"
+      },
+      {
+        "title": "从像素到高度需要标定",
+        "text": "网络输出液面在图中的纵坐标。若上缘与底缘已知，可用相对位置估算可见高度；透视、液面弯曲和标定误差都会影响这种换算。"
+      },
+      {
+        "title": "液位变化并不直接证明泄漏",
+        "text": "液位下降还可能来自正常出料、温度变化或测量误差。源照片没有时间和泄漏标签，所以本例只做液面读数，不能制造储罐泄漏识别成绩。"
+      }
+    ],
+    "steps": [
+      {
+        "name": "限定可见液面任务",
+        "do": "明确目标是照片中的液面行，不推断不可见储量或泄漏原因。",
+        "output": "可观察对象与成果定义。",
+        "blockId": "01"
+      },
+      {
+        "name": "保留真实像素与关键点",
+        "do": "保存照片来源、图像哈希和标定端点；标签不画入CNN输入，按时段分组。",
+        "output": "真实RGB输入与独立参考。",
+        "blockId": "02"
+      },
+      {
+        "name": "传统：寻找强边缘",
+        "do": "在已知上下缘之间找水平灰度变化最大的行，观察杯沿与反光干扰。",
+        "output": "同图的固定规则液面线。",
+        "blockId": "03traditional"
+      },
+      {
+        "name": "智能：CNN读取像素",
+        "do": "将32×32 CHW/255像素送入训练好的CNN，回归液面纵坐标，再换算高度。",
+        "output": "由实际像素推断的候选线。",
+        "blockId": "03intelligent"
+      },
+      {
+        "name": "核对位置与高度",
+        "do": "在原照片上并列显示参考、基线与CNN，报告原256px尺度误差。",
+        "output": "68张时段留出指标和逐图偏差。",
+        "blockId": "04"
+      },
+      {
+        "name": "导出读数与标定",
+        "do": "保存源图、预处理、标定端点、液面行与阈值提示，注明透明容器代理范围。",
+        "output": "可追溯的视觉读数表。",
+        "blockId": "05"
+      }
+    ],
+    "glossary10": [
+      [
+        "液面",
+        "Liquid interface",
+        "相机中实际可见的液体边界。"
+      ],
+      [
+        "液位窗",
+        "Sight glass",
+        "让内部液位成为可见目标的观察结构。"
+      ],
+      [
+        "关键点",
+        "Keypoint",
+        "原作者标注的液面、口沿或底缘位置。"
+      ],
+      [
+        "像素行",
+        "Image row",
+        "图像纵坐标，向下增大。"
+      ],
+      [
+        "标定端点",
+        "Calibration endpoints",
+        "把像素位置换成相对高度的已知上下缘。"
+      ],
+      [
+        "高度比例",
+        "Relative fill height",
+        "在可见上下缘间的相对高度，不是体积比例。"
+      ],
+      [
+        "边缘基线",
+        "Edge baseline",
+        "以水平灰度变化寻找液面的固定方法。"
+      ],
+      [
+        "RGB",
+        "Red–green–blue",
+        "模型实际读取的三通道颜色像素。"
+      ],
+      [
+        "回归",
+        "Regression",
+        "从图像输出连续液面位置。"
+      ],
+      [
+        "时段留出",
+        "Session holdout",
+        "相近时间拍摄的照片整组用于检查或测试。"
+      ]
+    ],
+    "primarySource": {
+      "title": "Glasses-in-the-Wild Dataset",
+      "url": "https://zenodo.org/records/17288503",
+      "license": "CC BY4.0；Adriaens、Lips、De Coster、Verleysen、wyffels。"
+    },
+    "research": {
+      "title": "Glasses-in-the-Wild · 透明容器液面关键点",
+      "url": "https://airo.ugent.be/open-source/",
+      "summary": "作者公开多种透明容器及复杂背景照片，标注口沿、底部与液面等关键点，支持可见液面估计研究。",
+      "boundary": "本课重建小型CNN，使用其公开子集，不沿用作者成绩，也不把饮用容器像素实验称作储罐现场验证。"
+    },
+    "columnMap": {
+      "input": "真实64RGB快照双线性缩32，CHW/255",
+      "target": "fluid_level_y/256，不进入输入",
+      "calibration": "top_front_y与bottom_front_y/256，只换算输出高度",
+      "formula": "fill=(bottom−predY)/(bottom−top)，展示可限0..1；不是体积"
+    },
+    "backgroundChapters": [
+      {
+        "id": "context",
+        "title": "真实背景",
+        "fields": [
+          "intro",
+          "problem",
+          "professional",
+          "why"
+        ]
+      },
+      {
+        "id": "research",
+        "title": "研究与开放资料",
+        "fields": [
+          "research",
+          "primarySource"
+        ]
+      },
+      {
+        "id": "data",
+        "title": "数据与实验",
+        "fields": [
+          "data",
+          "input",
+          "output",
+          "columnMap"
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "难度与边界",
+        "fields": [
+          "limits"
+        ]
+      },
+      {
+        "id": "glossary",
+        "title": "中英术语对照",
+        "fields": [
+          "glossary10"
+        ]
+      }
+    ],
+    "terms": [
+      [
+        "液面",
+        "Liquid interface",
+        "相机中实际可见的液体边界。"
+      ],
+      [
+        "液位窗",
+        "Sight glass",
+        "让内部液位成为可见目标的观察结构。"
+      ],
+      [
+        "关键点",
+        "Keypoint",
+        "原作者标注的液面、口沿或底缘位置。"
+      ],
+      [
+        "像素行",
+        "Image row",
+        "图像纵坐标，向下增大。"
+      ],
+      [
+        "标定端点",
+        "Calibration endpoints",
+        "把像素位置换成相对高度的已知上下缘。"
+      ],
+      [
+        "高度比例",
+        "Relative fill height",
+        "在可见上下缘间的相对高度，不是体积比例。"
+      ],
+      [
+        "边缘基线",
+        "Edge baseline",
+        "以水平灰度变化寻找液面的固定方法。"
+      ],
+      [
+        "RGB",
+        "Red–green–blue",
+        "模型实际读取的三通道颜色像素。"
+      ],
+      [
+        "回归",
+        "Regression",
+        "从图像输出连续液面位置。"
+      ],
+      [
+        "时段留出",
+        "Session holdout",
+        "相近时间拍摄的照片整组用于检查或测试。"
+      ]
+    ],
+    "refs": [
+      {
+        "title": "Glasses-in-the-Wild Dataset",
+        "url": "https://zenodo.org/records/17288503",
+        "license": "CC BY4.0；Adriaens、Lips、De Coster、Verleysen、wyffels。"
+      },
+      {
+        "title": "Glasses-in-the-Wild · 透明容器液面关键点",
+        "url": "https://airo.ugent.be/open-source/",
+        "summary": "作者公开多种透明容器及复杂背景照片，标注口沿、底部与液面等关键点，支持可见液面估计研究。",
+        "boundary": "本课重建小型CNN，使用其公开子集，不沿用作者成绩，也不把饮用容器像素实验称作储罐现场验证。"
+      }
+    ]
+  }
+]

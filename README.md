@@ -132,6 +132,14 @@ w1沿用 `welllog-layer` ID，旧测井示范脚本不再由首页加载，旧�
 
 最小输入快照、来源许可索引和训练准备脚本随仓库保存；网页按需载入单个案例。运行`npm run operations:build`整理已保存资源。数据选择、算法、适用范围和复现步骤见[案例说明](docs/采油修井增采案例说明.md)。
 
+## 运输与加工
+
+新增两个图解主题、10个案例和30个原生教学页签，继续采用录井的“问题—传统处理—智能方法—作用证据—结果”结构。入口：[运输](https://favorites-zhaoy.github.io/hw5/#/stage/transport)、[加工](https://favorites-zhaoy.github.io/hw5/#/stage/refining)。
+
+严格保留TXT的CV／TS／OPT／NLP分类，运行双端负压波、CNN、GRU、约束压气调度、Kalman漂移校正、字符文本审核和技能容量分派。真实透明容器照片、实验轴承数据、公开FCC仿真、脱丁烷塔模拟及受控情景分别标明，不改写数据对象或单位。三个页签共享当前资料和参数，可导出原始输入、参照、来源及模型哈希；弱于简单参照的结果保留。
+
+两张主题图通过内置imagegen参考已有浅色微缩图生成，只解释业务，不参与训练。运行`npm run downstream:build`整理已保存资源；数据选择、授权、算法和复现步骤见[运输加工案例说明](docs/运输加工案例说明.md)。
+
 ## 在线部署
 
 GitHub Pages从`main`分支根目录发布，`.nojekyll`让HTML、JavaScript和案例资源按静态文件提供。推送到`main`后自动部署；使用哈希路由，M1等场景链接可以直接分享。
