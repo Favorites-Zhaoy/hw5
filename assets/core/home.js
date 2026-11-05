@@ -23,7 +23,7 @@
       '<div class="atlas-cover-media" aria-hidden="true"><img class="atlas-cover-photo" src="assets/images/oilfield-cover.png" alt="" fetchpriority="high"></div>' +
       '<div class="atlas-cover-shade"></div><div class="atlas-cover-grid" aria-hidden="true"></div>' +
       '<div class="atlas-cover-content atlas-width"><div class="atlas-cover-kicker"><span class="atlas-live-dot"></span> PETRO × AI ATLAS <span class="atlas-kicker-line"></span> 从现场出发</div>' +
-      '<h1 id="cover-title">石油勘探开发的<br><span>智能化可能性地图</span></h1>' +
+      '<h1 id="cover-title">智探油气<br><span>石油勘探开发智能化探索</span></h1>' +
       '<p class="atlas-cover-desc">从石油现场的问题出发，理解专业背景与数据。<br>跟着案例看方法，再动手检查结果。</p>' +
       '<div class="atlas-cover-actions"><a class="atlas-btn atlas-btn-red" href="#/chain">探索五阶段课程大纲 ' + arrow + '</a>' +
       '<button class="atlas-cover-secondary atlas-cover-map" data-home-jump="stage-map">浏览课程大纲 <span>↓</span></button></div>' +

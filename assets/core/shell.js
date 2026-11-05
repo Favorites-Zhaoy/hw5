@@ -68,7 +68,7 @@
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round">' +
       '<path d="M3 17l5-6 4 3 4-6 5 4"/><circle cx="8" cy="11" r="1.6" fill="#fff" stroke="none"/>' +
       '</svg></span>' +
-      '<span class="brand-txt"><b>智能化可能性地图</b><span>Petro × AI Atlas</span></span></a>' +
+      '<span class="brand-txt"><b>智探油气</b><span>Petro × AI Atlas</span></span></a>' +
       '<nav class="nav">' +
       '<a class="nav-keep' + on('home') + '" href="#/">总览</a>' +
       '<a class="nav-keep' + on('chain') + '" href="#/chain">作业链</a>' +
@@ -1073,7 +1073,7 @@
       if (rb) rb.addEventListener('click', render);
     }
     if (p[0] === 'admin' && global.Admin) global.Admin.bind(view);
-    document.title = pageTitle(p) + ' · 智能化可能性地图';
+    document.title = pageTitle(p) + ' · 智探油气';
   }
 
   function pageTitle(p) {
